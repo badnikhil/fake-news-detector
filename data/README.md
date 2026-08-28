@@ -44,10 +44,10 @@ Unified schema for every parquet: `id, title, text, label, label5, label3, sourc
 (`meta` = JSON string with dataset-specific extras: ISOT subject, LIAR speaker/party/context/history counts,
 FEVER evidence pages + sentence ids, FakeNewsNet news_url + tweet count).
 
-| File | Content | Rows (2026-08-28 run) |
+| File | Content | Rows (2026-08-28 run, after the residual-artefact fix) |
 |---|---|---|
-| `processed/welfake.parquet` | WELFake after artefact stripping, empty/short drop, exact + near dedup; `split` ∈ train/val/test (80/10/10) | 60,847 (34,296 real / 26,551 fake; train 48,677 / val 6,085 / test 6,085) |
-| `processed/isot.parquet` | ISOT, same pipeline (Reuters datelines removed) | 37,608 (20,905 real / 16,703 fake; train 30,086 / val 3,761 / test 3,761) |
+| `processed/welfake.parquet` | WELFake after artefact stripping, empty/short drop, exact + near dedup; `split` ∈ train/val/test (80/10/10) | 60,799 (34,295 real / 26,504 fake; train 48,639 / val 6,080 / test 6,080) |
+| `processed/isot.parquet` | ISOT, same pipeline (Reuters datelines removed) | 37,567 (20,905 real / 16,662 fake; train 30,053 / val 3,757 / test 3,757) |
 | `processed/liar.parquet` | LIAR, official splits kept (nothing dropped), `label5`/`label3` added | 12,836 |
 | `processed/fever_subset.parquet` | balanced subset: 20,000 train + 3,000 dev (`split` = train/val) | 23,000 |
 | `processed/fnn_politifact.parquet` | FakeNewsNet PolitiFact titles (passthrough) | 1,056 |
@@ -58,13 +58,22 @@ Per-dataset counts (rows in → dropped empty / short → exact dups → near du
 and summarised in `agent-docs/README.md` / `notebooks/00_datasets.ipynb` §2.2.
 
 Pipeline (master §11.1): load → *(ISOT only: artefact-only leakage classifier on the raw text)* → strip artefacts
-(Reuters datelines / `(Reuters)`, "Featured image via…", "Read more:", "21st Century Wire says…", URLs, e-mails,
-@handles, pic.twitter.com) → NFKC + quote/whitespace normalisation (case kept) → drop empty and < 20-token texts
+from text **and title** (`src/preprocess/artefacts.py`, 25 text + 2 title patterns: Reuters datelines / `(Reuters)`,
+"Featured image via/by/: …", "Read more:", "21st Century Wire says…" / "SUPPORT 21WIRE" / "Continue this story at …",
+URLs, e-mails, @handles, pic.twitter.com and the `pic. twitter.` / `https: .` / `( )` / tweet-time-stamp debris of
+WELFake's own tokenisation, photo / image credits ("Photo: … via Getty Images", "(Photo by AFP)", "Image credit: …"),
+"Via: <outlet>" source lines, embed captions ("Watch it below:", "Here's the video via YouTube"), bylines ("Follow X on
+Twitter", "X is a reporter for Breitbart …"), bracketed format tags `[VIDEO]` / `(IMAGES)` in text and titles, and trailing
+outlet suffixes in titles (" - Breitbart", " - The New York Times", closed list); per-pattern document counts are in
+`docs/mse1_make_data.log`) → NFKC + quote/whitespace normalisation (case kept) → drop empty and < 20-token texts
 (articles only) → exact dedup (SHA-1 of normalised text) → near dedup (MinHash, word 5-gram shingles, 128 perms,
 Jaccard ≥ 0.9) → stratified 80/10/10 split (`random_state=42`) → cross-split overlap assertion (0) → parquet + CSVs.
 
 Known residuals (deliberately kept, discussed in the EDA / leakage section): the bare word "Reuters" inside prose
-("… told Reuters", "Reuters reported") still occurs in ~5,000 processed ISOT articles — only the dateline / "(Reuters)"
-token is an artefact; ISOT fake articles also carry the source's apostrophe-stripping quirk ("couldn t", "Trump s").
-WELFake loses 11,287 rows (empty/whitespace-only texts, < 20 tokens, 8,239 exact + 476 near duplicates — mostly in the fake
-class, so the processed set is 56 % real / 44 % fake); ISOT loses 7,290 (5,402 exact duplicates are a known ISOT quirk).
+("… told Reuters", "Reuters reported") still occurs in ~4,900 processed ISOT articles — only the dateline / "(Reuters)"
+token is an artefact; likewise prose uses of "via", "video", "Twitter", "below", "Breitbart" and the site name "21WIRE"
+inside sentences stay (after the fix "twitter" occurs in 10.9 % of fake vs 10.1 % of real WELFake docs; "via" 7.4 % vs
+2.8 %, "video" 12.8 % vs 6.1 % — register, not boiler-plate); ISOT fake articles also carry the source's
+apostrophe-stripping quirk ("couldn t", "Trump s"). WELFake loses 11,335 rows (1,591 empty, 1,047 < 20 tokens, 8,217 exact +
+480 near duplicates — mostly in the fake class, so the processed set is 56 % real / 44 % fake); ISOT loses 7,331 (5,380 exact
+duplicates are a known ISOT quirk). The first MSE1 run (before the residual-artefact fix) gave 60,847 / 37,608 rows.

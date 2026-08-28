@@ -1,58 +1,58 @@
-17:41:06 INFO make data started 2026-08-28T17:41:06 | seed=42 | datasets=['welfake', 'isot', 'liar', 'fever_subset', 'fnn_politifact']
-17:41:09 INFO [welfake] rows in: 72,134 | labels: fake=37,106, real=35,028
-17:41:50 INFO [welfake] artefact patterns stripped (docs matched): {'dateline': 21061, 'reuters': 21283, 'featured_image': 7192, 'read_more': 3146, 'wire': 748, 'url': 4899, 'pic_twitter': 4009, 'email': 299, 'handle': 10111}
-17:42:03 INFO [welfake] dropped empty=1,574 short(<20 tok)=998 -> 69,562
-17:42:09 INFO [welfake] exact duplicates removed: 8,239 -> 61,323
-17:43:35 INFO [welfake] near duplicates removed (MinHash Jaccard ≥ 0.90): 476 -> 60,847  (86.0s)
-17:43:36 INFO [welfake] split report:
+19:18:42 INFO make data started 2026-08-28T19:18:42 | seed=42 | datasets=['welfake', 'isot', 'liar', 'fever_subset', 'fnn_politifact']
+19:18:44 INFO [welfake] rows in: 72,134 | labels: fake=37,106, real=35,028
+19:20:47 INFO [welfake] artefact patterns stripped (docs matched): {'dateline': 21061, 'reuters': 224, 'featured_image': 8706, 'read_more': 3146, 'wire': 746, 'support_21wire': 118, 'continue_story': 106, 'url': 4766, 'pic_twitter': 4360, 'http_stub': 293, 'tweet_stamp': 6832, 'email': 1115, 'handle': 5866, 'paren_photo': 171, 'photo_credit': 638, 'image_credit': 67, 'getty': 217, 'via_source': 3578, 'source_line': 1256, 'watch_below': 3408, 'heres_video': 1244, 'follow_twitter': 2430, 'byline': 499, 'email_tips': 89, 'format_tag': 305, 'empty_parens': 1058, 'title_format_tag': 9480, 'title_outlet_suffix': 9232}
+19:20:59 INFO [welfake] dropped empty=1,591 short(<20 tok)=1,047 -> 69,496
+19:21:07 INFO [welfake] exact duplicates removed: 8,217 -> 61,279
+19:22:34 INFO [welfake] near duplicates removed (MinHash Jaccard ≥ 0.90): 480 -> 60,799  (87.6s)
+19:22:34 INFO [welfake] split report:
 split  rows  fraction  p(real)  p(fake)  max_class_dev
-train 48677       0.8   0.5636   0.4364            0.0
-  val  6085       0.1   0.5637   0.4363            0.0
- test  6085       0.1   0.5637   0.4363            0.0
-17:43:43 INFO [welfake] cross-split overlap (must be 0): {'exact_train_val': 0, 'exact_train_test': 0, 'near_train_val': 0, 'near_train_test': 0}
-17:43:44 INFO wrote /home/nikhil/Desktop/nlp/data/processed/welfake.parquet (60,847 rows, 128.0 MB)
-17:43:45 INFO [welfake] split CSVs written: {'train': 48677, 'val': 6085, 'test': 6085}
-17:43:45 INFO [welfake] rows out: 60,847 | labels: fake=26,551, real=34,296 | 155.7s
-17:43:46 INFO [isot] rows in: 44,898 | labels: fake=23,481, real=21,417
-17:43:54 INFO [isot] ARTEFACT-ONLY classifier (LR on pattern counts, 5-fold CV) accuracy = 0.9959 ± 0.0005  (8.5s)
-17:43:54 INFO [isot]   fraction of docs containing each pattern: {'dateline': 0.4689, 'reuters': 0.4734, 'featured_image': 0.1563, 'read_more': 0.0589, 'wire': 0.0164, 'url': 0.0757, 'pic_twitter': 0.0774, 'email': 0.0012, 'handle': 0.1416}
-17:44:12 INFO [isot] artefact patterns stripped (docs matched): {'dateline': 21054, 'reuters': 21256, 'featured_image': 7018, 'read_more': 2646, 'wire': 735, 'url': 3399, 'pic_twitter': 3474, 'email': 54, 'handle': 6357}
-17:44:17 INFO [isot] dropped empty=1,422 short(<20 tok)=432 -> 43,044
-17:44:20 INFO [isot] exact duplicates removed: 5,402 -> 37,642
-17:45:04 INFO [isot] near duplicates removed (MinHash Jaccard ≥ 0.90): 34 -> 37,608  (43.7s)
-17:45:04 INFO [isot] split report:
+train 48639       0.8   0.5641   0.4359         0.0000
+  val  6080       0.1   0.5641   0.4359         0.0001
+ test  6080       0.1   0.5641   0.4359         0.0001
+19:22:41 INFO [welfake] cross-split overlap (must be 0): {'exact_train_val': 0, 'exact_train_test': 0, 'near_train_val': 0, 'near_train_test': 0}
+19:22:42 INFO wrote /home/nikhil/Desktop/nlp/data/processed/welfake.parquet (60,799 rows, 127.4 MB)
+19:22:42 INFO [welfake] split CSVs written: {'train': 48639, 'val': 6080, 'test': 6080}
+19:22:43 INFO [welfake] rows out: 60,799 | labels: fake=26,504, real=34,295 | 238.6s
+19:22:44 INFO [isot] rows in: 44,898 | labels: fake=23,481, real=21,417
+19:23:40 INFO [isot] ARTEFACT-ONLY classifier (LR on pattern counts, 5-fold CV) accuracy = 0.9973 ± 0.0006  (55.8s)
+19:23:40 INFO [isot]   fraction of docs containing each pattern: {'dateline': 0.4689, 'reuters': 0.4734, 'featured_image': 0.1882, 'read_more': 0.0589, 'wire': 0.0164, 'support_21wire': 0.018, 'continue_story': 0.0078, 'url': 0.0757, 'pic_twitter': 0.0774, 'http_stub': 0.0, 'tweet_stamp': 0.1213, 'email': 0.0012, 'handle': 0.1416, 'paren_photo': 0.0008, 'photo_credit': 0.0318, 'image_credit': 0.0035, 'getty': 0.0906, 'via_source': 0.0802, 'source_line': 0.0202, 'watch_below': 0.0683, 'heres_video': 0.0239, 'follow_twitter': 0.0004, 'byline': 0.0002, 'email_tips': 0.0, 'format_tag': 0.0037, 'empty_parens': 0.0016}
+19:24:35 INFO [isot] artefact patterns stripped (docs matched): {'dateline': 21054, 'reuters': 204, 'featured_image': 8448, 'read_more': 2646, 'wire': 733, 'support_21wire': 104, 'continue_story': 106, 'url': 3275, 'pic_twitter': 3397, 'http_stub': 0, 'tweet_stamp': 5324, 'email': 35, 'handle': 2825, 'paren_photo': 20, 'photo_credit': 462, 'image_credit': 27, 'getty': 104, 'via_source': 3543, 'source_line': 862, 'watch_below': 2866, 'heres_video': 1097, 'follow_twitter': 17, 'byline': 9, 'email_tips': 0, 'format_tag': 151, 'empty_parens': 235, 'title_format_tag': 9096, 'title_outlet_suffix': 14}
+19:24:40 INFO [isot] dropped empty=1,439 short(<20 tok)=478 -> 42,981
+19:24:43 INFO [isot] exact duplicates removed: 5,380 -> 37,601
+19:25:25 INFO [isot] near duplicates removed (MinHash Jaccard ≥ 0.90): 34 -> 37,567  (42.0s)
+19:25:25 INFO [isot] split report:
 split  rows  fraction  p(real)  p(fake)  max_class_dev
-train 30086       0.8   0.5558   0.4442         0.0000
-  val  3761       0.1   0.5560   0.4440         0.0001
- test  3761       0.1   0.5560   0.4440         0.0001
-17:45:07 INFO [isot] cross-split overlap (must be 0): {'exact_train_val': 0, 'exact_train_test': 0, 'near_train_val': 0, 'near_train_test': 0}
-17:45:08 INFO wrote /home/nikhil/Desktop/nlp/data/processed/isot.parquet (37,608 rows, 56.3 MB)
-17:45:08 INFO [isot] split CSVs written: {'train': 30086, 'val': 3761, 'test': 3761}
-17:45:08 INFO [isot] rows out: 37,608 | labels: fake=16,703, real=20,905 | 82.4s
-17:45:08 INFO [liar] rows in: 12,836 | official splits: {'train': 10269, 'val': 1284, 'test': 1283}
-17:45:08 INFO [liar] 6-way labels: barely-true=2,108, false=2,511, half-true=2,638, mostly-true=2,466, pants-fire=1,050, true=2,063
-17:45:08 INFO [liar] dropped empty=0; exact duplicate statements present=33 (KEPT: official splits are frozen)
-17:45:08 INFO [liar] label5: FAKE=3,561, MISLEADING=2,108, PARTIALLY TRUE=2,638, REAL=4,529 | label3: FALSE=3,561, MIXED=4,746, TRUE=4,529
-17:45:09 INFO wrote /home/nikhil/Desktop/nlp/data/processed/liar.parquet (12,836 rows, 1.9 MB)
-17:45:09 INFO [liar] split CSVs written: {'train': 10269, 'val': 1284, 'test': 1283}
-17:45:10 INFO [fever] train full: 145,449 | NEUTRAL=35,639, REFUTES=29,775, SUPPORTS=80,035
-17:45:11 INFO [fever] train subset: 20,000 | NEUTRAL=6,667, REFUTES=6,667, SUPPORTS=6,666 (exact dups removed before sampling: 9984)
-17:45:11 INFO [fever] val full: 19,998 | NEUTRAL=6,666, REFUTES=6,666, SUPPORTS=6,666
-17:45:11 INFO [fever] val subset: 3,000 | NEUTRAL=1,000, REFUTES=1,000, SUPPORTS=1,000 (exact dups removed before sampling: 404)
-17:45:11 INFO wrote /home/nikhil/Desktop/nlp/data/processed/fever_subset.parquet (23,000 rows, 1.4 MB)
-17:45:11 INFO [fnn_politifact] rows in: 1,056 | fake=432, real=624
-17:45:11 INFO [fnn_politifact] dropped empty titles=0; duplicate titles present=75 (kept: passthrough)
-17:45:11 INFO wrote /home/nikhil/Desktop/nlp/data/processed/fnn_politifact.parquet (1,056 rows, 0.2 MB)
-17:45:11 INFO ====================================================================================================
-17:45:11 INFO SUMMARY (rows in -> dropped empty / short -> exact dups -> near dups -> rows out)
-17:45:11 INFO 
+train 30053       0.8   0.5565   0.4435         0.0000
+  val  3757       0.1   0.5566   0.4434         0.0001
+ test  3757       0.1   0.5566   0.4434         0.0001
+19:25:28 INFO [isot] cross-split overlap (must be 0): {'exact_train_val': 0, 'exact_train_test': 0, 'near_train_val': 0, 'near_train_test': 0}
+19:25:29 INFO wrote /home/nikhil/Desktop/nlp/data/processed/isot.parquet (37,567 rows, 56.0 MB)
+19:25:29 INFO [isot] split CSVs written: {'train': 30053, 'val': 3757, 'test': 3757}
+19:25:29 INFO [isot] rows out: 37,567 | labels: fake=16,662, real=20,905 | 165.2s
+19:25:29 INFO [liar] rows in: 12,836 | official splits: {'train': 10269, 'val': 1284, 'test': 1283}
+19:25:29 INFO [liar] 6-way labels: barely-true=2,108, false=2,511, half-true=2,638, mostly-true=2,466, pants-fire=1,050, true=2,063
+19:25:29 INFO [liar] dropped empty=0; exact duplicate statements present=33 (KEPT: official splits are frozen)
+19:25:29 INFO [liar] label5: FAKE=3,561, MISLEADING=2,108, PARTIALLY TRUE=2,638, REAL=4,529 | label3: FALSE=3,561, MIXED=4,746, TRUE=4,529
+19:25:29 INFO wrote /home/nikhil/Desktop/nlp/data/processed/liar.parquet (12,836 rows, 1.9 MB)
+19:25:29 INFO [liar] split CSVs written: {'train': 10269, 'val': 1284, 'test': 1283}
+19:25:31 INFO [fever] train full: 145,449 | NEUTRAL=35,639, REFUTES=29,775, SUPPORTS=80,035
+19:25:32 INFO [fever] train subset: 20,000 | NEUTRAL=6,667, REFUTES=6,667, SUPPORTS=6,666 (exact dups removed before sampling: 9984)
+19:25:32 INFO [fever] val full: 19,998 | NEUTRAL=6,666, REFUTES=6,666, SUPPORTS=6,666
+19:25:32 INFO [fever] val subset: 3,000 | NEUTRAL=1,000, REFUTES=1,000, SUPPORTS=1,000 (exact dups removed before sampling: 404)
+19:25:32 INFO wrote /home/nikhil/Desktop/nlp/data/processed/fever_subset.parquet (23,000 rows, 1.4 MB)
+19:25:32 INFO [fnn_politifact] rows in: 1,056 | fake=432, real=624
+19:25:32 INFO [fnn_politifact] dropped empty titles=0; duplicate titles present=75 (kept: passthrough)
+19:25:32 INFO wrote /home/nikhil/Desktop/nlp/data/processed/fnn_politifact.parquet (1,056 rows, 0.2 MB)
+19:25:32 INFO ====================================================================================================
+19:25:32 INFO SUMMARY (rows in -> dropped empty / short -> exact dups -> near dups -> rows out)
+19:25:32 INFO 
        dataset  rows_in  dropped_empty  dropped_short  exact_dups_removed  near_dups_removed  rows_out  seconds
-       welfake    72134           1574            998                8239                476     60847    155.7
-          isot    44898           1422            432                5402                 34     37608     82.4
+       welfake    72134           1591           1047                8217                480     60799    238.6
+          isot    44898           1439            478                5380                 34     37567    165.2
           liar    12836              0              0                   0                  0     12836      0.2
-  fever_subset   165447              0              0               10388                  0     23000      1.4
+  fever_subset   165447              0              0               10388                  0     23000      1.3
 fnn_politifact     1056              0              0                   0                  0      1056      0.0
-17:45:11 INFO cross-split overlap welfake: {'exact_train_val': 0, 'exact_train_test': 0, 'near_train_val': 0, 'near_train_test': 0}
-17:45:11 INFO artefact-only classifier accuracy on raw isot: 0.9959
-17:45:11 INFO cross-split overlap isot: {'exact_train_val': 0, 'exact_train_test': 0, 'near_train_val': 0, 'near_train_test': 0}
-17:45:11 INFO make data finished in 245.2s (4.1 min)
+19:25:32 INFO cross-split overlap welfake: {'exact_train_val': 0, 'exact_train_test': 0, 'near_train_val': 0, 'near_train_test': 0}
+19:25:32 INFO artefact-only classifier accuracy on raw isot: 0.9973
+19:25:32 INFO cross-split overlap isot: {'exact_train_val': 0, 'exact_train_test': 0, 'near_train_val': 0, 'near_train_test': 0}
+19:25:32 INFO make data finished in 410.7s (6.8 min)
