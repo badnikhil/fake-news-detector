@@ -17,7 +17,7 @@ date: "v1.1 — 28 August 2026 (Definition-of-Done ticked against the repository
 | **Document** | v1.1, 28 Aug 2026 (v1.0 written 27 Aug). Companion to the master document `docs/FakeNewsDetector_ProjectDetails.md` (v2.1); all file names, dataset IDs and objective numbers follow it. |
 | **Repository** | https://github.com/badnikhil/fake-news-detector (branch `main`); local clone `/home/nikhil/Desktop/nlp` |
 
-> **MSE1 status — 28 Aug 2026, commit `MSE1_STATUS_COMMIT`.** Every code artefact in this document exists in the repository and was regenerated end-to-end on the dev laptop on that date (`make data` twice, byte-identical → `make train-baselines` → `make nb-run-baselines` → `make nb-run` → `make eda` → `make test` (102 passed) → `make paper`), and the same sequence succeeded in a fresh `git clone` with only `data/raw/` copied in. To reproduce: `make setup && make download && make data && make test && make train-baselines && make nb-run-baselines && make nb-run && make eda && make paper` (≈ 25 min CPU after the download). Ticked boxes below (`[x]`) were verified by running the check; unticked ones carry an italic note saying why. What is still missing is team practice, not artefacts: the slide deck `docs/mse1_slides.pdf`, the dry-run viva, and the per-member "explain two papers" rehearsal.
+> **MSE1 status — 28 Aug 2026, commits `4ad179a` → `e2a870d` → `4e0a9b1` on `main` (this status note itself lands in the follow-up commit).** Every code artefact in this document exists in the repository and was regenerated end-to-end on the dev laptop on that date (`make data` twice, byte-identical → `make train-baselines` → `make nb-run-baselines` → `make nb-run` → `make eda` → `make test` (102 passed) → `make paper`), and the same sequence succeeded in a fresh `git clone` with only `data/raw/` copied in. To reproduce: `make setup && make download && make data && make test && make train-baselines && make nb-run-baselines && make nb-run && make eda && make paper` (≈ 25 min CPU after the download). Ticked boxes below (`[x]`) were verified by running the check; unticked ones carry an italic note saying why. What is still missing is team practice, not artefacts: the slide deck `docs/mse1_slides.pdf`, the dry-run viva, and the per-member "explain two papers" rehearsal.
 
 ## MSE 1 marking scheme (as on the evaluation form)
 
@@ -153,7 +153,7 @@ Raw counts must equal the table (processed WELFake/ISOT are smaller after de-dup
 - [x] Split proportions are 80/10/10 ± 0.5% and class proportions in each split match the full dataset ± 1% (stratification). *(`test_split_ratios`, `test_split_stratified`)*
 - [x] `grep -c "(Reuters)" ` on the processed ISOT text returns 0; the artefact-only classifier's ISOT accuracy is reported (expected: very high, ≥ 0.9 — measured 0.9973 ± 0.0006 on 2026-08-28 with the 26 text patterns, logged in `docs/mse1_make_data.log`).
 - [x] Cased text is preserved in the parquet; lower-casing happens inside the TF-IDF vectoriser only. *(`test_cased_text_preserved`)*
-- [x] `data/processed/` and `data/splits/` are reproducible from a fresh clone + raw files by following `data/README.md`. *(FRESH_CLONE_NOTE)*
+- [x] `data/processed/` and `data/splits/` are reproducible from a fresh clone + raw files by following `data/README.md`. *(verified 28 Aug 20:00: `git clone` of commit `4e0a9b1` into a scratch directory with only `.venv` and `data/raw/` linked in → `make data` 6.8 min, all 14 split CSVs / parquets byte-identical to the main checkout, `make test` 101 passed + 1 skipped (the saved-model test skips without `make train-baselines`), `make paper` 5 pages, no undefined citations)*
 
 **How the examiner can verify it in ≤ 3 minutes.**
 
@@ -378,7 +378,7 @@ Rules: laptop pre-opened with all notebooks executed and figures visible; `make 
 
 # 6. Pre-MSE1 checklist (the day before)
 
-- [x] Fresh-clone test on one member's laptop: `make setup` → copy raw data → `make data` → three notebooks "Run All" without error. *(FRESH_CLONE_NOTE2; repeat on a second member's laptop before the viva)*
+- [x] Fresh-clone test on one member's laptop: `make setup` → copy raw data → `make data` → three notebooks "Run All" without error. *(done 28 Aug on the dev laptop from commit `4e0a9b1`: clone + `data/raw/` → `make data` → `make test` (101 passed, 1 skipped) → `make paper` all green; the three notebooks were executed in the main checkout the same evening; repeat on a second member's laptop before the viva)*
 - [x] `ls docs/figures/eda_*.png | wc -l` ≥ 10; `docs/eda_summary.md` complete. *(18)*
 - [x] `notebooks/02_baselines.ipynb` shows LR val accuracy/macro-F1; `docs/results/classifier_table.md` has the LR row. *(six MSE1 rows)*
 - [x] `paper/main.pdf` builds; §I–II present; `refs.bib` ≥ 15 entries; `docs/literature_table.md` has no `[fill]` cells.
