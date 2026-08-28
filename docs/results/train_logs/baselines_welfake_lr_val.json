@@ -1,0 +1,53 @@
+{
+  "dataset": "welfake",
+  "model": "lr",
+  "split": "val",
+  "n_train": 48677,
+  "n_eval": 6085,
+  "accuracy": 0.9470829909613805,
+  "precision_macro": 0.9463472758188498,
+  "recall_macro": 0.9460402562962231,
+  "f1_macro": 0.9461920502521328,
+  "precision_fake": 0.9406875708349074,
+  "recall_fake": 0.9378531073446328,
+  "f1_fake": 0.9392682006789891,
+  "confusion": [
+    [
+      3273,
+      157
+    ],
+    [
+      165,
+      2490
+    ]
+  ],
+  "vectoriser_seconds": 52.747160326001904,
+  "fit_seconds": 4.371799306998582,
+  "predict_seconds": 0.007649144001334207,
+  "n_features": 100000,
+  "params": {
+    "tfidf": {
+      "ngram_range": [
+        1,
+        2
+      ],
+      "max_features": 100000,
+      "sublinear_tf": true,
+      "lowercase": true,
+      "min_df": 2,
+      "max_df": 0.95,
+      "strip_accents": "unicode"
+    },
+    "clf": {
+      "C": 1.0,
+      "max_iter": 1000,
+      "solver": "liblinear"
+    }
+  },
+  "artefact": "data/models/tfidf_lr_welfake_v0.joblib",
+  "train_seconds": 57.118959633000486,
+  "labels": [
+    "real",
+    "fake"
+  ]
+}

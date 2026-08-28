@@ -4,7 +4,7 @@
 
 B.Tech semester project (NLP, Dept. of CSE-AI/ML, KIET Group of Institutions, Aug–Dec 2026). A locally runnable web app that takes a headline / article / URL, extracts claims, retrieves evidence (online free sources + an offline FAISS fact-check index), runs NLI stance detection, checks dates ("old news presented as new"), and fuses everything into one of five verdicts — **REAL / FAKE / PARTIALLY TRUE / MISLEADING / UNVERIFIABLE** — with confidence, evidence cards (source + date) and a plain-language explanation. Team of five: Navishka Sharma, Naitik Kukreja, Naveen, Prateek Srivastava, Nikhil.
 
-**Current status: MSE1 foundation built (2026-08-28)** — env, `make download`, `make data`, `notebooks/00_datasets.ipynb`, `tests/test_data.py`. Not yet: EDA notebook, LR baseline, models, retrieval, API, UI.
+**Current status: MSE1 foundation + TF-IDF baselines built (2026-08-28)** — env, `make download`, `make data`, `notebooks/00_datasets.ipynb`, `tests/test_data.py`; `make train-baselines` (NB/LR/SVM on WELFake + ISOT → `data/models/tfidf_*_v0.joblib`, `docs/results/classifier_table.md`), `notebooks/02_baselines.ipynb`, `docs/model_identification.md`, `tests/test_models.py`. Not yet: DistilBERT, retrieval, stance, API, UI (MSE2/ESE).
 
 ## Where things are
 
@@ -14,6 +14,7 @@ B.Tech semester project (NLP, Dept. of CSE-AI/ML, KIET Group of Institutions, Au
 - `data/README.md` — dataset provenance table (URL, licence, SHA-256, download date, rows) + label conventions + processed layout.
 - Code: `src/config.py` (paths, seed 42, split ratios, label maps, `SCHEMA`), `src/preprocess/{load,artefacts,clean,dedupe,split,run_all}.py`, `scripts/download_data.py`, `src/common/seed.py`; stubs with docstrings for `src/{ingest,models,claims,evidence,stance,temporal,fusion,explain,api,eval}`.
 - `notebooks/00_datasets.ipynb` is generated from `scripts/build_notebook_00.py` and executed in place with `make nb-run` (outputs are saved on purpose — examiners need them; never `nbstripout` before a viva).
+- `src/models/baselines.py` — TF-IDF + NB/LR/SVM: `load_split` (joins `data/splits/*.csv` by id — never re-split), `fit_eval_all` (one TF-IDF per dataset shared by the three classifiers, val metrics), `top_coefficients` / `find_leak_tokens`, `render_classifier_table` (writes `docs/results/classifier_table.md` from `docs/results/train_logs/baselines_*.json`); CLI `python -m src.models.baselines --dataset welfake --model lr`. `src/models/tfidf_baselines.py` is only an alias (the docs use that name). `notebooks/02_baselines.ipynb` is generated from `scripts/build_notebook_02.py` and executed with `make nb-run-baselines`. Viva artefact: `docs/model_identification.md`.
 
 ## How to run
 
@@ -23,6 +24,8 @@ make download    # data/raw/ (WELFake via Zenodo API, ISOT via UVic zip, LIAR vi
 make data        # src.preprocess.run_all -> data/processed/*.parquet + data/splits/*.csv ; log tee'd to docs/mse1_make_data.log (~5 min)
 make test        # pytest tests/
 make nb-run      # execute notebooks/00_datasets.ipynb in place
+make train-baselines   # TF-IDF + NB/LR/SVM on WELFake + ISOT (train -> val, ~2 min CPU, peak RSS ~2.6 GB) -> data/models/, docs/results/
+make nb-run-baselines  # build + execute notebooks/02_baselines.ipynb in place (~2.5 min)
 ```
 
 Always use the venv interpreter (`.venv/bin/python`, `PY=.venv/bin/python` in the Makefile); the system `python3` (3.12) has no pandas.
@@ -36,6 +39,8 @@ Always use the venv interpreter (`.venv/bin/python`, `PY=.venv/bin/python` in th
 
 ## Data conventions (decided at MSE1; see data/README.md)
 
+- **ISOT ⊂ WELFake**: 99.94 % of processed ISOT texts occur verbatim in processed WELFake (WELFake = Kaggle + McIntire + Reuters/ISOT + BuzzFeed). "Train WELFake → test ISOT" is therefore in-domain, not cross-dataset — use the hash-join-defined WELFake∖ISOT subset as the second domain (see `docs/model_identification.md` §4.2).
+- Baseline evaluation at MSE1 is on **val** only; the test splits are untouched until MSE2. The classifier is a style signal (LR val macro-F1 0.946 WELFake, 0.984 ISOT; ISOT → WELFake 0.83); residual artefacts (`[VIDEO]` titles, photo credits `via Getty`, ` - Breitbart` title suffix, `pic. twitter.` / `https: .` stubs) are still in the processed text — preprocessing follow-up for MSE2.
 - WELFake CSV `label`: **0 = real, 1 = fake** (the Zenodo/Kaggle blurb is wrong; verified by artefact rates and the paper's counts).
 - Unified parquet schema: `id, title, text, label, label5, label3, source_dataset, date, split, meta` for every dataset. Text is cased; artefacts (Reuters datelines, "Featured image via", URLs, handles…) already stripped for WELFake/ISOT.
 - Splits: stratified 80/10/10 seed 42 for WELFake/ISOT (`data/splits/*.csv`, `id,label`, sorted by id — byte-identical across runs); LIAR official; FEVER balanced 20k/3k.
