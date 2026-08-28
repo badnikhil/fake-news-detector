@@ -72,7 +72,9 @@ TFIDF_DEFAULTS = dict(
 # "top coefficients contain no leakage tokens").  Checked as whole tokens *and* as parts of bigrams.
 LEAK_TOKENS = {
     "reuters", "featured", "image", "getty", "pic", "twitter", "com", "http", "https", "www",
-    "video", "via", "wire", "21st", "century", "read", "images", "ap", "afp", "bbc", "cnn",
+    "video", "via", "wire", "21st", "century", "21wire", "read", "images", "ap", "afp", "bbc", "cnn",
+    # residual publisher / format tokens found in the first MSE1 run (2026-08-28) and stripped since
+    "breitbart", "follow", "photo", "screenshot", "screengrab", "york times", "nytimes", "politico",
 }
 
 
@@ -334,7 +336,7 @@ PENDING_ROWS = [
     ("DistilBERT-base-uncased fine-tuned (best of 6-config sweep)", "WELFake", "val", "MSE2 — `docs/results/distilbert_sweep.md`"),
     ("DistilBERT-base-uncased fine-tuned", "WELFake", "test", "MSE2 — final number; ROC-AUC + `docs/figures/cm_distilbert_welfake.png`"),
     ("Best classical + DistilBERT", "ISOT", "test", "MSE2 — in-domain ISOT (leakage story)"),
-    ("Cross-dataset: WELFake∖ISOT ↔ ISOT (redesigned)", "WELFake∖ISOT ↔ ISOT", "test", "MSE2 — `docs/results/cross_dataset.md`, with / without artefact removal. **Redesign needed:** 99.94 % of ISOT texts occur verbatim in WELFake (MSE1 finding, `docs/model_identification.md` §4.2), so WELFake → ISOT is in-domain; use the hash-join-defined WELFake∖ISOT subset as the second domain"),
+    ("Cross-dataset: WELFake∖ISOT ↔ ISOT (redesigned)", "WELFake∖ISOT ↔ ISOT", "test", "MSE2 — `docs/results/cross_dataset.md`, with / without artefact removal. **Protocol (master §18):** ≈ 99.9 % of processed ISOT texts occur verbatim in WELFake (MSE1 finding, `docs/model_identification.md` §4.2), so WELFake → ISOT is in-domain; train on the hash-join-defined WELFake∖ISOT subset (≈ 23.3k rows, near-duplicates removed) as the second domain"),
     ("DistilBERT (or TF-IDF + LR) LIAR 3-way head", "LIAR", "test", "MSE2 — `docs/results/liar_head.md`"),
 ]
 

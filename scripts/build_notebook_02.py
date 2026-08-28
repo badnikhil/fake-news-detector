@@ -131,10 +131,16 @@ for t in (leak_fake + leak_real)[:4]:
     hits = [pat.search(x).group(0).replace("\\n", " ") for x in X_train_txt[train.label == "fake"].head(4000) if pat.search(x)][:3]
     print(f"\\n[{t}] e.g.:"); [print("   …", h, "…") for h in hits]""")
 
-md("""**Reading the coefficients.** Politically loaded, sensational and second-person tokens (e.g. *hillary*, *you*, *breaking*, *video*, *just*) drive
-predictions towards *fake*; wire-service register (*said on*, *washington*, *reuters*/*minister*, *percent*, dates) drives them towards *real*. This is a
+md("""**Reading the coefficients.** Politically loaded, sensational and second-person tokens (e.g. *hillary*, *you*, *breaking*, *just*) drive
+predictions towards *fake*; wire-service register (*said on*, *washington*, *minister*, *percent*, weekday tokens) drives them towards *real*. This is a
 **style / register** signal, not a truth signal — it is exactly why the classifier only adjusts confidence in the fusion (master §14) and why the
-cross-dataset drop (§18) is expected. Tokens flagged above are recorded in `agent-docs/README.md` and `docs/model_identification.md` as a preprocessing follow-up.""")
+cross-dataset drop (§18) is expected.
+
+*History of this check.* The first MSE1 run (v0, 2026-08-28 morning) flagged `via` (#1 → fake), `video`, `image`, `breitbart` (#1 → real), `on twitter`, `follow`
+— publisher / format boiler-plate that `src/preprocess/artefacts.py` did not yet strip (`[VIDEO]` title tags, photo credits "via Getty Images",
+" - Breitbart" title suffixes, "Follow X on Twitter" bylines, `pic. twitter.` / `https: .` stubs). Those patterns were added to the preprocessing
+the same day, `make data` was re-run and this notebook re-executed; the table above is the result. Anything still flagged is discussed honestly in
+`docs/model_identification.md` §4.1 (e.g. prose uses of *video* / *twitter* are content, not artefacts).""")
 
 md("""## 3. Train-size sanity check (learning curve, LR)
 

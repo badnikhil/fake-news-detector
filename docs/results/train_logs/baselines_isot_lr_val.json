@@ -2,28 +2,28 @@
   "dataset": "isot",
   "model": "lr",
   "split": "val",
-  "n_train": 30086,
-  "n_eval": 3761,
-  "accuracy": 0.9843126827971285,
-  "precision_macro": 0.9843181691809684,
-  "recall_macro": 0.9839026394843026,
-  "f1_macro": 0.9841068613903644,
-  "precision_fake": 0.9843656043295249,
-  "recall_fake": 0.9802395209580839,
-  "f1_fake": 0.9822982298229823,
+  "n_train": 30053,
+  "n_eval": 3757,
+  "accuracy": 0.9824327921213735,
+  "precision_macro": 0.9829670614455646,
+  "recall_macro": 0.9814730770356923,
+  "f1_macro": 0.9821782494173982,
+  "precision_fake": 0.98721071863581,
+  "recall_fake": 0.9729891956782714,
+  "f1_fake": 0.9800483675937122,
   "confusion": [
     [
-      2065,
-      26
+      2070,
+      21
     ],
     [
-      33,
-      1637
+      45,
+      1621
     ]
   ],
-  "vectoriser_seconds": 26.932907284000976,
-  "fit_seconds": 2.3922791160002816,
-  "predict_seconds": 0.005519518999790307,
+  "vectoriser_seconds": 19.96401162999973,
+  "fit_seconds": 1.7159692929999437,
+  "predict_seconds": 0.004734368994832039,
   "n_features": 100000,
   "params": {
     "tfidf": {
@@ -45,7 +45,7 @@
     }
   },
   "artefact": "data/models/tfidf_lr_isot_v0.joblib",
-  "train_seconds": 29.325186400001257,
+  "train_seconds": 21.679980922999675,
   "labels": [
     "real",
     "fake"

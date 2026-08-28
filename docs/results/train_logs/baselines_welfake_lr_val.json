@@ -2,28 +2,28 @@
   "dataset": "welfake",
   "model": "lr",
   "split": "val",
-  "n_train": 48677,
-  "n_eval": 6085,
-  "accuracy": 0.9470829909613805,
-  "precision_macro": 0.9463472758188498,
-  "recall_macro": 0.9460402562962231,
-  "f1_macro": 0.9461920502521328,
-  "precision_fake": 0.9406875708349074,
-  "recall_fake": 0.9378531073446328,
-  "f1_fake": 0.9392682006789891,
+  "n_train": 48639,
+  "n_eval": 6080,
+  "accuracy": 0.9327302631578948,
+  "precision_macro": 0.9315278980576518,
+  "recall_macro": 0.9317118653391276,
+  "f1_macro": 0.9316192216445269,
+  "precision_fake": 0.9220338983050848,
+  "recall_fake": 0.9237735849056604,
+  "f1_fake": 0.9229029217719132,
   "confusion": [
     [
-      3273,
-      157
+      3223,
+      207
     ],
     [
-      165,
-      2490
+      202,
+      2448
     ]
   ],
-  "vectoriser_seconds": 52.747160326001904,
-  "fit_seconds": 4.371799306998582,
-  "predict_seconds": 0.007649144001334207,
+  "vectoriser_seconds": 46.5591097600045,
+  "fit_seconds": 4.103147399000591,
+  "predict_seconds": 0.006347020003886428,
   "n_features": 100000,
   "params": {
     "tfidf": {
@@ -45,7 +45,7 @@
     }
   },
   "artefact": "data/models/tfidf_lr_welfake_v0.joblib",
-  "train_seconds": 57.118959633000486,
+  "train_seconds": 50.662257159005094,
   "labels": [
     "real",
     "fake"
