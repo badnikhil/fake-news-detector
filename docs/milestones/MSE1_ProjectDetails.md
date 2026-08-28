@@ -148,7 +148,7 @@ Raw counts must equal the table (processed WELFake/ISOT are smaller after de-dup
 - [ ] Log output reports, per dataset: rows in, rows dropped (empty/short), exact duplicates removed, near-duplicates removed, rows out.
 - [ ] Cross-split overlap check prints `0` duplicate pairs between train and test for WELFake and ISOT.
 - [ ] Split proportions are 80/10/10 ± 0.5% and class proportions in each split match the full dataset ± 1% (stratification).
-- [ ] `grep -c "(Reuters)" ` on the processed ISOT text returns 0; the artefact-only classifier's ISOT accuracy is reported (expected: very high, ≥ 0.9).
+- [ ] `grep -c "(Reuters)" ` on the processed ISOT text returns 0; the artefact-only classifier's ISOT accuracy is reported (expected: very high, ≥ 0.9 — measured 0.996 on 2026-08-28, logged in `docs/mse1_make_data.log`).
 - [ ] Cased text is preserved in the parquet; lower-casing happens inside the TF-IDF vectoriser only.
 - [ ] `data/processed/` and `data/splits/` are reproducible from a fresh clone + raw files by following `data/README.md`.
 
@@ -158,7 +158,7 @@ Raw counts must equal the table (processed WELFake/ISOT are smaller after de-dup
 make data 2>&1 | tail -30          # or, if already run: ls -la data/processed data/splits
 python -c "import pandas as pd; d=pd.read_parquet('data/processed/isot.parquet'); \
   print(d.text.str.contains('\(Reuters\)').sum())"     # expect 0
-python -c "import pandas as pd; s=pd.read_csv('data/splits/welfake_train.csv'); print(len(s))"  # ≈ 57.7k
+python -c "import pandas as pd; s=pd.read_csv('data/splits/welfake_train.csv'); print(len(s))"  # 48,677 = 80% of the 60,847 de-duplicated rows
 ```
 
 Then open `notebooks/01_eda.ipynb` at the "Before/after" cell and the leakage-token table.

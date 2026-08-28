@@ -62,3 +62,9 @@ Pipeline (master §11.1): load → *(ISOT only: artefact-only leakage classifier
 @handles, pic.twitter.com) → NFKC + quote/whitespace normalisation (case kept) → drop empty and < 20-token texts
 (articles only) → exact dedup (SHA-1 of normalised text) → near dedup (MinHash, word 5-gram shingles, 128 perms,
 Jaccard ≥ 0.9) → stratified 80/10/10 split (`random_state=42`) → cross-split overlap assertion (0) → parquet + CSVs.
+
+Known residuals (deliberately kept, discussed in the EDA / leakage section): the bare word "Reuters" inside prose
+("… told Reuters", "Reuters reported") still occurs in ~5,000 processed ISOT articles — only the dateline / "(Reuters)"
+token is an artefact; ISOT fake articles also carry the source's apostrophe-stripping quirk ("couldn t", "Trump s").
+WELFake loses 11,287 rows (empty/whitespace-only texts, < 20 tokens, 8,239 exact + 476 near duplicates — mostly in the fake
+class, so the processed set is 56 % real / 44 % fake); ISOT loses 7,290 (5,402 exact duplicates are a known ISOT quirk).
