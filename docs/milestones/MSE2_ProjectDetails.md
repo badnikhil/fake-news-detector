@@ -31,13 +31,13 @@ date: "v1.0 — 27 August 2026 (prepared for the MSE 2 window, weeks 12–13, 2�
 
 **Recap of MSE 1 (weeks 1–7).** Problem, 5-class scheme (REAL / FAKE / PARTIALLY TRUE / MISLEADING / UNVERIFIABLE) and objectives fixed; WELFake, ISOT, LIAR, FEVER-subset downloaded and schema-unified; `make data` produces cleaned, de-duplicated, artefact-stripped, stratified 80/10/10 splits (seed 42); EDA + leakage audit in `notebooks/01_eda.ipynb`; TF-IDF + LR baseline trained; paper §I–II drafted.
 
-**What exists by MSE 2 (weeks 7–12).** (1) All content classifiers trained on WELFake with pinned configs: TF-IDF + Naive Bayes / Logistic Regression / LinearSVC, (optional Bi-LSTM + GloVe), and the final **fine-tuned DistilBERT** (`data/models/distilbert-welfake-v1`); (2) the **LIAR 3-way head** (TRUE / MIXED / FALSE); (3) the stance model `cross-encoder/nli-deberta-v3-small` **evaluated on a FEVER dev subset** (fine-tune optional); (4) the **offline FAISS index** (LIAR statements + FakeNewsNet PolitiFact titles, MiniLM embeddings); (5) GridSearchCV tables for the classical models and the DistilBERT sweep table; (6) test metrics, confusion matrices, ROC curves, the **cross-dataset WELFake↔ISOT table** with leakage discussion, and an error analysis; (7) online retrieval (DuckDuckGo + Wikipedia, cached), claim identifier v1, temporal check v1 and **fusion v1 (rules R0–R9 + confidence)**; (8) **`POST /analyze` working end-to-end in `MODE=offline`** (claims → offline evidence → stance → temporal → fusion → JSON); (9) paper §III–VI drafted (≈ 5 pages); (10) Live Claims Set ≥ 60 items labelled.
+**What exists by MSE 2 (weeks 7–12).** (1) All content classifiers trained on WELFake with pinned configs: TF-IDF + Naive Bayes / Logistic Regression / LinearSVC, (optional Bi-LSTM + GloVe), and the final **fine-tuned DistilBERT** (`data/models/distilbert-welfake-v1`); (2) the **LIAR 3-way head** (TRUE / MIXED / FALSE); (3) the stance model `cross-encoder/nli-deberta-v3-small` **evaluated on a FEVER dev subset** (fine-tune optional); (4) the **offline FAISS index** (LIAR statements + FakeNewsNet PolitiFact titles, MiniLM embeddings); (5) GridSearchCV tables for the classical models and the DistilBERT sweep table; (6) test metrics, confusion matrices, ROC curves, the **cross-dataset WELFake∖ISOT ↔ ISOT table** with leakage discussion (MSE1 found that ≈ 99.6 % of processed ISOT is contained verbatim in WELFake, so the training side must exclude the hash-matched articles — master §18), and an error analysis; (7) online retrieval (DuckDuckGo + Wikipedia, cached), claim identifier v1, temporal check v1 and **fusion v1 (rules R0–R9 + confidence)**; (8) **`POST /analyze` working end-to-end in `MODE=offline`** (claims → offline evidence → stance → temporal → fusion → JSON); (9) paper §III–VI drafted (≈ 5 pages); (10) Live Claims Set ≥ 60 items labelled.
 
 **Deliberately not yet built (scheduled for weeks 13–16, ESE).** Front-end polish, LIME highlights + explanation templates + uncertainty text, Docker image and HF Spaces / Render deployment, full end-to-end 5-class evaluation on the ~100-item Live Claims Set, ablation, temporal test set, latency, case studies, comparison table, Turnitin check and venue submission. Saying this up front is expected and correct.
 
 # 3. Criterion 1 — Model Training (5 marks)
 
-**What we built.** Every model in the §12 ladder trained on identical splits (`data/splits/*.csv`) with fixed seeds (`src/common/seed.py`): TF-IDF + NB / LR / LinearSVC (`src/models/tfidf_baselines.py`); DistilBERT-base-uncased fine-tuned with fp16, max_len 256, batch 16 on the RTX 3050 4 GB (`src/models/distilbert.py`; CPU members use the 10k-subset / max_len 128 path or Colab T4); LIAR 3-way head with class weights (`src/models/liar_head.py`); stance model evaluated on 3k balanced FEVER dev pairs with gold evidence (`src/stance/fever_eval.py`); offline FAISS `IndexFlatIP` over ~14k MiniLM-embedded statements (`src/evidence/offline_index.py`, `make index`). Checkpoints in `data/models/` (git-ignored, mirrored to the team HF Hub account).
+**What we built.** Every model in the §12 ladder trained on identical splits (`data/splits/*.csv`) with fixed seeds (`src/common/seed.py`): TF-IDF + NB / LR / LinearSVC (`src/models/baselines.py`; `tfidf_baselines.py` is an alias); DistilBERT-base-uncased fine-tuned with fp16, max_len 256, batch 16 on the RTX 2050/3050-class 4 GB GPU (`src/models/distilbert.py`; CPU members use the 10k-subset / max_len 128 path or Colab T4); LIAR 3-way head with class weights (`src/models/liar_head.py`); stance model evaluated on 3k balanced FEVER dev pairs with gold evidence (`src/stance/fever_eval.py`); offline FAISS `IndexFlatIP` over ~14k MiniLM-embedded statements (`src/evidence/offline_index.py`, `make index`). Checkpoints in `data/models/` (git-ignored, mirrored to the team HF Hub account).
 
 **Artefacts**
 
@@ -77,15 +77,15 @@ date: "v1.0 — 27 August 2026 (prepared for the MSE 2 window, weeks 12–13, 2�
 
 # 4. Criterion 2 — Hyperparameter Tuning (5 marks)
 
-**What we built.** `GridSearchCV` (5-fold, on train) for NB / LR / SVM over `ngram_range ∈ {(1,1),(1,2)}`, `max_features ∈ {50k,100k,200k}`, `sublinear_tf ∈ {T,F}`, `C ∈ {0.1,1,10}` (LR/SVM), `alpha ∈ {0.1,0.5,1.0}` (NB); a DistilBERT sweep on a 20k stratified subset over `lr ∈ {2e-5,3e-5,5e-5} × epochs ∈ {2,3} × max_len ∈ {128,256}` (warmup ratio {0.06, 0.1}, weight decay 0.01, batch 16; ≤ 6 Optuna trials or a reduced manual grid), winner retrained on full train; LIAR head over `lr ∈ {2e-5,3e-5} × epochs ∈ {3,5}`; fusion thresholds (τ, min evidence count, N months) grid-searched on a 30-item dev slice of the Live Claims Set. Selection metric everywhere: **validation macro-F1**.
+**What we built.** `GridSearchCV` (5-fold, on train) for NB / LR / SVM over `ngram_range ∈ {(1,1),(1,2)}`, `max_features ∈ {50k,100k,200k}`, `sublinear_tf ∈ {T,F}`, `C ∈ {0.1,1,10}` (LR/SVM), `alpha ∈ {0.1,0.5,1.0}` (NB); a DistilBERT sweep on a 20k stratified subset over the reduced manual grid of master §12.2: `lr ∈ {2e-5,3e-5,5e-5} × max_len ∈ {256,512}` = 6 configs (epochs fixed at 3 with the best epoch kept, warmup ratio 0.1, weight decay 0.01, fp16; batch 16 at 256, batch 8 × grad-accum 2 at 512 — the EDA showed only 19 % of WELFake inputs fit in 256 tokens and 50 % in 512, so 512 rather than 128 is the informative second point), winner retrained on full train; LIAR head over `lr ∈ {2e-5,3e-5} × epochs ∈ {3,5}`; fusion thresholds (τ, min evidence count, N months) grid-searched on a 30-item dev slice of the Live Claims Set. Selection metric everywhere: **validation macro-F1**.
 
 **Artefacts**
 
 | Path | What it shows |
 |---|---|
 | `docs/results/gridsearch_{nb,lr,svm}.csv` | Every configuration tried with mean/std CV macro-F1, fit time; best row flagged |
-| `docs/results/distilbert_sweep.md` | Every DistilBERT run: lr, epochs, max_len, warmup, seed, val macro-F1, minutes, hardware; winner + full-train retrain row |
-| `docs/figures/sweep_*.png` | Val macro-F1 vs. lr (grouped by max_len / epochs); GridSearch heat-map for SVM |
+| `docs/results/distilbert_sweep.md` | Every DistilBERT run: lr, max_len (256 / 512), best epoch, warmup, seed, val macro-F1, minutes, hardware; winner + full-train retrain row |
+| `docs/figures/sweep_*.png` | Val macro-F1 vs. lr (grouped by max_len 256 / 512); GridSearch heat-map for SVM |
 | `src/fusion/fusion.yaml` + `docs/results/fusion_thresholds.md` | Chosen τ / min-evidence / N-months and the dev-slice grid results |
 | `notebooks/04_tuning.ipynb` | Narrated sweep, plots, val-vs-test gap table |
 
@@ -112,14 +112,14 @@ date: "v1.0 — 27 August 2026 (prepared for the MSE 2 window, weeks 12–13, 2�
 
 # 5. Criterion 3 — Result Analysis (5 marks)
 
-**What we built.** Held-out test metrics for NB, LR, SVM, DistilBERT (and Bi-LSTM if trained) on WELFake and ISOT; confusion matrices and ROC curves; the **cross-dataset table** (train WELFake → test ISOT and vice versa, with and without artefact removal) and a **leakage audit** (an "artefact-only" classifier on ISOT datelines / source tokens); LIAR 3-way head vs. Wang (2017); stance metrics on FEVER; error analysis of ≥ 20 misclassified WELFake test items categorised (truncation, satire, opinion, label noise, artefact-driven, near-duplicate).
+**What we built.** Held-out test metrics for NB, LR, SVM, DistilBERT (and Bi-LSTM if trained) on WELFake and ISOT; confusion matrices and ROC curves; the **cross-dataset table** (train WELFake∖ISOT → test ISOT and vice versa, with and without artefact removal; the WELFake∖ISOT domain = the ≈ 23.3k WELFake rows whose normalised text is not hash-matched to an ISOT article, near-duplicates removed — plain WELFake → ISOT is in-domain because ISOT ⊂ WELFake, master §18) and a **leakage audit** (an "artefact-only" classifier on ISOT datelines / source tokens); LIAR 3-way head vs. Wang (2017); stance metrics on FEVER; error analysis of ≥ 20 misclassified WELFake test items categorised (truncation, satire, opinion, label noise, artefact-driven, near-duplicate).
 
 **Artefacts**
 
 | Path | What it shows |
 |---|---|
 | `docs/results/classifier_table.md` | Accuracy / precision / recall / macro-F1 / ROC-AUC, test split, all models, WELFake and ISOT |
-| `docs/results/cross_dataset.md` | WELFake↔ISOT F1 matrix, with/without artefact removal; artefact-only classifier accuracy; discussion |
+| `docs/results/cross_dataset.md` | WELFake∖ISOT ↔ ISOT F1 matrix, with/without artefact removal; artefact-only classifier accuracy; the ISOT ⊂ WELFake overlap numbers; discussion |
 | `docs/figures/cm_*.png`, `docs/figures/roc_*.png` | Confusion matrices and ROC curves per model/dataset |
 | `docs/results/liar_head.md` | 3-way (and mapped 6-way) accuracy / macro-F1 vs. Wang (2017) |
 | `docs/results/stance_fever.md` | Stance accuracy / macro-F1 / CM |
@@ -129,7 +129,7 @@ date: "v1.0 — 27 August 2026 (prepared for the MSE 2 window, weeks 12–13, 2�
 **Definition of Done**
 
 - [ ] Test-set table complete for NB, LR, SVM, DistilBERT on **both** WELFake and ISOT (in-domain).
-- [ ] Cross-dataset table has all four cells (W→W, W→I, I→W, I→I) × {raw, artefact-removed}; F1 drop quantified in one sentence.
+- [ ] Cross-dataset table has all four cells (W∖I→W∖I, W∖I→I, I→W∖I, I→I, where W∖I = WELFake minus the ISOT articles) × {raw, artefact-removed}; F1 drop quantified in one sentence; the overlap (≈ 99.6 % of ISOT inside WELFake) stated next to the table.
 - [ ] Artefact-only classifier accuracy on ISOT reported (expected very high) and discussed as leakage.
 - [ ] CM + ROC figures exist for every model; DistilBERT CM annotated with counts and percentages.
 - [ ] `error_analysis.md` has ≥ 20 categorised examples and a category-frequency table.
@@ -143,6 +143,7 @@ date: "v1.0 — 27 August 2026 (prepared for the MSE 2 window, weeks 12–13, 2�
 1. *Why does ISOT give ~99 % and why is that suspicious?* ISOT's real articles are all Reuters ("WASHINGTON (Reuters) –" datelines) and its fakes come from a few sites with fixed trailers; a classifier trained only on those artefacts already scores very high, so the number measures source style, not truth.
 2. *What does macro-F1 tell you that accuracy does not?* It averages per-class F1 equally, so ignoring a minority class is punished; on balanced WELFake they agree, on LIAR 3-way and the 5-class Live Claims Set (UNVERIFIABLE is rare) they diverge.
 3. *What does the cross-dataset drop mean for your project?* Style-based classifiers learn dataset-specific cues; the drop (larger after artefact removal is undone) is the empirical reason our verdict comes from evidence, not the classifier.
+4. *Why WELFake∖ISOT ↔ ISOT and not WELFake ↔ ISOT?* WELFake was assembled from Kaggle + McIntire + Reuters/ISOT + BuzzFeed, so ≈ 99.6 % of ISOT is verbatim inside WELFake (≈ 79 % of ISOT val/test rows sit in WELFake *train*); "train WELFake → test ISOT" is a train-on-test number (MSE1 preview 0.985 macro-F1 vs 0.83 for ISOT → WELFake). We remove the hash-matched articles and their MinHash near-duplicates from the WELFake side to get two disjoint domains.
 4. *Interpret this confusion matrix.* Rows = true, columns = predicted; the fake→real cell is the dangerous one for users (missed fakes); we report it separately as fake-class recall.
 5. *How do you get ROC-AUC for LinearSVC without probabilities?* From `decision_function` margins (AUC is threshold-free), or `CalibratedClassifierCV` if calibrated probabilities are needed.
 6. *How was the stance model evaluated on FEVER?* 3k balanced dev claims with gold Wikipedia evidence; NEI claims paired with a random sentence from the same page; accuracy / macro-F1 / CM. Caveat stated openly: FEVER-NLI is in the model's pre-training mix, so the score is optimistic for news-domain evidence.
@@ -166,7 +167,7 @@ date: "v1.0 — 27 August 2026 (prepared for the MSE 2 window, weeks 12–13, 2�
 - [ ] Every module named in §IV exists as code under `src/` (claims, evidence, stance, temporal, fusion) — an examiner can cross-check.
 - [ ] Rule table in the paper equals `src/fusion/rules.py` and `fusion.yaml` (τ = 0.6, N = 6, k = 5).
 - [ ] Pipeline figure has the same boxes as §9 of the master doc; dataset table numbers equal `notebooks/00_datasets.ipynb` output.
-- [ ] §V lists seed 42, 80/10/10 split, the winning hyperparameters, RTX 3050 4 GB / Colab T4, library versions.
+- [ ] §V lists seed 42, 80/10/10 split, the winning hyperparameters, RTX 2050/3050-class 4 GB / Colab T4, library versions.
 
 **Verify in ≤ 3 minutes.** Open `paper/main.pdf` pages 2–4; compare the rule table with `cat src/fusion/fusion.yaml`; check the figure against `docs/FakeNewsDetector_ProjectDetails.md` §9.
 
@@ -181,7 +182,7 @@ date: "v1.0 — 27 August 2026 (prepared for the MSE 2 window, weeks 12–13, 2�
 
 # 7. Criterion 5 — Research Paper: Results (2.5 marks)
 
-**What we deliver.** `paper/main.tex` §VI Results with (a) the model-comparison table (test accuracy / P / R / macro-F1 / ROC-AUC for NB, LR, SVM, DistilBERT on WELFake and ISOT), (b) the tuning table (DistilBERT sweep summary; best classical config per model), (c) the cross-dataset table with artefact-removal ablation and the artefact-only baseline, (d) stance results on FEVER, (e) LIAR 3-way results, (f) DistilBERT confusion matrices as figures, (g) preliminary end-to-end results on the ≥ 60 labelled Live Claims items. Every table is generated from `docs/results/*.md`.
+**What we deliver.** `paper/main.tex` §VI Results with (a) the model-comparison table (test accuracy / P / R / macro-F1 / ROC-AUC for NB, LR, SVM, DistilBERT on WELFake and ISOT), (b) the tuning table (DistilBERT sweep summary; best classical config per model), (c) the cross-dataset table (WELFake∖ISOT ↔ ISOT) with artefact-removal ablation, the artefact-only baseline and the ISOT ⊂ WELFake overlap statement in the dataset paragraph, (d) stance results on FEVER, (e) LIAR 3-way results, (f) DistilBERT confusion matrices as figures, (g) preliminary end-to-end results on the ≥ 60 labelled Live Claims items. Every table is generated from `docs/results/*.md`.
 
 **Artefacts**
 

@@ -227,8 +227,8 @@ Owners follow the proposed role split in §23 (adjust as agreed by the team).
 
 | # | Dataset | Size | Labels | Source | License / access | Role |
 |---|---|---|---|---|---|---|
-| D1 | **WELFake** (Verma et al., 2021) | 72,134 articles (35,028 real / 37,106 fake); title + text | CSV column `label`: **0 = real, 1 = fake** (the Zenodo/Kaggle blurb says the opposite, but the file's 35,028 label-0 rows are the Reuters-style real articles — verified 2026-08-28, see `data/README.md`) | Zenodo record 4561253 (`WELFake_Dataset.csv`, fetched by `make download` via the Zenodo API — **no Kaggle login needed**); Kaggle mirror `saurabhshahane/fake-news-classification` | Free download; **CC BY 4.0** on Zenodo (verified 28 Aug 2026 via the Zenodo API record, `license.id = cc-by-4.0`; the Kaggle mirror shows no separate licence) | **Primary** article-level train/val/test for the content classifier |
-| D2 | **ISOT Fake News** (Ahmed, Traore & Saad, 2017) | 44,898 articles (21,417 true from Reuters / 23,481 fake) | True / Fake | University of Victoria ISOT lab page (direct zip `News-_dataset.zip`, fetched by `make download`); Kaggle mirror `clmentbisaillon/fake-and-real-news-dataset` as manual fallback | Free for research (cite Ahmed et al.) | Secondary; **cross-dataset generalisation** test; artefact/leakage study |
+| D1 | **WELFake** (Verma et al., 2021) | 72,134 articles (35,028 real / 37,106 fake); title + text | CSV column `label`: **0 = real, 1 = fake** (the Zenodo/Kaggle blurb says the opposite, but the file's 35,028 label-0 rows are the Reuters-style real articles — verified 2026-08-28, see `data/README.md`) | Zenodo record 4561253 (`WELFake_Dataset.csv`, fetched by `make download` via the Zenodo API — **no Kaggle login needed**); Kaggle mirror `saurabhshahane/fake-news-classification` | Free download; **CC BY 4.0** on Zenodo (verified 28 Aug 2026 via the Zenodo API record, `license.id = cc-by-4.0`; the Kaggle mirror shows no separate licence) | **Primary** article-level train/val/test for the content classifier. **Contains ISOT:** WELFake = Kaggle + McIntire + Reuters/ISOT + BuzzFeed Political, and ≈ 99.6 % of the processed ISOT articles occur verbatim in processed WELFake (MSE1 finding, `docs/eda_summary.md`, `docs/model_identification.md` §4.2) |
+| D2 | **ISOT Fake News** (Ahmed, Traore & Saad, 2017) | 44,898 articles (21,417 true from Reuters / 23,481 fake) | True / Fake | University of Victoria ISOT lab page (direct zip `News-_dataset.zip`, fetched by `make download`); Kaggle mirror `clmentbisaillon/fake-and-real-news-dataset` as manual fallback | Free for research (cite Ahmed et al.) | Secondary; artefact/leakage study (raw vs. processed); **cross-dataset generalisation** only against the hash-join-defined **WELFake∖ISOT** subset (≈ 23.3k rows) — plain "train WELFake → test ISOT" is in-domain because ISOT ⊂ WELFake |
 | D3 | **LIAR** (Wang, 2017) | 12,836 short PolitiFact statements; train 10,269 / val 1,284 / test 1,283; speaker metadata | pants-fire, false, barely-true, half-true, mostly-true, true | https://www.cs.ucsb.edu/~william/data/liar_dataset.zip; HF `liar` | Free for research | Fine-grained/partial-truth modelling; **offline fact-check index** |
 | D4 | **FEVER** (Thorne et al., 2018) | 185,445 claims with Wikipedia evidence; we sample 20–30k | SUPPORTS / REFUTES / NOT ENOUGH INFO | https://fever.ai/dataset/fever.html; HF `fever` (`v1.0`) | CC BY-SA 3.0 | Evaluate (and optionally fine-tune) the **stance/NLI** model |
 | D5 | **FakeNewsNet — PolitiFact subset** (Shu et al., 2018) | ~1,056 news items (432 fake / 624 real) with titles, PolitiFact labels | fake / real | GitHub `KaiDMML/FakeNewsNet` (CSV with titles/URLs) | Free; full content requires crawling (we use titles only) | Adds to the **offline fact-check index** |
@@ -267,10 +267,11 @@ For NEI claims we pair the claim with a randomly retrieved Wikipedia sentence fr
 
 1. **Load & unify** the schema: `id, title, text, label, label5, label3, source_dataset, date, split, meta` — identical for every dataset (`src/config.SCHEMA`); `label5`/`label3` are the §10.1 mappings (binary datasets get REAL/FAKE and TRUE/FALSE), `date` is filled only where the source has one (ISOT), `split` holds the official (LIAR, FEVER) or generated split, `meta` is a JSON string with dataset-specific extras (ISOT subject, LIAR speaker/party, FEVER evidence ids).
 2. **Drop** rows with empty/NaN text or text < 20 tokens; log counts dropped.
-3. **Exact and near-duplicate removal**: SHA-1 on normalised text for exact; MinHash/`datasketch` (or TF-IDF cosine > 0.9 on a sample) for near-duplicates; **check that no duplicate spans train/test**.
+3. **Exact and near-duplicate removal**: SHA-1 on normalised text for exact; MinHash/`datasketch` (or TF-IDF cosine > 0.9 on a sample) for near-duplicates; **check that no duplicate spans train/test** (holds for the WELFake/ISOT splits we generate; LIAR's *official* splits contain 5 train∩val and 4 train∩test identical statements — kept for comparability with the literature and disclosed).
 4. **Artefact / leakage removal** (critical for honest numbers):
    - Strip the ISOT "`WASHINGTON (Reuters) - `" dateline prefix and any "`(Reuters)`" token; strip "`Featured image via …`", "`Read more:`", "`21st Century Wire says…`" trailers common in fake articles.
    - Remove URLs, e-mail addresses, Twitter handles, and "`@realDonaldTrump`"-style tokens that act as label shortcuts.
+   - **Residual publisher/format artefacts found by the MSE1 LR coefficients and stripped since (2026-08-28):** bracketed title tags `[VIDEO]` / `(IMAGES)` / `[TWEETS]`, trailing outlet suffixes in titles (" - Breitbart", " - The New York Times", " - TruthFeed" …, closed list), photo/image credits ("Photo: … via Getty Images", "(Photo by AFP)", "Image credit: …", "Featured Image: …"), source lines "Via: <outlet>", embed captions ("Watch it below:", "Here's the video via YouTube"), bylines ("Follow <name> on Twitter", "<name> is a reporter for Breitbart …"), 21WIRE "SUPPORT / Continue this story at" stubs, and the debris WELFake's own tokenisation left behind (`pic. twitter.`, `https: .`, empty `( )`, embedded-tweet time-stamps). Bare source names inside prose ("told Reuters", "Breitbart News reported") are content and stay.
    - Report the accuracy of a classifier trained *only* on these artefacts to quantify the leakage (expected: very high on ISOT — this becomes a discussion point).
 5. **Normalisation**: Unicode NFKC, lower-casing (for TF-IDF only — cased text kept for transformers), whitespace collapse, quote normalisation. The processed parquet keeps the raw cased text because spaCy NER and claim extraction need capitalisation; the chosen `distilbert-base-uncased` tokenizer lower-cases internally, so no separate lower-cased copy is stored (and a cased model can be swapped in later without re-running `make data`).
 6. **Sentence segmentation** with spaCy for the claim module; keep sentence offsets for highlighting.
@@ -283,14 +284,14 @@ For NEI claims we pair the claim with a randomly retrieved Wikipedia sentence fr
 | Plot / table | Purpose |
 |---|---|
 | Class distribution bars per dataset | Show balance; justify metrics |
-| Histogram of article/claim lengths (tokens) per class | Choose max_len = 256; note fake articles' length distribution |
-| Top 30 unigrams/bigrams per class (after artefact removal) and **before** removal | Demonstrate leakage tokens ("Reuters", "said", "video", "Hillary") |
+| Histogram of article/claim lengths (tokens) per class | Length distribution per class (measured: the *real* class has the wider spread — short wire briefs and long pieces; fakes cluster at 250–550 words); together with the DistilBERT-tokenizer coverage plot (only ≈ 19 % of WELFake inputs fit in 256 tokens, ≈ 50 % in 512; head truncation at 256 keeps a median 50 % of an article) it makes max_len = 256 an explicit GPU-budget choice and motivates sweeping 256 vs 512 |
+| Top 30 unigrams/bigrams per class (after artefact removal) and **before** removal | Demonstrate leakage tokens (measured: "reuters", "washington" for real; "featured image", "image via", "getty images", "pic twitter", "twitter com", "screen capture", "21wire", "https" for fake — these vanish after removal; "hillary" and "said" remain because they are content/register, not source) |
 | Word clouds per class | Presentation aid only |
 | Named-entity type frequencies per class (spaCy) | Motivates claim heuristics |
 | Publication-date distribution (ISOT has dates 2015–2018) | Motivates temporal check; shows dataset age |
 | Duplicate/near-duplicate counts and cross-split overlaps | Leakage audit |
 | LIAR 6-label and 3-label distributions; label vs. speaker party | Fine-grained difficulty discussion |
-| FEVER subset label balance; evidence sentence lengths | Stance model input sizing |
+| FEVER subset label balance; evidence pointers per claim (the parquet stores page + sentence ids, not sentence text); claim length | Stance model input sizing |
 | Readability / punctuation / ALL-CAPS ratio per class | Style features discussion |
 
 # 12. Models
@@ -302,7 +303,7 @@ For NEI claims we pair the claim with a randomly retrieved Wikipedia sentence fr
 | Baseline | TF-IDF + Multinomial Naive Bayes | Fast, classic NLP baseline; viva-friendly | Reference point |
 | Baseline | TF-IDF + Logistic Regression | Strong linear baseline; coefficients are interpretable | Reference + interpretable feature analysis |
 | Baseline | TF-IDF + Linear SVM (`LinearSVC`) | Usually best classical model on this task | Best classical; CPU fallback for deployment |
-| Middle (optional) | Bi-LSTM + GloVe 100d | Shows sequence modelling; cheap on 3050 | Only if time permits (week 9) |
+| Middle (optional) | Bi-LSTM + GloVe 100d | Shows sequence modelling; cheap on the 4 GB GPU | Only if time permits (week 9) |
 | Final | **DistilBERT-base-uncased fine-tuned** | Best accuracy/size trade-off; 66M params; fits 4 GB GPU with fp16 | Content classifier in production |
 | Fine-grained | DistilBERT (or TF-IDF+LR) on LIAR 3-way | Gives a truth-shade probability for short claims | Confidence adjustment in fusion |
 | Stance | `cross-encoder/nli-deberta-v3-small` (pre-trained on SNLI/MNLI/FEVER-NLI etc.) | Ready-made NLI cross-encoder, ~140M params, CPU-usable | Stance detection; optional fine-tune on FEVER subset |
@@ -317,7 +318,7 @@ For NEI claims we pair the claim with a randomly retrieved Wikipedia sentence fr
 |---|---|---|---|
 | TF-IDF + NB / LR / SVM | `GridSearchCV` (5-fold, on train) | `ngram_range ∈ {(1,1),(1,2)}`, `max_features ∈ {50k, 100k, 200k}`, `sublinear_tf ∈ {T,F}`; LR/SVM `C ∈ {0.1, 1, 10}`; NB `alpha ∈ {0.1, 0.5, 1.0}` | Macro-F1 on validation |
 | Bi-LSTM (optional) | Manual, 4 runs | hidden ∈ {128, 256}, dropout ∈ {0.3, 0.5}, lr 1e-3, 5 epochs, early stopping | Val macro-F1 |
-| DistilBERT | **Reduced manual grid of ≤ 6 configurations** (Optuna over the same 6 points is optional, never more) | lr ∈ {2e-5, 3e-5, 5e-5} × max_len ∈ {128, 256} = 6 configs; fixed: epochs = 3 (the best epoch by val macro-F1 is kept, which subsumes the epochs ∈ {2, 3} choice), warmup ratio 0.1, weight decay 0.01, batch 16 (grad-accum 2 if OOM) | Val macro-F1; every config runs on a 20k stratified subset (≈ 20 min each, ≈ 2 h for all 6), then the best config is retrained on the full train split (≈ 1–1.25 h); total DistilBERT budget ≈ 3–3.5 h GPU |
+| DistilBERT | **Reduced manual grid of ≤ 6 configurations** (Optuna over the same 6 points is optional, never more) | lr ∈ {2e-5, 3e-5, 5e-5} × max_len ∈ {256, 512} = 6 configs (the EDA showed that max_len 128 keeps only ~25 % of a typical article and 256 ~50 %, so 512 rather than 128 is the informative second point); fixed: epochs = 3 (the best epoch by val macro-F1 is kept, which subsumes the epochs ∈ {2, 3} choice), warmup ratio 0.1, weight decay 0.01, fp16; batch 16 at max_len 256, batch 8 × grad-accum 2 (effective 16) at max_len 512, gradient checkpointing as the second fallback — both fit the 4 GB card | Val macro-F1; every config runs on a 20k stratified subset (≈ 20 min at 256, ≈ 40 min at 512 → ≈ 3 h for all 6), then the best config is retrained on the full train split (≈ 1–1.25 h at 256, ≈ 2–2.5 h at 512); total DistilBERT budget ≈ 4–5.5 h GPU over two or three evenings |
 | LIAR 3-way head | Same as DistilBERT with class weights | lr ∈ {2e-5, 3e-5}, epochs ∈ {3, 5} | Val macro-F1 |
 | Stance fine-tune (optional) | 2 runs | lr ∈ {1e-5, 2e-5}, 1 epoch on 20k FEVER pairs, max_len 256 | Dev accuracy |
 | Fusion thresholds | Grid on a 30-item dev slice of the Live Claims Set | support/refute margins, min evidence count, temporal gap N months | 5-class macro-F1; grid recorded in `docs/results/fusion_thresholds.md` |
@@ -326,12 +327,12 @@ For NEI claims we pair the claim with a randomly retrieved Wikipedia sentence fr
 
 | Model | Hardware | Estimated time | Notes |
 |---|---|---|---|
-| TF-IDF + NB/LR/SVM on 58k WELFake train | CPU (4–8 cores) | 1–5 min per fit; full GridSearch 30–60 min | Cache the TF-IDF matrix |
-| Bi-LSTM + GloVe | RTX 3050 | ~5–10 min/epoch | Skip if behind |
-| DistilBERT, max_len 256, batch 16, fp16 | RTX 3050 4 GB | ~15–25 min/epoch on 58k; 3 epochs ≈ 1–1.25 h; each sweep run on 20k subset ≈ 20 min (6 configs ≈ 2 h, §12.2) | Enable `fp16=True`, `gradient_checkpointing` if OOM |
+| TF-IDF + NB/LR/SVM on 48.7k WELFake train (after dedup) | CPU (4–8 cores) | ≈ 55 s TF-IDF fit + ≤ 5 s per classifier (measured 2026-08-28, peak RSS ≈ 2.6 GB); full GridSearch 30–60 min | Cache the TF-IDF matrix |
+| Bi-LSTM + GloVe | RTX 2050/3050-class 4 GB | ~5–10 min/epoch | Skip if behind |
+| DistilBERT, max_len 256, batch 16, fp16 (max_len 512: batch 8 × grad-accum 2, ≈ 2× the time) | RTX 2050/3050-class 4 GB (dev laptop: RTX 2050, 3.68 GiB usable) | ~15–25 min/epoch on 48.7k; 3 epochs ≈ 1–1.25 h; each sweep run on a 20k subset ≈ 20 min at 256 / ≈ 40 min at 512 (6 configs ≈ 3 h, §12.2) | Enable `fp16=True`, `gradient_checkpointing` if OOM |
 | DistilBERT — CPU-only member | Laptop CPU | 10k subset, max_len 128, 2 epochs ≈ 1.5–3 h | Or use **Google Colab free T4** (free) and download the checkpoint |
-| LIAR 3-way DistilBERT | RTX 3050 | ~3 min/epoch (10k short texts) | |
-| Stance fine-tune on 20k FEVER pairs | RTX 3050 | ~30–40 min/epoch with batch 8 + grad-accum | Optional |
+| LIAR 3-way DistilBERT | RTX 2050/3050-class 4 GB | ~3 min/epoch (10k short texts) | |
+| Stance fine-tune on 20k FEVER pairs | RTX 2050/3050-class 4 GB | ~30–40 min/epoch with batch 8 + grad-accum | Optional |
 | MiniLM embeddings of ~14k index statements | CPU | ~2 min | One-off, cached |
 
 All GPU checkpoints are saved to `data/models/` and shared with CPU-only members, who only need inference.
@@ -566,7 +567,7 @@ Errors: `422` for invalid input, `502` with `{"error":"extraction_failed"}` when
 | Component | Data | Metrics | Artefact |
 |---|---|---|---|
 | Content classifier (all tiers) | WELFake test (10%); ISOT test | Accuracy, precision, recall, **macro-F1**, confusion matrix, ROC-AUC | `docs/results/classifier_table.md`, `docs/figures/cm_*.png` (e.g. `docs/figures/cm_distilbert_welfake.png`), `docs/figures/roc_*.png` |
-| **Cross-dataset generalisation** | Train WELFake → test ISOT, and vice versa; with and without artefact removal | Same metrics; drop in F1 quantified | `docs/results/cross_dataset.md` — discussion of ISOT's ~99% in-domain accuracy being driven by Reuters-style artefacts |
+| **Cross-dataset generalisation** | **WELFake∖ISOT ↔ ISOT**: train on the WELFake rows that are *not* hash-matched to an ISOT article (≈ 23.3k rows; near-duplicates removed via MinHash) → test ISOT, and vice versa; with and without artefact removal. Plain "WELFake → ISOT" is **not** reported as cross-dataset — ≈ 99.6 % of processed ISOT is contained verbatim in WELFake (≈ 79 % of ISOT val/test rows sit in WELFake *train*), so it is an in-domain number (MSE1 preview: 0.985 macro-F1 vs. 0.83 for the honest ISOT → WELFake direction) | Same metrics; drop in F1 quantified | `docs/results/cross_dataset.md` — discussion of ISOT's ~99% in-domain accuracy being driven by Reuters-style artefacts *and* by dataset overlap |
 | Leakage audit | ISOT | Accuracy of an "artefact-only" classifier (source tokens, datelines) | Table + paragraph in paper |
 | LIAR 3-way head | LIAR official test | Accuracy, macro-F1 vs. Wang (2017) baselines | `docs/results/liar_head.md` |
 | Stance model | FEVER subset dev (3k) with gold evidence; optionally FEVER-NLI style pairs | Accuracy, macro-F1, confusion matrix | `docs/results/stance_fever.md`, `docs/figures/cm_stance_fever.png` |
@@ -638,7 +639,7 @@ All numbers are produced by `make eval` from `src/eval/` scripts with fixed seed
 **Definition of Done — MSE1**
 - Raw datasets are present in `data/raw/` via `make download` (all five core datasets are scriptable without Kaggle: WELFake from Zenodo, ISOT from the UVic lab zip, LIAR from UCSB, FEVER from fever.ai, FakeNewsNet from GitHub; the manual Kaggle step in `data/README.md` is only the ISOT fallback). `make data` then runs end-to-end from `data/raw/` on a fresh clone and produces the processed splits (≤ 15 min CPU, excluding downloads); keep the run log as `docs/mse1_make_data.log`.
 - `notebooks/00_datasets.ipynb`, `01_eda.ipynb`, `02_baselines.ipynb` execute without error (Run All).
-- ≥ 10 EDA figures saved (`docs/figures/eda_*.png`); leakage table produced; baseline LR macro-F1 reported on WELFake val (sanity bar ≥ 0.90).
+- ≥ 10 EDA figures saved (`docs/figures/eda_*.png`); leakage table produced; baseline LR macro-F1 reported on WELFake val (sanity bar ≥ 0.90); the top LR coefficients contain no publisher/format tokens (checked in `notebooks/02_baselines.ipynb`).
 - Paper §I and §II drafted (≈ 2 pages) with ≥ 15 BibTeX entries.
 - This document v2 finalised and printed for the viva; each member can walk through §9 architecture.
 
@@ -647,8 +648,8 @@ All numbers are produced by `make eval` from `src/eval/` scripts with fixed seed
 | Marking criterion | Marks | What will be built / delivered | Concrete artefacts | How the examiner can verify |
 |---|---|---|---|---|
 | Model Training | 5 | NB, LR, SVM, (Bi-LSTM), DistilBERT trained on WELFake; LIAR 3-way head; stance model evaluated (optionally fine-tuned) on FEVER subset; offline FAISS index built | `src/models/train_*.py`, checkpoints `data/models/tfidf_{nb,lr,svm}.joblib`, `data/models/distilbert-welfake-v1/`, `data/models/distilbert-liar3-v1/` (+ HF Hub upload), `docs/results/classifier_table.md`, `docs/results/stance_fever.md`, `docs/results/liar_head.md`, training logs `docs/results/train_logs/*.json`, training curves `docs/figures/train_*.png` (e.g. `docs/figures/train_distilbert.png`), `notebooks/03_transformers.ipynb` | `make train-baselines` runs in minutes; show DistilBERT training logs (loss/F1 per epoch) and the saved checkpoint loading in `POST /classify` |
-| Hyperparameter Tuning | 5 | GridSearchCV results for classical models; DistilBERT sweep table (lr × max_len, 6 configs, §12.2); fusion thresholds tuned on the dev slice | `docs/results/gridsearch_{nb,lr,svm}.csv`, `docs/results/distilbert_sweep.md`, `docs/results/fusion_thresholds.md`, `docs/figures/sweep_*.png` (e.g. `docs/figures/sweep_distilbert_lr.png`), `notebooks/04_tuning.ipynb` | Ask which config won and why; ask what happened at lr = 5e-5; show the val-vs-test gap |
-| Result Analysis | 5 | Metrics on held-out test; confusion matrices; ROC curves; **cross-dataset table** with leakage discussion; stance accuracy; error analysis of 20 misclassified items | `docs/results/*.md`, `docs/figures/cm_*.png`, `docs/figures/roc_*.png`, `docs/figures/cm_stance_fever.png`, `docs/results/cross_dataset.md`, `docs/results/error_analysis.md` | Ask to explain why ISOT in-domain is ~99% but cross-dataset drops; ask to interpret a confusion matrix |
+| Hyperparameter Tuning | 5 | GridSearchCV results for classical models; DistilBERT sweep table (lr × max_len {256, 512}, 6 configs, §12.2); fusion thresholds tuned on the dev slice | `docs/results/gridsearch_{nb,lr,svm}.csv`, `docs/results/distilbert_sweep.md`, `docs/results/fusion_thresholds.md`, `docs/figures/sweep_*.png` (e.g. `docs/figures/sweep_distilbert_lr.png`), `notebooks/04_tuning.ipynb` | Ask which config won and why; ask what happened at lr = 5e-5; show the val-vs-test gap |
+| Result Analysis | 5 | Metrics on held-out test; confusion matrices; ROC curves; **cross-dataset table** (WELFake∖ISOT ↔ ISOT, §18) with leakage discussion; stance accuracy; error analysis of 20 misclassified items | `docs/results/*.md`, `docs/figures/cm_*.png`, `docs/figures/roc_*.png`, `docs/figures/cm_stance_fever.png`, `docs/results/cross_dataset.md`, `docs/results/error_analysis.md` | Ask to explain why ISOT in-domain is ~99% but cross-dataset drops, and why the cross-dataset pair is WELFake∖ISOT ↔ ISOT rather than WELFake ↔ ISOT; ask to interpret a confusion matrix |
 | Paper: Methodology | 2.5 | §III–V written with pipeline figure and fusion rules | `paper/main.tex` §III–V, `paper/figures/pipeline.pdf` | Read; cross-check against the running code |
 | Paper: Results | 2.5 | §VI with classifier, cross-dataset, stance tables (e2e may be preliminary) | `paper/main.tex` §VI tables generated from `docs/results/`; figures exported to `paper/figures/` (e.g. `paper/figures/cm_distilbert_welfake.pdf`) | Numbers in paper must equal numbers in `docs/results/` |
 
@@ -738,6 +739,7 @@ Shared duties: every member labels ≥ 20 Live Claims Set items (double-labelled
 │   │                             #   distilbert-welfake-v1/, distilbert-liar3-v1/
 │   ├── live_claims/              # live_claims.csv, temporal_set.csv, annotation guide
 │   └── README.md
+├── scripts/         # download_data.py, build_notebook_{00,01,02}.py (the notebooks are generated, then executed in place)
 ├── notebooks/
 │   ├── 00_datasets.ipynb  01_eda.ipynb  02_baselines.ipynb
 │   ├── 03_transformers.ipynb  04_tuning.ipynb  05_stance.ipynb
@@ -745,7 +747,7 @@ Shared duties: every member labels ≥ 20 Live Claims Set items (double-labelled
 ├── src/
 │   ├── ingest/      # url_extract.py, dates.py
 │   ├── preprocess/  # clean.py, dedupe.py, artefacts.py, split.py
-│   ├── models/      # tfidf_baselines.py, bilstm.py, distilbert.py, liar_head.py, predict.py
+│   ├── models/      # baselines.py (TF-IDF + NB/LR/SVM; tfidf_baselines.py = alias), bilstm.py, distilbert.py, liar_head.py, predict.py
 │   ├── claims/      # heuristics.py, claimbuster.py, rank.py
 │   ├── evidence/    # queries.py, online.py, wikipedia.py, factcheck_api.py, offline_index.py, sources.yaml, cache.py
 │   ├── stance/      # nli.py, fever_eval.py
@@ -763,14 +765,14 @@ Shared duties: every member labels ≥ 20 Live Claims Set items (double-labelled
 │                    #   results/  (classifier_table.md, cross_dataset.md, error_analysis.md, distilbert_sweep.md, gridsearch_{nb,lr,svm}.csv,
 │                    #             stance_fever.md, liar_head.md, fusion_thresholds.md, train_logs/*.json, e2e.md, ablation.md, latency.md, worklog_ese.md)
 │                    #   figures/  (eda_*.png, cm_*.png incl. cm_stance_fever.png, roc_*.png, train_*.png, sweep_*.png)
-├── tests/           # test_preprocess.py, test_claims.py, test_fusion.py, test_api.py
+├── tests/           # test_data.py, test_artefacts.py, test_eda.py, test_models.py (MSE1); test_claims.py, test_fusion.py, test_api.py (later)
 └── agent-docs/      # LOCAL ONLY shared notes for AI agents (never committed)
 ```
 
 **Tooling**
 
 - `requirements.txt` (key pins): `python==3.11`, `torch>=2.3` (default PyPI wheel bundles CUDA 12.x/13.x and runs on the RTX 2050/3050-class 4 GB laptop GPU; CPU-only wheel for Docker), `transformers>=4.44`, `datasets`, `scikit-learn>=1.5`, `spacy>=3.7` + `en_core_web_sm`, `sentence-transformers>=3.0`, `faiss-cpu`, `trafilatura`, `newspaper3k`, `htmldate`, `dateparser`, `ddgs`, `wikipedia-api`, `requests`, `fastapi`, `uvicorn`, `pydantic`, `lime`, `shap` (optional), `optuna` (optional), `langdetect`, `pandas`, `pyarrow`, `matplotlib`, `seaborn`, `datasketch`, `pytest`, `jinja2`, `python-dotenv`.
-- `Makefile` targets: `setup`, `download` (scriptable raw downloads into `data/raw/` — no Kaggle credentials needed, see §21.1 and `data/README.md`), `data`, `index`, `train-baselines`, `train-distilbert`, `train-liar`, **`train`** (umbrella alias = `train-baselines` + `train-distilbert` + `train-liar`), **`models`** (umbrella alias = `train` + `index`; used by §17 and NFR-5), `eval-models`, `eval-e2e`, `eval` (all), `run`, `test`, `docker-build`, `docker-run`, `paper` (latexmk).
+- `Makefile` targets: `setup` (installs the spaCy `en_core_web_sm` wheel by URL — `python -m spacy download` silently installs nowhere under a uv venv), `download` (scriptable raw downloads into `data/raw/` — no Kaggle credentials needed, see §21.1 and `data/README.md`), `data`, `index`, `train-baselines`, `train-distilbert`, `train-liar`, **`train`** (umbrella alias = `train-baselines` + `train-distilbert` + `train-liar`), **`models`** (umbrella alias = `train` + `index`; used by §17 and NFR-5), `eval-models`, `eval-e2e`, `eval` (all), `run`, `test`, `docker-build`, `docker-run`, `paper` (delegates to `paper/Makefile`: latexmk if installed, otherwise the tectonic binary in `~/.local/bin`); helper targets `nb-run` (notebook 00), `eda` (notebook 01), `nb-run-baselines` (notebook 02), `lint`, `clean-data`. `docs/results/train_logs/*.json` are tracked; `*.log` files are git-ignored except `docs/mse1_make_data.log`.
 - Optional `pre-commit` with `ruff` + `black`; `nbstripout` to keep notebooks diff-able — **do NOT strip outputs from notebooks shown in vivas; run it only after each exam** (examiners need the saved outputs).
 - Seeds fixed in `src/common/seed.py` (`random`, `numpy`, `torch`, `transformers.set_seed`).
 

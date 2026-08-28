@@ -33,7 +33,7 @@ date: "v1.0 — 27 August 2026 (prepared in advance; fill every `[fill]` before 
 
 # 2. Milestone Summary
 
-**Where we were.** *MSE1 (weeks 6–7):* problem, 5-class scheme, four core datasets unified (WELFake 72,134 / ISOT 44,898 / LIAR 12,836 / FEVER subset), preprocessing with artefact removal and leakage audit, EDA figures, TF-IDF + LR baseline, paper §I–II. *MSE2 (weeks 12–13):* NB/LR/SVM + DistilBERT trained and tuned (GridSearchCV, lr × epochs × max_len sweep), LIAR 3-way head, stance model evaluated on FEVER, cross-dataset table, offline FAISS index, `/analyze` working end-to-end in offline mode, Live Claims Set ≥ 60 items, paper §III–VI. *Carried forward:* the fusion invariant — evidence decides the verdict, the classifier only adjusts confidence (±0.10) and breaks the single-source tie (R8).
+**Where we were.** *MSE1 (weeks 6–7):* problem, 5-class scheme, four core datasets unified (WELFake 72,134 / ISOT 44,898 / LIAR 12,836 / FEVER subset), preprocessing with artefact removal and leakage audit, EDA figures, TF-IDF + LR baseline, paper §I–II. *MSE2 (weeks 12–13):* NB/LR/SVM + DistilBERT trained and tuned (GridSearchCV, lr × max_len {256, 512} sweep), LIAR 3-way head, stance model evaluated on FEVER, cross-dataset table, offline FAISS index, `/analyze` working end-to-end in offline mode, Live Claims Set ≥ 60 items, paper §III–VI. *Carried forward:* the fusion invariant — evidence decides the verdict, the classifier only adjusts confidence (±0.10) and breaks the single-source tie (R8).
 
 **What is new for ESE (weeks 13–16).**
 
@@ -238,7 +238,7 @@ Open the Space URL on their own phone → `/health` in the browser → run an ex
 | Where are the API keys? | Env vars / HF secrets; `.env` is git-ignored; only the free Google Fact Check key exists. |
 | How big is the image and why? | ≈ 2.5 GB: CPU torch wheel + transformers + ≈ 1 GB models; models can also be pulled from the HF Hub at first start into a volume. |
 | What does offline mode lose? | Fresh evidence: only the LIAR + PolitiFact FAISS index and cached results; very recent claims become UNVERIFIABLE. |
-| How is a GPU handled? | `torch.cuda.is_available()` auto-detect; the image is CPU-only; training used an RTX 3050 / Colab T4. |
+| How is a GPU handled? | `torch.cuda.is_available()` auto-detect; the image is CPU-only; training used an RTX 2050/3050-class 4 GB GPU / Colab T4. |
 | Can a stranger reproduce your numbers? | `git clone` → `make setup data train eval` with pinned `requirements.txt` and seed 42; results land in `docs/results/`. |
 
 # 6. Research Paper — Result and Discussion (10 marks)
@@ -252,8 +252,8 @@ Final §VI Results and §VII Discussion of `paper/main.tex`, every number genera
 | # | Table / figure | Source file |
 |---|---|---|
 | Tab. 1 | Classifier comparison on WELFake test: NB, LR, SVM, (Bi-LSTM), DistilBERT — accuracy, P, R, macro-F1, ROC-AUC | `docs/results/classifier_table.md` |
-| Tab. 2 | Cross-dataset: WELFake→ISOT and ISOT→WELFake, with/without artefact removal; artefact-only classifier accuracy (leakage audit) | `docs/results/cross_dataset.md` |
-| Tab. 3 | DistilBERT sweep (lr × epochs × max_len) and GridSearchCV winners | `docs/results/distilbert_sweep.md`, `gridsearch_*.csv` |
+| Tab. 2 | Cross-dataset: WELFake∖ISOT→ISOT and ISOT→WELFake∖ISOT (ISOT ⊂ WELFake, so the shared articles are removed from the WELFake side), with/without artefact removal; artefact-only classifier accuracy (leakage audit) | `docs/results/cross_dataset.md` |
+| Tab. 3 | DistilBERT sweep (lr × max_len {256, 512}, 6 configs) and GridSearchCV winners | `docs/results/distilbert_sweep.md`, `gridsearch_*.csv` |
 | Tab. 4 | Stance accuracy / macro-F1 on FEVER dev subset; LIAR 3-way head vs. Wang (2017) | `docs/results/*.md` |
 | Tab. 5 | **End-to-end 5-class** on Live Claims Set: accuracy, macro-F1, per-class P/R, UNVERIFIABLE precision | `docs/results/e2e.md` |
 | Tab. 6 | **Ablation**: classifier-only / + evidence & stance / + temporal / offline-only | `docs/results/ablation.md` |
@@ -458,7 +458,7 @@ Fuller version: `docs/viva_qa.md` (60 Q&A). Every member must be able to answer 
 | Question | Answer |
 |---|---|
 | Classical search space? | GridSearchCV 5-fold: ngram (1,1)/(1,2), max_features 50k/100k/200k, sublinear_tf, C ∈ {0.1,1,10}, NB alpha ∈ {0.1,0.5,1}. |
-| DistilBERT sweep? | lr × epochs × max_len on a 20k stratified subset (≤ 6 trials), best config retrained on full train; selection by val macro-F1. |
+| DistilBERT sweep? | lr {2e-5, 3e-5, 5e-5} × max_len {256, 512} on a 20k stratified subset (6 configs, epochs fixed at 3 with the best epoch kept), best config retrained on full train; selection by val macro-F1. |
 | How were fusion thresholds tuned? | Grid over τ, min evidence count, N months on a 30-item dev slice of the Live Claims Set; the test slice was never touched. |
 | Val–test gap? | `[fill]` — small, indicating no overfitting to val. |
 

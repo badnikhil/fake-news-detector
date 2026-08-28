@@ -1,7 +1,7 @@
 ---
 title: "MSE 1 — Project Details & Verification"
 subtitle: "Fake News & Misinformation Detector (evidence-grounded, explainable 5-class news verification)"
-date: "v1.0 — 27 August 2026"
+date: "v1.1 — 28 August 2026 (Definition-of-Done ticked against the repository)"
 ---
 
 # 1. Title block
@@ -14,8 +14,10 @@ date: "v1.0 — 27 August 2026"
 | **Team** | Navishka Sharma (Data & EDA lead), Naitik Kukreja (Modelling lead), Naveen (Claim / Evidence / Stance lead), Prateek Srivastava (Backend / API / Deployment lead), Nikhil (UI / XAI / Paper lead) |
 | **Guide** | `<Guide name, designation>` |
 | **Assumed MSE1 window** | Weeks 6–7, **21 Sep – 4 Oct 2026** (week 6 = buffer + dry-run viva, week 7 = exam window). Adjust to the official academic calendar. |
-| **Document** | v1.0, 27 Aug 2026. Companion to the master document `docs/FakeNewsDetector_ProjectDetails.md` (v2.0); all file names, dataset IDs and objective numbers follow it. |
-| **Repository** | `/home/nikhil/Desktop/nlp` (local); GitHub remote `<to be added>` |
+| **Document** | v1.1, 28 Aug 2026 (v1.0 written 27 Aug). Companion to the master document `docs/FakeNewsDetector_ProjectDetails.md` (v2.1); all file names, dataset IDs and objective numbers follow it. |
+| **Repository** | https://github.com/badnikhil/fake-news-detector (branch `main`); local clone `/home/nikhil/Desktop/nlp` |
+
+> **MSE1 status — 28 Aug 2026, commit `MSE1_STATUS_COMMIT`.** Every code artefact in this document exists in the repository and was regenerated end-to-end on the dev laptop on that date (`make data` twice, byte-identical → `make train-baselines` → `make nb-run-baselines` → `make nb-run` → `make eda` → `make test` (102 passed) → `make paper`), and the same sequence succeeded in a fresh `git clone` with only `data/raw/` copied in. To reproduce: `make setup && make download && make data && make test && make train-baselines && make nb-run-baselines && make nb-run && make eda && make paper` (≈ 25 min CPU after the download). Ticked boxes below (`[x]`) were verified by running the check; unticked ones carry an italic note saying why. What is still missing is team practice, not artefacts: the slide deck `docs/mse1_slides.pdf`, the dry-run viva, and the per-member "explain two papers" rehearsal.
 
 ## MSE 1 marking scheme (as on the evaluation form)
 
@@ -32,9 +34,9 @@ date: "v1.0 — 27 August 2026"
 
 # 2. Milestone summary
 
-**What exists by MSE1.** The problem, 5-class output scheme (REAL / FAKE / PARTIALLY TRUE / MISLEADING / UNVERIFIABLE), objectives O1–O8 and scope are fixed in the master document. The four core datasets (D1 WELFake, D2 ISOT, D3 LIAR, D4 FEVER subset) plus D5 FakeNewsNet-PolitiFact titles are downloaded, schema-unified and documented (`data/README.md`, `notebooks/00_datasets.ipynb`). A reproducible preprocessing pipeline (`make data` → `src/preprocess/`) performs cleaning, exact + near-duplicate removal, artefact/leakage removal (e.g. the ISOT "(Reuters)" dateline), spaCy sentence segmentation and stratified 80/10/10 splits with seed 42. `notebooks/01_eda.ipynb` produces ≥ 10 figures in `docs/figures/` with a one-line insight each (`docs/eda_summary.md`), including a leakage-token table. The model ladder (TF-IDF baselines → DistilBERT; NLI cross-encoder for stance; MiniLM for retrieval) is justified with hyperparameter spaces and a hardware budget, and a **TF-IDF + Logistic Regression baseline is already trained** (`notebooks/02_baselines.ipynb`) as proof of feasibility. Paper §I (Introduction) and §II (Literature Survey) are drafted in `paper/main.tex` with ≥ 15 BibTeX entries and a comparison table.
+**What exists by MSE1.** The problem, 5-class output scheme (REAL / FAKE / PARTIALLY TRUE / MISLEADING / UNVERIFIABLE), objectives O1–O8 and scope are fixed in the master document. The four core datasets (D1 WELFake, D2 ISOT, D3 LIAR, D4 FEVER subset) plus D5 FakeNewsNet-PolitiFact titles are downloaded, schema-unified and documented (`data/README.md`, `notebooks/00_datasets.ipynb`). A reproducible preprocessing pipeline (`make data` → `src/preprocess/`) performs cleaning, exact + near-duplicate removal, artefact/leakage removal (the ISOT "(Reuters)" dateline, photo credits, title tags, outlet suffixes, bylines, URL debris …) and stratified 80/10/10 splits with seed 42 (spaCy sentence segmentation is done on the fly by the claim module at MSE2, not stored in the parquet). `notebooks/01_eda.ipynb` produces ≥ 10 figures in `docs/figures/` with a one-line insight each (`docs/eda_summary.md`), including a leakage-token table. The model ladder (TF-IDF baselines → DistilBERT; NLI cross-encoder for stance; MiniLM for retrieval) is justified with hyperparameter spaces and a hardware budget, and a **TF-IDF + Logistic Regression baseline is already trained** (`notebooks/02_baselines.ipynb`) as proof of feasibility. Paper §I (Introduction) and §II (Literature Survey) are drafted in `paper/main.tex` with ≥ 15 BibTeX entries and a comparison table.
 
-**What deliberately does NOT exist yet** (planned for MSE2/ESE, so the examiner is not surprised): no fine-tuned DistilBERT, no GridSearchCV results, no evidence retrieval (online or offline FAISS index), no stance/NLI evaluation, no temporal check, no fusion rules in code, no FastAPI backend, no UI, no Docker image or deployment, no Live Claims Set (D7), no `tests/`. A URL → text + date `ingest` prototype may exist (week 5) but is not evaluated at MSE1.
+**What deliberately does NOT exist yet** (planned for MSE2/ESE, so the examiner is not surprised): no fine-tuned DistilBERT, no GridSearchCV results, no evidence retrieval (online or offline FAISS index), no stance/NLI evaluation, no temporal check, no fusion rules in code, no FastAPI backend, no UI, no Docker image or deployment, no Live Claims Set (D7). (`tests/` *does* exist at MSE1: `make test` checks the processed data, the artefact regexes, the EDA outputs and the baselines.) A URL → text + date `ingest` prototype may exist (week 5) but is not evaluated at MSE1.
 
 # 3. Per-criterion sections
 
@@ -52,12 +54,12 @@ date: "v1.0 — 27 August 2026"
 
 **Acceptance criteria / Definition of Done**
 
-- [ ] Problem statement is one sentence, appears identically in the master doc §3, the slides and `paper/main.tex` §I.
-- [ ] Every motivating statistic has a citation; items marked `[verify]` in the master doc (Indian lynching figure) are either verified or dropped from the paper.
-- [ ] Objectives O1–O8 each have a numeric target (master doc §4).
-- [ ] The five classes have a one-line definition and one example each (master doc §8); UNVERIFIABLE is explained as a first-class output.
-- [ ] Out-of-scope table (§5.2) is present — no video/image forensics, no multilingual, no crawlers, no paid APIs/LLMs.
-- [ ] Every team member can draw the pipeline (input → ingest → preprocess → claims → evidence → stance → temporal → fusion → explanation) on the whiteboard in under 2 minutes.
+- [ ] Problem statement is one sentence, appears identically in the master doc §3, the slides and `paper/main.tex` §I. *(not met only because `docs/mse1_slides.pdf` does not exist yet — team action; master §3 ↔ paper §I checked by the paper agent, `docs/problem_identification.md`)*
+- [x] Every motivating statistic has a citation; items marked `[verify]` in the master doc (Indian lynching figure) are either verified or dropped from the paper. *(verified 28 Aug: BBC/Al Jazeera figure used; table V1–V6 in `docs/problem_identification.md`)*
+- [x] Objectives O1–O8 each have a numeric target (master doc §4).
+- [x] The five classes have a one-line definition and one example each (master doc §8); UNVERIFIABLE is explained as a first-class output.
+- [x] Out-of-scope table (§5.2) is present — no video/image forensics, no multilingual, no crawlers, no paid APIs/LLMs.
+- [ ] Every team member can draw the pipeline (input → ingest → preprocess → claims → evidence → stance → temporal → fusion → explanation) on the whiteboard in under 2 minutes. *(team action before viva)*
 
 **How the examiner can verify it in ≤ 3 minutes.** Open the printed master doc at §3 (problem statement) and §8 (class table); ask any member to define the five classes and give one example each; ask "what happens when no evidence is found?" (answer: UNVERIFIABLE, by design); check that the motivation statistics carry references (§29).
 
@@ -78,7 +80,7 @@ date: "v1.0 — 27 August 2026"
 | ID | Dataset | Size (must match on disk) | Role at MSE1 |
 |---|---|---|---|
 | D1 | WELFake (Verma et al., 2021) | 72,134 articles (35,028 real / 37,106 fake; CSV `label` 0 = real, 1 = fake — the Zenodo blurb says the reverse, see `data/README.md`) | Primary classifier train/val/test |
-| D2 | ISOT (Ahmed et al., 2017) | 44,898 (21,417 true / 23,481 fake) | Cross-dataset + leakage study |
+| D2 | ISOT (Ahmed et al., 2017) | 44,898 (21,417 true / 23,481 fake) | Leakage study (raw vs. processed); cross-dataset only against WELFake∖ISOT — ≈ 99.6 % of processed ISOT is contained verbatim in WELFake (finding of 2026-08-28, see §3.3 / §3.5) |
 | D3 | LIAR (Wang, 2017) | 12,836 (train 10,269 / val 1,284 / test 1,283) | Fine-grained labels; offline index later |
 | D4 | FEVER (Thorne et al., 2018) | 185,445 total → 20k train / 3k dev sampled, balanced | Stance evaluation (MSE2) |
 | D5 | FakeNewsNet – PolitiFact titles (Shu et al.) | ~1,056 (432 fake / 624 real) | Offline index (MSE2) |
@@ -96,12 +98,12 @@ date: "v1.0 — 27 August 2026"
 
 **Acceptance criteria / Definition of Done**
 
-- [ ] `notebooks/00_datasets.ipynb` runs "Run All" without error and prints **raw** counts equal to the table above (72,134 / 44,898 / 12,836 / FEVER subset 20k + 3k / ~1,056); processed counts for WELFake/ISOT are lower after empty/short-row drop and exact + near de-duplication (numbers in `docs/mse1_make_data.log`).
-- [ ] Every dataset row in `data/README.md` has: source URL, licence line, download date, SHA-256 of the raw archive.
-- [ ] Unified schema is identical across datasets; `label` uses the project vocabulary (`fake`/`real`, or LIAR 6-way + mapped columns `label5`, `label3`).
-- [ ] LIAR official train/val/test are kept unchanged; FEVER subset sampling uses a fixed seed and is balanced across the three labels.
-- [ ] Licence notes marked `[verify]` in the master doc (WELFake CC BY 4.0 on Zenodo, ClaimBuster CC BY 4.0) are confirmed and recorded.
-- [ ] Nothing in `data/raw/` or `data/processed/` is committed to git.
+- [x] `notebooks/00_datasets.ipynb` runs "Run All" without error (`make nb-run`, 11 s) and prints **raw** counts equal to the table above (72,134 / 44,898 / 12,836 / FEVER subset 20k + 3k / ~1,056); processed counts for WELFake/ISOT are lower after empty/short-row drop and exact + near de-duplication (numbers in `docs/mse1_make_data.log`).
+- [x] Every dataset row in `data/README.md` has: source URL, licence line, download date, SHA-256 of the raw archive.
+- [x] Unified schema is identical across datasets (`tests/test_data.py::test_schema_columns_identical`); `label` uses the project vocabulary (`fake`/`real`, or LIAR 6-way + mapped columns `label5`, `label3`).
+- [x] LIAR official train/val/test are kept unchanged; FEVER subset sampling uses a fixed seed and is balanced across the three labels. *(tests `test_liar_official_splits_unchanged`, `test_fever_subset_balanced`; LIAR's official splits themselves contain 5 train∩val + 4 train∩test duplicate statements — kept, disclosed)*
+- [x] Licence notes marked `[verify]` in the master doc (WELFake CC BY 4.0 on Zenodo, ClaimBuster CC BY 4.0) are confirmed and recorded. *(Zenodo API `license.id`, 28 Aug)*
+- [x] Nothing in `data/raw/` or `data/processed/` is committed to git. *(`git ls-files data` → only `data/README.md`, `data/splits/.gitkeep`)*
 
 **How the examiner can verify it in ≤ 3 minutes.**
 
@@ -127,30 +129,31 @@ Raw counts must equal the table (processed WELFake/ISOT are smaller after de-dup
 
 ## 3.3 Data Preprocessing (3 marks)
 
-**What we built / delivered.** `make data` runs `src/preprocess/{clean,dedupe,artefacts,split}.py` in order: (1) load + unify schema; (2) drop empty / < 20-token texts and log counts; (3) exact duplicates via SHA-1 of normalised text, near-duplicates via MinHash (`datasketch`) — and assert zero duplicate pairs across train/test; (4) **artefact / leakage removal**: ISOT "`WASHINGTON (Reuters) - `" datelines and "`(Reuters)`" tokens, "Featured image via…", "Read more:", "21st Century Wire says…" trailers, URLs, e-mails, Twitter handles; an "artefact-only" classifier is trained to quantify the leakage; (5) NFKC normalisation, whitespace/quote normalisation (lower-casing only for the TF-IDF path — cased text kept for transformers); (6) spaCy sentence segmentation with offsets; (7) tokenisation choices recorded (TF-IDF word 1–2-grams; `DistilBertTokenizerFast` max_len 256); (8) stratified **80/10/10** splits per dataset with `random_state=42`, saved as ID lists; LIAR keeps official splits; (9) class weights (not resampling) noted for LIAR.
+**What we built / delivered.** `make data` runs `src/preprocess/{clean,dedupe,artefacts,split}.py` in order: (1) load + unify schema; (2) drop empty / < 20-token texts and log counts; (3) exact duplicates via SHA-1 of normalised text, near-duplicates via MinHash (`datasketch`) — and assert zero duplicate pairs across train/test; (4) **artefact / leakage removal** (`src/preprocess/artefacts.py`, applied to text *and* title before normalisation): ISOT "`WASHINGTON (Reuters) - `" datelines and "`(Reuters)`" tokens; "Featured image via/by/: …", "Read more:", "21st Century Wire says…" / "SUPPORT 21WIRE" trailers; URLs, e-mails, Twitter handles, `pic.twitter` links and the `pic. twitter.` / `https: .` / empty-`( )` / tweet-time-stamp debris of WELFake's own tokenisation; photo/image credits ("Photo: … via Getty Images", "(Photo by AFP)", "Image credit: …") and "Via: <outlet>" source lines; embed captions ("Watch it below:", "Here's the video via YouTube"); bylines ("Follow <name> on Twitter", "<name> is a reporter for Breitbart …"); bracketed title tags `[VIDEO]` / `(IMAGES)`; trailing outlet suffixes in titles (" - Breitbart", " - The New York Times", closed list). Bare source names in prose ("told Reuters") are kept. An "artefact-only" classifier is trained to quantify the leakage; (5) NFKC normalisation, whitespace/quote normalisation (lower-casing only for the TF-IDF path — cased text kept for transformers); (6) spaCy sentence segmentation with offsets is *not* stored — the claim module (MSE2) segments on the fly, which is why the parquet keeps cased text; (7) tokenisation choices recorded (TF-IDF word 1–2-grams; `DistilBertTokenizerFast` max_len 256 as a GPU-budget choice — only 19 % of WELFake inputs fit in 256 tokens, 50 % in 512, so the MSE2 sweep compares 256 vs 512); (8) stratified **80/10/10** splits per dataset with `random_state=42`, saved as ID lists; LIAR keeps official splits; (9) class weights (not resampling) noted for LIAR.
 
 **Artefacts**
 
 | Artefact | What it shows |
 |---|---|
 | `Makefile` target `data` | One command regenerates everything below |
-| `src/preprocess/clean.py`, `dedupe.py`, `artefacts.py`, `split.py` | The pipeline steps, each with a `main()` and logged counts |
+| `src/preprocess/load.py`, `artefacts.py`, `clean.py`, `dedupe.py`, `split.py`, `run_all.py` | The pipeline steps (`run_all.main()` orchestrates; every step logs its counts) |
 | `data/processed/{welfake,isot,liar,fever_subset,fnn_politifact}.parquet` | Unified, cleaned tables |
 | `data/splits/{welfake,isot}_{train,val,test}.csv`, `data/splits/liar_{train,val,test}.csv` | ID lists so every model uses identical splits |
-| `notebooks/01_eda.ipynb` (section "Before/after") | 5 raw vs. cleaned examples incl. a Reuters-prefix removal; leakage-token table; artefact-only classifier accuracy |
+| `notebooks/01_eda.ipynb` (section "Before/after") | raw vs. cleaned examples incl. a Reuters-prefix removal; leakage-token table; artefact-only classifier accuracy |
+| `tests/test_data.py`, `tests/test_artefacts.py` | 27 data checks (schema, splits, no cross-split duplicates, no `(Reuters)`/URLs left) + 39 unit tests for the artefact regexes |
 | `src/common/seed.py` | Fixed seeds for `random`, `numpy`, `torch` |
 | Master doc §11.1 | The step list with rationale |
 
 **Acceptance criteria / Definition of Done**
 
-- [ ] `make data` runs end-to-end from the raw files in ≤ 15 min on a 4-core laptop CPU (dataset download is a documented prerequisite, not part of the target) and writes every parquet/CSV listed above.
-- [ ] Running `make data` twice yields byte-identical split CSVs (seed 42).
-- [ ] Log output reports, per dataset: rows in, rows dropped (empty/short), exact duplicates removed, near-duplicates removed, rows out.
-- [ ] Cross-split overlap check prints `0` duplicate pairs between train and test for WELFake and ISOT.
-- [ ] Split proportions are 80/10/10 ± 0.5% and class proportions in each split match the full dataset ± 1% (stratification).
-- [ ] `grep -c "(Reuters)" ` on the processed ISOT text returns 0; the artefact-only classifier's ISOT accuracy is reported (expected: very high, ≥ 0.9 — measured 0.996 on 2026-08-28, logged in `docs/mse1_make_data.log`).
-- [ ] Cased text is preserved in the parquet; lower-casing happens inside the TF-IDF vectoriser only.
-- [ ] `data/processed/` and `data/splits/` are reproducible from a fresh clone + raw files by following `data/README.md`.
+- [x] `make data` runs end-to-end from the raw files in ≤ 15 min on a 4-core laptop CPU (dataset download is a documented prerequisite, not part of the target) and writes every parquet/CSV listed above. *(6.8 min, peak RSS ≈ 1.8 GB on the 8-thread dev laptop, 28 Aug)*
+- [x] Running `make data` twice yields byte-identical split CSVs (seed 42). *(all 9 CSVs **and** all 5 parquets `sha256sum -c` OK across two consecutive runs, 28 Aug)*
+- [x] Log output reports, per dataset: rows in, rows dropped (empty/short), exact duplicates removed, near-duplicates removed, rows out. *(WELFake 72,134 → 1,591 / 1,047 → 8,217 → 480 → 60,799; ISOT 44,898 → 1,439 / 478 → 5,380 → 34 → 37,567; `docs/mse1_make_data.log`)*
+- [x] Cross-split overlap check prints `0` duplicate pairs between train and test for WELFake and ISOT. *(exact and MinHash, train↔val and train↔test)*
+- [x] Split proportions are 80/10/10 ± 0.5% and class proportions in each split match the full dataset ± 1% (stratification). *(`test_split_ratios`, `test_split_stratified`)*
+- [x] `grep -c "(Reuters)" ` on the processed ISOT text returns 0; the artefact-only classifier's ISOT accuracy is reported (expected: very high, ≥ 0.9 — measured 0.9973 ± 0.0006 on 2026-08-28 with the 26 text patterns, logged in `docs/mse1_make_data.log`).
+- [x] Cased text is preserved in the parquet; lower-casing happens inside the TF-IDF vectoriser only. *(`test_cased_text_preserved`)*
+- [x] `data/processed/` and `data/splits/` are reproducible from a fresh clone + raw files by following `data/README.md`. *(FRESH_CLONE_NOTE)*
 
 **How the examiner can verify it in ≤ 3 minutes.**
 
@@ -158,7 +161,8 @@ Raw counts must equal the table (processed WELFake/ISOT are smaller after de-dup
 make data 2>&1 | tail -30          # or, if already run: ls -la data/processed data/splits
 python -c "import pandas as pd; d=pd.read_parquet('data/processed/isot.parquet'); \
   print(d.text.str.contains('\(Reuters\)').sum())"     # expect 0
-python -c "import pandas as pd; s=pd.read_csv('data/splits/welfake_train.csv'); print(len(s))"  # 48,677 = 80% of the 60,847 de-duplicated rows
+python -c "import pandas as pd; s=pd.read_csv('data/splits/welfake_train.csv'); print(len(s))"  # 48,639 = 80% of the 60,799 de-duplicated rows
+grep -c "" docs/mse1_make_data.log; grep "artefact patterns stripped" docs/mse1_make_data.log | head -1   # per-pattern document counts
 ```
 
 Then open `notebooks/01_eda.ipynb` at the "Before/after" cell and the leakage-token table.
@@ -170,7 +174,7 @@ Then open `notebooks/01_eda.ipynb` at the "Before/after" cell and the leakage-to
 3. *Why near-duplicate removal, not just exact?* Syndicated articles differ by a few tokens; a near-duplicate in both train and test inflates accuracy. We use MinHash (Jaccard on shingles) and verify zero cross-split duplicates.
 4. *Why keep cased text?* Transformers use their own tokeniser (DistilBERT-uncased lower-cases internally); lower-casing beforehand would only lose information for the TF-IDF char-gram option and for spaCy NER, which is case-sensitive.
 5. *Why not stemming / stop-word removal?* Sub-word tokenisers handle morphology; TF-IDF with sublinear tf already down-weights frequent words; stop words like "not" matter for claims.
-6. *Why max_len 256?* The length histogram shows most article heads (title + first ~200 tokens) carry the signal; 256 fits fp16 batch 16 on a 4 GB GPU.
+6. *Why max_len 256?* Honest answer: it is a GPU-budget choice, not a coverage choice — the DistilBERT tokenizer coverage plot shows only 19 % of WELFake inputs fit entirely in 256 tokens (50 % in 512; head truncation at 256 keeps a median 50 % of an article), but the title + lede that survive carry most of the style signal and 256 fits fp16 batch 16 on a 4 GB GPU. The MSE2 sweep therefore compares 256 vs 512 (batch 8 × grad-accum 2), not 128 vs 256.
 7. *Why class weights rather than oversampling for LIAR?* Imbalance is mild; weights avoid duplicating short statements and leaking them across folds.
 
 ## 3.4 EDA (3 marks)
@@ -182,33 +186,36 @@ Then open `notebooks/01_eda.ipynb` at the "Before/after" cell and the leakage-to
 | Figure / table (`docs/figures/`) | What it shows → consequence |
 |---|---|
 | `eda_class_balance.png` | Class bars per dataset → WELFake/ISOT near-balanced; accuracy acceptable but we report macro-F1 |
-| `eda_length_hist.png` | Token-length histograms per class → max_len 256; fake articles' length pattern |
-| `eda_top_ngrams_before.png` / `eda_top_ngrams_after.png` | Top 30 uni/bigrams per class before and after artefact removal → "Reuters", "said", "video", "Hillary" leakage tokens |
+| `eda_length_hist.png` | Word-length histograms per class → the *real* class has the wider spread (short wire briefs, long pieces), fakes cluster at 250–550 words; no length feature |
+| `eda_maxlen_coverage.png` | DistilBERT-tokenizer coverage: 8.6 % / 19.1 % / 50.1 % of WELFake inputs fit in 128 / 256 / 512 tokens → max_len 256 is a GPU-budget choice; sweep 256 vs 512 |
+| `eda_top_ngrams_before.png` / `eda_top_ngrams_after.png` | Top 30 uni/bigrams per class before and after artefact removal → the source tokens ("reuters", "washington"; "featured image", "image via", "getty images", "pic twitter", "twitter com", "21wire", "https") vanish; "said" (register) and "hillary" (content) remain |
 | `eda_wordclouds.png` | Per-class word clouds → presentation aid |
 | `eda_ner_types.png` | spaCy entity-type frequency per class → motivates claim heuristics (PERSON/ORG/GPE/DATE) |
 | `eda_isot_dates.png` | ISOT publication-date distribution (2015–2018) → dataset age; motivates temporal check and the Live Claims Set |
 | `eda_duplicates.png` | Exact / near-duplicate counts and cross-split overlaps → leakage audit |
 | `eda_liar_labels.png` | LIAR 6- and 3-label distributions; label vs. speaker party → fine-grained difficulty |
-| `eda_fever_balance.png` | FEVER subset label balance; evidence-sentence lengths → stance model input sizing |
+| `eda_fever_balance.png` | FEVER subset label balance; evidence pointers per claim (the parquet stores page + sentence ids, not sentence text) and claim length → stance model input sizing |
 | `eda_style_features.png` | Readability, punctuation, ALL-CAPS ratio per class → style features are real but shallow |
-| `docs/eda_summary.md` | One insight per figure; leakage-token table with artefact-only classifier accuracy |
+| `eda_title_length.png`, `eda_leakage_tokens.png`, `eda_artefact_classifier.png`, `eda_liar_speakers.png`, `eda_vocab_overlap.png`, `eda_sources.png` | Extra figures (18 in total): title length / ALL-CAPS share, per-token leakage counts, artefact-only classifier vs dummy, LIAR speaker shortcut, **ISOT ⊂ WELFake** vocabulary overlap, ISOT `subject` / FakeNewsNet domain as label proxies |
+| `docs/eda_summary.md`, `data/processed/eda_numbers.json` | One insight + design decision per figure (generated by the notebook's last cell); every quoted number, machine-readable |
+| `scripts/build_notebook_01.py`, `make eda` | The notebook is generated from the builder and executed in place (≈ 4 min CPU, ≈ 2.5 GB RAM) |
 
 **Acceptance criteria / Definition of Done**
 
-- [ ] ≥ 10 figures exist in `docs/figures/` with the names above, each ≥ 150 dpi, titled, axis-labelled, legend where needed.
-- [ ] `notebooks/01_eda.ipynb` runs "Run All" in ≤ 20 min on CPU and regenerates every figure.
-- [ ] The before/after n-gram figures visibly differ (leakage tokens disappear after artefact removal).
-- [ ] `docs/eda_summary.md` has exactly one insight line per figure and states the artefact-only classifier accuracy on ISOT.
-- [ ] Duplicate audit reports numbers (not just a plot): exact, near, cross-split — cross-split = 0 after preprocessing.
-- [ ] At least one insight per figure is turned into a design decision (max_len, macro-F1, class weights, claim heuristics, temporal check).
+- [x] ≥ 10 figures exist in `docs/figures/` with the names above, each ≥ 150 dpi, titled, axis-labelled, legend where needed. *(18 figures at 200 dpi; `tests/test_eda.py` checks the 18 names)*
+- [x] `notebooks/01_eda.ipynb` runs "Run All" in ≤ 20 min on CPU and regenerates every figure. *(`make eda`: ≈ 10 min after the artefact-pattern list grew to 26 — the artefact-only classifier is recomputed on raw + processed WELFake and ISOT; was 4 min with 9 patterns)*
+- [x] The before/after n-gram figures visibly differ (leakage tokens disappear after artefact removal). *(red-highlighted bars in `eda_top_ngrams_before.png`; vanished tokens listed in `docs/eda_summary.md`)*
+- [x] `docs/eda_summary.md` has exactly one insight line per figure and states the artefact-only classifier accuracy on ISOT. *(`test_summary_has_exactly_one_line_per_figure`, `test_summary_states_leakage_and_duplicate_numbers`)*
+- [x] Duplicate audit reports numbers (not just a plot): exact, near, cross-split — cross-split = 0 after preprocessing.
+- [x] At least one insight per figure is turned into a design decision (max_len, macro-F1, class weights, claim heuristics, temporal check). *(third column of the table in `docs/eda_summary.md`)*
 
-**How the examiner can verify it in ≤ 3 minutes.** `ls docs/figures/eda_*.png | wc -l` (≥ 10); open `docs/eda_summary.md`; open `eda_top_ngrams_before.png` next to `eda_top_ngrams_after.png`; ask "what does this figure change in your model?" for any two figures.
+**How the examiner can verify it in ≤ 3 minutes.** `ls docs/figures/eda_*.png | wc -l` (18 ≥ 10); open `docs/eda_summary.md`; (`make eda` regenerates everything in ≈ 4 min); open `eda_top_ngrams_before.png` next to `eda_top_ngrams_after.png`; ask "what does this figure change in your model?" for any two figures.
 
 **Likely viva questions**
 
 1. *What did the EDA change in your design?* max_len 256 (length histogram), macro-F1 as headline metric (balance), artefact removal (n-gram leakage), entity-based claim heuristics (NER plot), temporal check + Live Claims Set (date plot).
-2. *Which tokens leak the label?* Before removal: "Reuters", "WASHINGTON", "said" for real; "video", "image", "Hillary", "via" for fake. After removal the top lists look topical rather than source-specific.
-3. *Are fake articles longer or shorter?* Report the actual histogram; typical finding: fake articles have a heavier tail of very short and very long texts, more ALL-CAPS and exclamation marks.
+2. *Which tokens leak the label?* Measured (n-gram lists and `eda_leakage_tokens.png`): before removal "reuters", "washington" for real; "featured image", "image via", "getty images", "pic twitter", "twitter com", "screen capture", "21wire", "https" for fake. After removal the top lists are topical (trump, clinton, president …) and the class-specific residue is register — attribution words ("said", "told") for real, conversational words ("just", "like", "people") plus "hillary" for fake; "hillary" is content, not an artefact, and stays.
+3. *Are fake articles longer or shorter?* Measured, not assumed: median 428 (real) vs 380 (fake) words in WELFake; both distributions are bimodal and it is the *real* class that has the wider spread (short wire briefs < 100 words: 11 % of reals vs 8 % of fakes; > 1,000 words: 15 % vs 9 %), while fakes cluster at 250–550 words. What fakes do have more of: exclamation marks (~10×), question marks, ALL-CAPS words and ALL-CAPS titles (4.2 % vs 0.0 %).
 4. *What does the LIAR label-vs-party plot tell you?* Labels are politically skewed by speaker; a text-only model can exploit speaker cues, which is why we use LIAR for fine-grained shading rather than as the main classifier.
 5. *Why is the ISOT date range relevant?* All data are 2015–2018 US politics; a model trained on it is stale — motivates cross-dataset testing and the 2026 Live Claims Set.
 6. *How did you measure duplication?* SHA-1 on normalised text (exact) and MinHash Jaccard ≥ 0.9 (near); counts are in `eda_duplicates.png` and the notebook.
@@ -221,7 +228,7 @@ Then open `notebooks/01_eda.ipynb` at the "Before/after" cell and the leakage-to
 |---|---|---|
 | Baseline | TF-IDF + Multinomial NB; TF-IDF + LR (**trained at MSE1**); TF-IDF + LinearSVC | Reference points; LR coefficients interpretable; SVM = CPU fallback for `MODE=lite` |
 | Middle (optional) | Bi-LSTM + GloVe 100d | Only if time permits (week 9) |
-| Final | **DistilBERT-base-uncased fine-tuned** (fp16, max_len 256, batch 16 on an RTX 3050 4 GB; CPU path 10k subset / Colab T4) | Content classifier |
+| Final | **DistilBERT-base-uncased fine-tuned** (fp16, max_len 256, batch 16 on an RTX 2050/3050-class 4 GB GPU; CPU path 10k subset / Colab T4) | Content classifier |
 | Fine-grained | DistilBERT (or TF-IDF + LR) on LIAR 3-way | Truth-shade probability for fusion |
 | Stance | `cross-encoder/nli-deberta-v3-small` (pre-trained NLI; optional FEVER fine-tune) | SUPPORTS / REFUTES / NEUTRAL per (claim, evidence) |
 | Embedding | `all-MiniLM-L6-v2` | Offline FAISS index + passage re-ranking |
@@ -231,31 +238,31 @@ Then open `notebooks/01_eda.ipynb` at the "Before/after" cell and the leakage-to
 
 | Artefact | What it shows |
 |---|---|
-| Master doc §12.1–§12.3 | Ladder + rationale, search spaces (`GridSearchCV` grid; DistilBERT lr × epochs × max_len), time per model on the RTX 3050 / CPU |
-| `notebooks/02_baselines.ipynb` | Loads `data/splits/welfake_*`, fits TF-IDF + LR, prints accuracy, macro-F1, confusion matrix on val; top ±20 coefficients |
-| `src/models/tfidf_baselines.py` | Reusable training code (`make train-baselines` later runs NB/LR/SVM + GridSearch) |
-| `docs/results/classifier_table.md` | First row (LR, val) filled at MSE1; rest at MSE2 |
+| Master doc §12.1–§12.3, `docs/model_identification.md` | Ladder + rationale, rejected alternatives, search spaces (`GridSearchCV` grid; DistilBERT lr {2e-5, 3e-5, 5e-5} × max_len {256, 512}, 6 configs, epochs fixed at 3 with the best epoch kept, warmup 0.1), measured hardware budget (RTX 2050 4 GB / CPU) |
+| `notebooks/02_baselines.ipynb` | Loads `data/splits/welfake_*`, fits one TF-IDF + NB / LR / SVM, prints accuracy, P, R, macro-F1, confusion matrices on val; top ±25 LR coefficients with a leakage-token check; learning curve; ISOT run + cross-dataset preview; the ISOT ⊂ WELFake hash join |
+| `src/models/baselines.py` (`tfidf_baselines.py` = alias) | Reusable training code + CLI; `make train-baselines` runs NB/LR/SVM on WELFake + ISOT (GridSearch at MSE2) |
+| `docs/results/classifier_table.md` | Six MSE1 rows (NB / LR / SVM × WELFake / ISOT, val); rest at MSE2 |
 | `docs/mse1_slides.pdf` (model slides) | Ladder, why DistilBERT, why NLI, why not an LLM |
 
 **Acceptance criteria / Definition of Done**
 
-- [ ] `notebooks/02_baselines.ipynb` runs "Run All" in ≤ 10 min on CPU using the saved split IDs (no re-splitting inside the notebook).
-- [ ] Reported on WELFake **val**: accuracy, precision, recall, macro-F1, confusion matrix; LR macro-F1 ≥ 0.90 (sanity check; the O1 target of ≥ 0.95 is for the final model on test).
-- [ ] The fitted vectoriser + LR are saved to `data/models/tfidf_lr_welfake_v0.joblib` and reload in one line.
-- [ ] Top positive/negative LR coefficients are listed and contain no leakage tokens (otherwise preprocessing is incomplete).
-- [ ] The DistilBERT configuration (lr grid, epochs, max_len, batch, fp16, grad-accum) and the CPU/Colab fallback are written down; every member can state the hardware budget.
-- [ ] Each model in the ladder has a one-line "why included" and the alternatives rejected (BERT-base, RoBERTa, LLMs) are named with reasons.
+- [x] `notebooks/02_baselines.ipynb` runs "Run All" in ≤ 10 min on CPU using the saved split IDs (no re-splitting inside the notebook). *(133 s in-kernel; `B.load_split` joins `data/splits/*.csv` by id)*
+- [x] Reported on WELFake **val**: accuracy, precision, recall, macro-F1, confusion matrix; LR macro-F1 ≥ 0.90 (sanity check; the O1 target of ≥ 0.95 is for the final model on test). *(LR 0.9316, SVM 0.9484, NB 0.8616 after artefact removal — 0.9462 / 0.9610 / 0.8620 before it; `docs/results/classifier_table.md`)*
+- [x] The fitted vectoriser + LR are saved to `data/models/tfidf_lr_welfake_v0.joblib` and reload in one line. *(`test_saved_mse1_artefact_reloads_in_one_line`)*
+- [x] Top positive/negative LR coefficients are listed and contain no leakage tokens (otherwise preprocessing is incomplete). *(met for publisher/format boiler-plate: the first run flagged `via`, `video`, `image`, `breitbart`, `on twitter`, `follow`, `twitter`, `york times` — 26 text + 2 title patterns were added to `artefacts.py` and everything was re-run; the top-25 now contain none of them. Three watch-list tokens remain **by policy** because they occur inside ordinary sentences — `reuters` ("told Reuters"), `breitbart` ("Breitbart News reported") and `via` ("announced via Twitter") — disclosed in `docs/model_identification.md` §4.1 and the notebook)*
+- [x] The DistilBERT configuration (lr grid, epochs, max_len, batch, fp16, grad-accum) and the CPU/Colab fallback are written down; every member can state the hardware budget. *(master §12.2–12.3 + `docs/model_identification.md` §3 with the measured RTX 2050 numbers; "every member can state it" = team action before viva)*
+- [x] Each model in the ladder has a one-line "why included" and the alternatives rejected (BERT-base, RoBERTa, LLMs) are named with reasons. *(`docs/model_identification.md` §1–2)*
 
 **How the examiner can verify it in ≤ 3 minutes.** Open `notebooks/02_baselines.ipynb` — scroll to the metrics cell and coefficient table; `cat docs/results/classifier_table.md`; ask the "why" questions below.
 
 **Likely viva questions**
 
 1. *Why baselines first?* They take minutes, give a floor (LR usually ≥ 0.90 F1 here), expose leakage through interpretable coefficients, and become the CPU fallback (`MODE=lite`); a transformer that cannot beat TF-IDF + SVM is not worth its cost.
-2. *Why DistilBERT rather than BERT-base?* 66M vs. 110M parameters, ~40% smaller, ~60% faster, retains ~97% of BERT's GLUE performance (Sanh et al. 2019); fits fp16 batch 16 × 256 tokens on a 4 GB RTX 3050 (~15–25 min/epoch on 58k articles) and CPU inference ≤ 1 s.
+2. *Why DistilBERT rather than BERT-base?* 66M vs. 110M parameters, ~40% smaller, ~60% faster, retains ~97% of BERT's GLUE performance (Sanh et al. 2019); fits fp16 batch 16 × 256 tokens on a 4 GB RTX 2050/3050-class GPU (~15–25 min/epoch on the 48.7k de-duplicated train rows) and CPU inference ≤ 1 s.
 3. *Why not RoBERTa / DeBERTa for the classifier?* Larger memory footprint on 4 GB; the classifier's job is only to adjust confidence, so the accuracy gain is not worth 2–3× training time. DeBERTa-v3-small *is* used where it matters — NLI stance.
 4. *Why NLI for stance?* Stance = "does the evidence entail / contradict / say nothing about the claim" — exactly the three NLI classes, so a pre-trained cross-encoder (`nli-deberta-v3-small`, trained on SNLI/MNLI/FEVER-NLI) works with zero training; FEVER gives a labelled dev set to measure it.
 5. *Why a cross-encoder rather than bi-encoder embeddings for stance?* A cross-encoder reads claim and evidence jointly and models contradiction; cosine similarity of embeddings cannot distinguish "X happened" from "X did not happen". Bi-encoder MiniLM is used only for retrieval, where speed matters.
-6. *Which hyperparameters will you tune and how?* Classical: `GridSearchCV` 5-fold over ngram_range, max_features, sublinear_tf, C / alpha, selected by val macro-F1. DistilBERT: lr {2e-5, 3e-5, 5e-5} × epochs {2, 3} × max_len {128, 256}, warmup {0.06, 0.1}, on a 20k subset, best config retrained on full train.
+6. *Which hyperparameters will you tune and how?* Classical: `GridSearchCV` 5-fold over ngram_range, max_features, sublinear_tf, C / alpha, selected by val macro-F1. DistilBERT: the reduced manual grid of master §12.2 — lr {2e-5, 3e-5, 5e-5} × max_len {256, 512} = 6 configs, epochs fixed at 3 (best epoch by val macro-F1 kept), warmup 0.1, weight decay 0.01, fp16 (batch 16 at 256, batch 8 × grad-accum 2 at 512), each on a 20k stratified subset, best config retrained on full train.
 7. *What if the GPU is unavailable?* CPU path: 10k subset, max_len 128, 2 epochs (~1.5–3 h), or Google Colab free T4; checkpoints shared via the HF Hub so others only run inference. (For "why not an LLM", see §3.1 Q4.)
 
 ## 3.6 Research Paper — Introduction (2.5 marks)
@@ -271,11 +278,11 @@ Then open `notebooks/01_eda.ipynb` at the "Before/after" cell and the leakage-to
 
 **Acceptance criteria / Definition of Done**
 
-- [ ] §I is 0.75–1.0 page in the IEEE template, compiles with `make paper` (latexmk), no `??` citations.
-- [ ] Problem statement in §I matches the master doc §3 word-for-word in meaning.
-- [ ] Every statistic in §I is cited; the Indian lynching figure is verified or omitted.
-- [ ] Exactly three contribution bullets, each traceable to an objective (O6, O3/O4/O5, O1).
-- [ ] Written from notes, not pasted — will pass the week-14 Turnitin check (< 10%).
+- [x] §I is 0.75–1.0 page in the IEEE template, compiles with `make paper` (latexmk if installed, otherwise tectonic), no `??` citations. *(≈ 1.0–1.05 page — trim ~50 words if the examiner is strict; built with tectonic 0.17 because `latexmk`/IEEEtran are not in the local TeX Live; `make -C paper check` → 33 bib entries, no undefined citations)*
+- [x] Problem statement in §I matches the master doc §3 word-for-word in meaning.
+- [x] Every statistic in §I is cited; the Indian lynching figure is verified or omitted. *(verified, BBC + Al Jazeera)*
+- [x] Exactly three contribution bullets, each traceable to an objective (O6, O3/O4/O5, O1).
+- [ ] Written from notes, not pasted — will pass the week-14 Turnitin check (< 10%). *(drafted from notes; the Turnitin check itself is week 14 — team action)*
 
 **How the examiner can verify it in ≤ 3 minutes.** Open `paper/main.pdf` page 1; check the contribution bullets against §4 objectives of the master doc; ask a member to state the gap in one sentence.
 
@@ -326,11 +333,11 @@ Then open `notebooks/01_eda.ipynb` at the "Before/after" cell and the leakage-to
 
 **Acceptance criteria / Definition of Done**
 
-- [ ] ≥ 15 references in `refs.bib`, each cited at least once in §I–§II; no `[fill]` cells left in the paper's table.
-- [ ] Five themes, each with ≥ 2 papers; the survey ends with an explicit gap statement matching our contributions.
-- [ ] Every "Reported result" cell is copied from the paper with page/table reference in the team's notes.
-- [ ] Each member can explain two papers in 1 minute each (assign: Navishka — LIAR, WELFake; Naitik — FakeBERT, DistilBERT; Naveen — FEVER, KGAT; Prateek — ISOT, Sentence-BERT; Nikhil — LIME, Vosoughi).
-- [ ] No sentence pasted from a source (paraphrased from notes).
+- [x] ≥ 15 references in `refs.bib`, each cited at least once in §I–§II; no `[fill]` cells left in the paper's table. *(33 entries, 33 distinct `\cite` keys; `grep -c '\[fill\]' docs/literature_table.md` = 0)*
+- [x] Five themes, each with ≥ 2 papers; the survey ends with an explicit gap statement matching our contributions.
+- [x] Every "Reported result" cell is copied from the paper with page/table reference in the team's notes. *(the page/table consulted and a confidence level are listed at the bottom of `docs/literature_table.md`; dEFEND's accuracy is deliberately marked "not verified here")*
+- [ ] Each member can explain two papers in 1 minute each (assign: Navishka — LIAR, WELFake; Naitik — FakeBERT, DistilBERT; Naveen — FEVER, KGAT; Prateek — ISOT, Sentence-BERT; Nikhil — LIME, Vosoughi). *(team action before viva)*
+- [ ] No sentence pasted from a source (paraphrased from notes). *(cannot be machine-verified here — Turnitin week 14, team action)*
 
 **How the examiner can verify it in ≤ 3 minutes.** Open `paper/main.pdf` §II and `docs/literature_table.md`; pick any two rows and ask the questions below; `grep -c "@" paper/refs.bib` ≥ 15.
 
@@ -371,42 +378,49 @@ Rules: laptop pre-opened with all notebooks executed and figures visible; `make 
 
 # 6. Pre-MSE1 checklist (the day before)
 
-- [ ] Fresh-clone test on one member's laptop: `make setup` → copy raw data → `make data` → three notebooks "Run All" without error.
-- [ ] `ls docs/figures/eda_*.png | wc -l` ≥ 10; `docs/eda_summary.md` complete.
-- [ ] `notebooks/02_baselines.ipynb` shows LR val accuracy/macro-F1; `docs/results/classifier_table.md` has the LR row.
-- [ ] `paper/main.pdf` builds; §I–II present; `refs.bib` ≥ 15 entries; `docs/literature_table.md` has no `[fill]` cells.
-- [ ] Master doc v2.0 printed (or PDF on a second laptop); `docs/mse1_slides.pdf` exported.
-- [ ] Notebook outputs are **saved** (do not enable `nbstripout` before the viva).
-- [ ] `data/raw/`, `data/processed/`, `data/models/` are git-ignored; nothing large is committed.
-- [ ] `[verify]` items resolved: dataset licences, lynching statistic, satire-domain list (not needed at MSE1).
-- [ ] Dry-run viva done (week 6) with the demo script above; each member rehearsed their "why" answers and two literature papers.
-- [ ] Evidence-of-work log (§7) filled and printed.
-- [ ] Laptop charged; offline copy of everything (no dependency on college Wi-Fi at MSE1).
+- [x] Fresh-clone test on one member's laptop: `make setup` → copy raw data → `make data` → three notebooks "Run All" without error. *(FRESH_CLONE_NOTE2; repeat on a second member's laptop before the viva)*
+- [x] `ls docs/figures/eda_*.png | wc -l` ≥ 10; `docs/eda_summary.md` complete. *(18)*
+- [x] `notebooks/02_baselines.ipynb` shows LR val accuracy/macro-F1; `docs/results/classifier_table.md` has the LR row. *(six MSE1 rows)*
+- [x] `paper/main.pdf` builds; §I–II present; `refs.bib` ≥ 15 entries; `docs/literature_table.md` has no `[fill]` cells.
+- [ ] Master doc v2.1 printed (or PDF on a second laptop); `docs/mse1_slides.pdf` exported. *(team action before viva — the slides do not exist yet)*
+- [x] Notebook outputs are **saved** (do not enable `nbstripout` before the viva). *(all three notebooks executed in place and committed with outputs)*
+- [x] `data/raw/`, `data/processed/`, `data/models/` are git-ignored; nothing large is committed. *(largest tracked files are the executed notebooks and the EDA PNGs)*
+- [x] `[verify]` items resolved: dataset licences, lynching statistic, satire-domain list (not needed at MSE1). *(licences + lynching verified; the satire-domain list and the "IEEE conference hosted by KIET" venue line stay `[verify]` for the guide — not needed at MSE1)*
+- [ ] Dry-run viva done (week 6) with the demo script above; each member rehearsed their "why" answers and two literature papers. *(team action before viva)*
+- [ ] Evidence-of-work log (§7) filled and printed. *(paths and dates filled below; the "Reviewed by" column and the printout are a team action)*
+- [ ] Laptop charged; offline copy of everything (no dependency on college Wi-Fi at MSE1). *(team action before viva)*
 
 **Known gaps & honest answers**
 
 | Gap at MSE1 | Honest answer if asked |
 |---|---|
-| DistilBERT not yet trained | "Identified and budgeted (§12.3: ~1–1.25 h for 3 epochs on the RTX 3050); training is the MSE2 criterion. The LR baseline proves the data pipeline." |
+| DistilBERT not yet trained | "Identified and budgeted (§12.3: ≈ 1–1.25 h for 3 epochs at max_len 256 on the RTX 2050/3050-class 4 GB GPU, ≈ 3 h for the 6-config sweep); training is the MSE2 criterion. The TF-IDF baselines prove the data pipeline." |
 | No GridSearchCV / sweep results | "Search spaces are fixed (§12.2); runs start in week 7 and are reported at MSE2 (Hyperparameter Tuning)." |
 | No retrieval / stance / temporal / fusion code | "Designed in §13–14 with decision table R0–R9; implementation is weeks 7–10. The NLI model is pre-trained, so stance needs evaluation, not training." |
 | No UI / API / Docker / deployment | "ESE deliverables; architecture and endpoints are specified (§16–17)." |
 | Live Claims Set (D7) not started | "Starts week 9 to keep claims recent (Aug–Nov 2026); ≥ 60 by MSE2, ~100 by ESE." |
-| Only WELFake baseline, not ISOT | "ISOT baseline + cross-dataset results are the MSE2 Result Analysis item; the leakage audit is already in the EDA." |
+| ISOT ⊂ WELFake (≈ 99.6 % of processed ISOT is verbatim in WELFake) | "Found by our own hash join at MSE1. WELFake's authors list Reuters/ISOT as one of their four sources. It means 'train WELFake → test ISOT' is in-domain, so the MSE2 cross-dataset study trains on WELFake minus the ISOT articles (WELFake∖ISOT ↔ ISOT); the leakage audit (raw vs processed ISOT) is unaffected." |
 | Optional items (Bi-LSTM, ClaimBuster classifier, SHAP, Ollama) absent | "Marked optional/stretch in scope; only after the core Definition of Done." |
-| Numbers may still shift | "All numbers are regenerated by `make data` / notebooks with seed 42; values quoted today are from `docs/results/classifier_table.md`." |
+| Residual label cues in the LR coefficients: `reuters`, `breitbart`, `via` | "The publisher/format boiler-plate is gone (title tags, photo credits, bylines, outlet suffixes, URL debris — 26 text + 2 title patterns, re-run on 28 Aug). What remains are source names *inside sentences* — 'told Reuters', 'Breitbart News reported', 'announced via Twitter'. Those are content words; deleting them would mean editing sentences, so we keep them and disclose that the classifier still knows which outlets an article talks about. Removing the boiler-plate cost the LR 1.5 macro-F1 points (0.946 → 0.932) — the first measurement of how much in-domain accuracy was leakage." |
+| ISOT ⊂ WELFake (99.9 % of processed ISOT texts are verbatim in WELFake; ≈ 80 % of ISOT val/test rows sit in WELFake *train*) | "Found by our own hash join. The planned 'train WELFake → test ISOT' would be a train-on-test number (0.978 macro-F1 in our preview vs 0.83 the other way). The MSE2 cross-dataset study therefore uses WELFake∖ISOT (23,257 rows) ↔ ISOT (master §18); the raw-vs-processed ISOT leakage audit is unaffected." |
+| LIAR official splits contain 5 train∩val + 4 train∩test identical statements | "Kept on purpose for comparability with Wang (2017) and every later LIAR paper; < 0.1 % of the data, disclosed in `docs/eda_summary.md`. Our own WELFake/ISOT splits have zero cross-split duplicates, exact or near." |
+| FEVER parquet stores evidence *pointers* (Wikipedia page + sentence id), not the sentence text | "The stance evaluation at MSE2 needs the evidence sentences: we will fetch them from the FEVER Wikipedia dump / use FEVER-NLI style pairs. The EDA therefore reports 'evidence pointers per claim' (29 % need > 1 sentence) rather than sentence lengths." |
+| `make paper` uses tectonic, not latexmk | "The local TeX Live lacks `latexmk`, `IEEEtran.cls` and the Times fonts; `paper/Makefile` uses latexmk when present and otherwise the tectonic binary in `~/.local/bin` (documented in `paper/README.md`); Overleaf also compiles it. The PDF is 5 pages because §III–VIII are headed stubs." |
+| `make eda` takes ≈ 10 min, not 4 | "The artefact-only leakage classifier is recomputed on raw and processed WELFake + ISOT with 26 regex features; the budget is ≤ 20 min and the figures are committed, so nothing needs to run live." |
+| Slides (`docs/mse1_slides.pdf`) not yet made; dry-run viva not yet done | "Team action for week 6; every number on the slides must come from `docs/results/classifier_table.md`, `docs/eda_summary.md` and `docs/mse1_make_data.log`." |
+| Numbers may still shift | "All numbers are regenerated by `make data` / notebooks with seed 42; values quoted today are from the 28 Aug 2026 evening run (`docs/results/classifier_table.md`, `docs/eda_summary.md`, `docs/mse1_make_data.log`)." |
 
 # 7. Evidence-of-work log (fill in; one row per artefact or decision)
 
 | Date | Member | Item (what was done) | Link / path | Reviewed by |
 |---|---|---|---|---|
 | 2026-08-27 | Nikhil | Master doc v2.0 + this MSE1 doc | `docs/FakeNewsDetector_ProjectDetails.md`, `docs/milestones/MSE1_ProjectDetails.md` | — |
-| | Prateek Srivastava | Repo skeleton, `requirements.txt`, `Makefile`, `.env.example` | | |
-| | Navishka Sharma | Datasets downloaded, `data/README.md`, `00_datasets.ipynb` | | |
-| | Navishka Sharma | `make data` pipeline, splits, leakage audit | | |
-| | Navishka Sharma | `01_eda.ipynb`, `docs/figures/eda_*.png`, `docs/eda_summary.md` | | |
-| | Naitik Kukreja | `02_baselines.ipynb`, LR baseline, `classifier_table.md` row | | |
-| | Naveen | Model-identification write-up for stance/retrieval; NER/date EDA insights | | |
-| | Nikhil | `paper/main.tex` §I–II, `refs.bib`, `docs/literature_table.md` | | |
-| | All | `docs/mse1_slides.pdf`; dry-run viva (week 6) | | |
+| 2026-08-28 | Prateek Srivastava | Repo skeleton, `requirements.txt`, `Makefile`, `.env.example`, `scripts/download_data.py` | commit `3f8b609` | |
+| 2026-08-28 | Navishka Sharma | Datasets downloaded (no Kaggle), `data/README.md`, `00_datasets.ipynb` | commit `61f3c71` | |
+| 2026-08-28 | Navishka Sharma | `make data` pipeline, splits, leakage audit; residual-artefact fix (26 + 2 patterns, `tests/test_artefacts.py`) | `src/preprocess/`, `docs/mse1_make_data.log` | |
+| 2026-08-28 | Navishka Sharma | `01_eda.ipynb`, 18 figures, `docs/eda_summary.md`; ISOT ⊂ WELFake finding | commit `e42ee69` + re-run | |
+| 2026-08-28 | Naitik Kukreja | `02_baselines.ipynb`, NB/LR/SVM on WELFake + ISOT, `classifier_table.md`, `docs/model_identification.md` | commit `97c43f9` + re-run | |
+| 2026-08-28 | Naveen | Stance / retrieval rows of the model ladder; NER/date EDA insights → claim heuristics, temporal check | `docs/model_identification.md` §1, `docs/eda_summary.md` | |
+| 2026-08-28 | Nikhil | `paper/main.tex` §I–II, `refs.bib` (33), `docs/literature_table.md`, `docs/problem_identification.md` | commit `3f8b609` | |
+| | All | `docs/mse1_slides.pdf`; dry-run viva (week 6) | *pending* | |
 | | | | | |

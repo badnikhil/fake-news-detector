@@ -5,6 +5,7 @@ SHELL := /bin/bash
 PY      ?= .venv/bin/python
 PIP_UV  := $(shell command -v uv 2>/dev/null || echo $(HOME)/.local/bin/uv)
 PYTHON_VERSION ?= 3.11
+SPACY_MODEL_URL ?= https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
 NOT_YET = @echo "make $@: not implemented until MSE2/ESE"
 
 .PHONY: setup download data index train-baselines train-distilbert train-liar train models \
@@ -13,13 +14,16 @@ NOT_YET = @echo "make $@: not implemented until MSE2/ESE"
 help:
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  %-16s %s\n", $$1, $$2}'
 
-setup: ## create .venv (Python 3.11 via uv, pip fallback), install requirements, spaCy model, ipykernel
+setup: ## create .venv (Python 3.11 via uv, pip fallback), install requirements, spaCy en_core_web_sm (wheel URL), ipykernel
 	@if [ ! -x $(PY) ]; then \
 	  if [ -x "$(PIP_UV)" ]; then $(PIP_UV) venv .venv --python $(PYTHON_VERSION); \
 	  else python3 -m venv .venv; fi; fi
 	@if [ -x "$(PIP_UV)" ]; then $(PIP_UV) pip install --python $(PY) -r requirements.txt; \
 	 else $(PY) -m pip install -U pip && $(PY) -m pip install -r requirements.txt; fi
-	-$(PY) -m spacy download en_core_web_sm
+	@# `python -m spacy download` silently installs nowhere under a uv venv ("Audited 1 package"); install the wheel URL instead
+	@if [ -x "$(PIP_UV)" ]; then $(PIP_UV) pip install --python $(PY) $(SPACY_MODEL_URL); \
+	 else $(PY) -m pip install $(SPACY_MODEL_URL); fi
+	$(PY) -c "import spacy; spacy.load('en_core_web_sm'); print('spaCy en_core_web_sm OK')"
 	$(PY) -m ipykernel install --user --name fakenews --display-name "Python (fakenews)"
 	@echo "setup done: source .venv/bin/activate"
 
