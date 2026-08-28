@@ -1,0 +1,179 @@
+%% ---------------------------------------------------------------------------
+%% Fake News & Misinformation Detector -- IEEE conference paper (IEEEtran)
+%% B.Tech semester project, Dept. of CSE (AI/ML), KIET Group of Institutions
+%% Build: latexmk -pdf main.tex   (or: tectonic main.tex, or: make -C paper)
+%% Status: MSE1 draft -- Sections I and II written; III-VIII are stubs.
+%% ---------------------------------------------------------------------------
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{textcomp}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\graphicspath{{figures/}}
+
+\newcommand{\cls}[1]{\textsc{#1}}          % verdict class names
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+
+\begin{document}
+
+\title{Beyond Fake or Real: Evidence-Grounded, Explainable Five-Class News Verification with Temporal Context Checking\\
+%TODO(ESE): delete the next line before submission
+{\footnotesize Draft v0.1 -- MSE1 -- Sections I--II only}}
+
+\author{%
+\IEEEauthorblockN{Navishka Sharma, Naitik Kukreja, Naveen, Prateek Srivastava, and Nikhil}
+\IEEEauthorblockA{Department of Computer Science and Engineering (AI/ML)\\
+KIET Group of Institutions, Ghaziabad, Uttar Pradesh, India\\
+\{navishka.sharma, naitik.kukreja, naveen, prateek.srivastava, nikhil\}@kiet.edu %TODO: replace with real e-mail IDs
+}%
+%TODO: add the project guide as an author or in the Acknowledgment, as the department prefers.
+}
+
+\maketitle
+
+\begin{abstract}
+%TODO(ESE): every number below is a PLACEHOLDER; replace with measured results from docs/results/ before submission.
+Most automatic ``fake news'' detectors are binary text classifiers: they learn how fabricated articles tend to be written rather than whether the claims in them are true, so they cannot explain a verdict, cannot describe an item that is only partly wrong or true-but-out-of-date, and cannot admit that they do not know. We present a compact, fully open-source verification pipeline that can run on a student laptop. Given a headline, an article or a URL, the system extracts check-worthy claims, retrieves evidence from free online sources and from an offline index of fact-checked statements, labels the stance of every evidence passage with a natural-language-inference cross-encoder, compares publication dates to detect old news recirculated as ``breaking'', and fuses these signals with transparent rules into one of five verdicts---\cls{Real}, \cls{Fake}, \cls{Partially True}, \cls{Misleading} or \cls{Unverifiable}---together with a confidence score, dated evidence cards and a plain-language explanation. A fine-tuned DistilBERT content classifier with LIME token attributions contributes only to the confidence estimate. On the WELFake corpus the classifier reaches a macro-F1 of \todo{0.xx}, and on a hand-labelled set of about 100 recent claims the complete pipeline reaches a five-class macro-F1 of \todo{0.xx}; a cross-dataset audit shows why in-domain accuracies near 99\,\% do not transfer. Code, data splits and the claim set are released.
+\end{abstract}
+
+\begin{IEEEkeywords}
+fake news detection, fact verification, evidence retrieval, stance detection, natural language inference, explainable AI, temporal misinformation
+\end{IEEEkeywords}
+
+%% ===========================================================================
+\section{Introduction}
+%% ===========================================================================
+
+News now reaches most people through feeds and messaging groups rather than through editors, and the damage done by what slips through is well documented. Tracing roughly 126{,}000 story cascades on Twitter over eleven years, Vosoughi \emph{et al.}\ found that false stories were about 70\,\% more likely to be retweeted than true ones and that the truth needed roughly six times longer to reach 1{,}500 people~\cite{vosoughi2018spread}. The World Economic Forum's \emph{Global Risks Report 2024} places misinformation and disinformation first among global risks for the coming two years, ahead of extreme weather and armed conflict~\cite{wef2024risks}. A study of the COVID-19 ``infodemic'' linked a single rumour---that drinking concentrated alcohol or methanol cures the virus---to about 800 deaths and roughly 5{,}800 hospital admissions in the first three months of 2020~\cite{islam2020infodemic}. India, the setting of this work, offers its own examples: child-kidnapping rumours forwarded on WhatsApp were linked to at least 17 mob killings across the country between April and July 2018~\cite{bbc2018whatsapp,aljazeera2018whatsapp}, and Indian fact-checkers routinely find genuine footage of earlier floods, riots and accidents re-captioned as ``breaking'' news for a new event---in one analysis of 125 fact-checked Indian COVID-19 items, nearly half paired text with video and 94\,\% originated on social platforms~\cite{alzaman2021india}. This last pattern---true material presented in the wrong time or place---is one that most detectors are not built to see.
+
+Manual fact-checking is accurate but slow. Most academic work on automatic detection has therefore taken a shortcut: treat the task as binary text classification and let a model learn the surface cues of fabricated writing. Such classifiers report accuracies above 95\,\% on benchmark corpora~\cite{verma2021welfake,kaliyar2021fakebert}, but the numbers hide three weaknesses. First, they learn \emph{style} and dataset artefacts rather than \emph{facts}: a corpus whose genuine articles all come from one wire service can be separated almost perfectly by boilerplate alone~\cite{ahmed2017isot}, and the same models lose much of their accuracy on a different corpus. Second, a binary label cannot express the shapes real misinformation takes---a true event with a wrong number, a real quotation attached to the wrong occasion, a 2018 video captioned as today's news. Third, a classifier always produces an answer; it cannot say that the evidence is insufficient, which for hyper-local or very recent claims is the only honest response.
+
+\textbf{Problem statement.} Given a news item---a headline, an article text or a URL---automatically determine, with supporting evidence, dates and a human-readable explanation, whether its central claims are real, fake, partially true, misleading or unverifiable, using only free tools and hardware available to students.
+
+We address this problem by moving the decision from the classifier to the evidence: the system selects the check-worthy sentences of an item, retrieves passages from free web search, Wikipedia, the Google Fact Check Tools API and an offline index of fact-checked statements, labels each passage as supporting, refuting or neutral, compares the dates involved, and applies a small, inspectable set of rules. A style-based classifier is retained, but it may only adjust the confidence or break a single-source tie; it never outputs \cls{Fake} or \cls{Real} on its own when evidence exists. The contributions of this paper are:
+
+\begin{itemize}
+  \item \textbf{An evidence-grounded five-class verdict scheme with abstention.} We define \cls{Real}, \cls{Fake}, \cls{Partially True}, \cls{Misleading} and \cls{Unverifiable} operationally, map LIAR's six PolitiFact grades onto them, and reach each verdict through a published decision table whose confidence reflects evidence agreement, coverage and source reliability, so every output carries the rule that fired, the evidence used and an explicit uncertainty statement (objective O6).
+  \item \textbf{A laptop-scale claim-to-verdict pipeline.} Claim identification, evidence retrieval from free sources with an offline FAISS fallback, NLI stance detection with a small cross-encoder, and a temporal/context check that flags old news presented as new and entity--date mismatches, all running on CPU within seconds offline (objectives O3--O5).
+  \item \textbf{An explainable content classifier evaluated honestly.} A fine-tuned DistilBERT model with LIME token attributions serves as the style signal; we report in-domain results on WELFake, a cross-dataset transfer and leakage audit against ISOT, and an ablation of how much the classifier adds to the evidence-based verdict (objective O1).
+\end{itemize}
+
+The rest of the paper is organised as follows. Section~\ref{sec:related} surveys related work and states the gap; Sections~\ref{sec:data}--\ref{sec:setup} describe the datasets, the pipeline with its fusion rules, and the experimental setup; Section~\ref{sec:results} reports results, Section~\ref{sec:discussion} compares them with existing systems, and Section~\ref{sec:conclusion} concludes.
+
+%% ===========================================================================
+\section{Related Work}\label{sec:related}
+%% ===========================================================================
+
+We group prior work into five themes that correspond to the components of our system; Table~\ref{tab:lit} summarises the most relevant papers along the dimensions that matter to us.
+
+\subsection{Datasets and Benchmarks}
+
+LIAR~\cite{wang2017liar} collects 12.8k short political statements rated by PolitiFact on a six-point scale from \emph{pants-on-fire} to \emph{true}. Its best text-and-metadata model reached only about 27\,\% six-way accuracy, which remains a useful reminder that fine-grained truthfulness cannot be read off the wording of a sentence. ISOT~\cite{ahmed2017isot,ahmed2018opinion} pairs 21k Reuters articles with 23k articles from sites flagged by fact-checkers; because every genuine article shares one source, the corpus is easy to separate and is widely suspected of source leakage. WELFake~\cite{verma2021welfake} merges four public corpora into 72k articles to reduce exactly this kind of overfitting and is our primary training set. FakeNewsNet~\cite{shu2020fakenewsnet} adds social context and PolitiFact/GossipCop labels to news items; we use its PolitiFact titles in our offline index. On the verification side, FEVER~\cite{thorne2018fever} contributes 185k claims written against Wikipedia and labelled \emph{Supports}, \emph{Refutes} or \emph{Not Enough Info}, defining the retrieve-then-verify task that our stance module inherits, while MultiFC~\cite{augenstein2019multifc} gathers 35k claims with the heterogeneous verdict labels of 26 real fact-checking sites. ClaimBuster~\cite{arslan2020claimbuster} provides 23.5k debate sentences annotated for check-worthiness. Surveys by Zhou and Zafarani~\cite{zhou2020survey} and Guo \emph{et al.}~\cite{guo2022survey} organise this landscape: the former distinguishes knowledge-, style-, propagation- and source-based detection, and the latter formalises fact-checking as claim detection, evidence retrieval, verdict prediction and justification production---the sequence our pipeline follows.
+
+\subsection{Content-Based Classifiers}
+
+The earliest and still most common approach treats detection as document classification. Ahmed \emph{et al.}~\cite{ahmed2017isot} reported that TF-IDF n-grams with a linear SVM reach roughly 92\,\% accuracy on ISOT, and P{\'e}rez-Rosas \emph{et al.}~\cite{perezrosas2018automatic} found linear models on lexical, syntactic and readability features to be competitive on crowd-sourced fake news. Pre-trained transformers~\cite{devlin2019bert} raised these numbers further: FakeBERT~\cite{kaliyar2021fakebert} feeds BERT embeddings through parallel convolutional blocks and reports 98.9\,\% accuracy on a Kaggle corpus, and WELFake's own linguistic-feature model reports 96.7\,\%. DistilBERT~\cite{sanh2019distilbert} keeps about 97\,\% of BERT's language-understanding performance at 40\,\% fewer parameters, which is what makes fine-tuning on a 4\,GB consumer GPU feasible and is why we adopt it. What these papers share is an in-domain, binary evaluation; none reports cross-corpus transfer, and none can tell a user \emph{why} an article is suspicious beyond its wording. We keep such a classifier, but only as a secondary signal.
+
+\subsection{Claim Detection, Evidence Retrieval and Fact Verification}
+
+ClaimBuster~\cite{hassan2017claimbuster} showed that check-worthy sentences in political debates can be ranked with sentence-level features and a supervised classifier, and its later benchmark release~\cite{arslan2020claimbuster} is the standard training set for the task; our claim identifier combines similar hand-crafted cues with an optional classifier trained on that data. For verification, the FEVER baseline~\cite{thorne2018fever} chains document retrieval, sentence selection and an NLI model and scored 31.9 FEVER points; the shared-task winner, NSMN~\cite{nie2019nsmn}, unified the three steps with semantic matching networks, and KGAT~\cite{liu2020kgat} propagates evidence through a kernel-based graph attention network to exceed 70 FEVER points---the current ceiling for Wikipedia-grounded verification. DeClarE~\cite{popat2018declare} verifies free-text claims against web search results with attention over the retrieved articles and a source-credibility embedding, which is close in spirit to our online path. Two components make retrieval and stance practical at our scale: Sentence-BERT~\cite{reimers2019sbert} bi-encoders (we use the 22M-parameter MiniLM variant~\cite{wang2020minilm}) turn semantic search over thousands of fact-checked statements into a millisecond nearest-neighbour lookup, while a small DeBERTaV3 cross-encoder~\cite{he2023debertav3} trained on MultiNLI~\cite{williams2018mnli} and FEVER-NLI provides an off-the-shelf three-way stance judgement on CPU. Hanselowski \emph{et al.}~\cite{hanselowski2018stance} re-examined the Fake News Challenge and showed that headline-body stance systems that looked strong under the challenge metric had far lower macro-F1 on the minority \emph{agree}/\emph{disagree} classes---a caution we take into account by reporting macro-F1 throughout.
+
+\subsection{Explainability}
+
+LIME~\cite{ribeiro2016lime} explains an individual prediction by fitting a sparse linear surrogate on perturbed inputs, and SHAP~\cite{lundberg2017shap} unifies several attribution methods under Shapley values; both are model-agnostic and produce token-level highlights that lay users can read. In the fake-news setting, dEFEND~\cite{shu2019defend} co-attends over article sentences and user comments so that the sentences and comments that drove the decision can be shown as the explanation, and DeClarE~\cite{popat2018declare} exposes the retrieved evidence words its attention focused on. These methods explain a \emph{model}; they do not by themselves ground the verdict in checkable facts. We therefore treat LIME highlights as an explanation of the style signal only, and build the primary explanation from the retrieved evidence, its stance, its source and its date.
+
+\subsection{Temporal and Contextual Misinformation}
+
+Much misinformation is not fabricated text but genuine material displaced in time or place. Vosoughi \emph{et al.}~\cite{vosoughi2018spread} quantified how much faster and deeper falsehoods travel, and Zubiaga \emph{et al.}~\cite{zubiaga2018rumours} survey rumour detection, tracking and stance classification as an inherently temporal process in which a story's veracity is resolved over time. In India, Al-Zaman~\cite{alzaman2021india} analysed 125 fact-checked COVID-19 stories and found that two-thirds concerned health, that text paired with video was the commonest format, and that almost all originated on social platforms rather than in mainstream media; reporting on the 2018 WhatsApp lynchings~\cite{bbc2018whatsapp,aljazeera2018whatsapp} traced the killings to rumour messages and videos forwarded as local warnings. Existing detectors ignore publication dates entirely; we add a lightweight check that compares the input's date and recency cues against the dates of the supporting evidence and against the entities it mentions.
+
+\subsection{The Gap}
+
+Table~\ref{tab:lit} makes the gap visible. Style-based classifiers are accurate in-domain but produce no evidence, no partial-truth labels and no abstention; FEVER-style verifiers ground their decisions in evidence but assume Wikipedia-only, synthetic claims and do not consider time; explainability work explains models rather than facts. No system we are aware of combines (i) a five-way verdict with an explicit \cls{Unverifiable} class, (ii) evidence retrieval from free sources with an offline fallback, (iii) a temporal and contextual check, and (iv) evidence-linked explanations, while running on ordinary student hardware. Those properties are the three contributions listed in Section~I, and the rest of this paper builds and evaluates them.
+
+\begin{table}[t]
+\caption{Representative prior work compared on the properties this paper targets. Ev.\ = grounds the verdict in retrieved evidence; Exp.\ = explains the verdict to a user; Abst.\ = can abstain; Temp.\ = checks dates or context. Full table in \texttt{docs/literature\_table.md}.}
+\label{tab:lit}
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}l l c c c c@{}}
+\toprule
+Work & Output & Ev. & Exp. & Abst. & Temp. \\
+\midrule
+LIAR CNN~\cite{wang2017liar}            & 6-way   & --  & --  & --  & --  \\
+ISOT SVM~\cite{ahmed2017isot}           & binary  & --  & --  & --  & --  \\
+WELFake~\cite{verma2021welfake}         & binary  & --  & --  & --  & --  \\
+FakeBERT~\cite{kaliyar2021fakebert}     & binary  & --  & --  & --  & --  \\
+FEVER baseline~\cite{thorne2018fever}   & 3-way   & \checkmark & --  & NEI & --  \\
+KGAT~\cite{liu2020kgat}                 & 3-way   & \checkmark & --  & NEI & --  \\
+DeClarE~\cite{popat2018declare}         & binary  & \checkmark & \checkmark & --  & --  \\
+dEFEND~\cite{shu2019defend}             & binary  & --  & \checkmark & --  & --  \\
+MultiFC~\cite{augenstein2019multifc}    & per-site & \checkmark & --  & --  & --  \\
+\textbf{This work}                      & 5-way   & \checkmark & \checkmark & \checkmark & \checkmark \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%% ===========================================================================
+\section{Datasets and Preprocessing}\label{sec:data}
+%% ===========================================================================
+%TODO(MSE2): condense master doc Sections 10-11 -- WELFake (primary), ISOT (cross-dataset / leakage audit),
+%TODO(MSE2): LIAR (6->5 and 3-way mapping, offline index), FEVER subset (stance), FakeNewsNet PolitiFact titles,
+%TODO(MSE2): ClaimBuster (optional), Live Claims Set (~100 items, 5-class). Splits 80/10/10 stratified, seed 42.
+%TODO(MSE2): Preprocessing: cleaning, de-duplication, artefact removal (Reuters datelines etc.), sentence split.
+Placeholder --- to be written for MSE2.
+
+%% ===========================================================================
+\section{Methodology}\label{sec:method}
+%% ===========================================================================
+%TODO(MSE2): pipeline figure (figures/pipeline.pdf), claim identification (heuristic score + optional ClaimBuster LR),
+%TODO(MSE2): evidence retrieval (ddgs / Wikipedia / Google Fact Check Tools / offline FAISS), stance (nli-deberta-v3-small),
+%TODO(MSE2): temporal & context check (old-news flag, out-of-context flag, headline-body mismatch),
+%TODO(MSE2): fusion decision table R0-R9 and the confidence formula; explanation generation (LIME + evidence templates).
+Placeholder --- to be written for MSE2.
+
+%% ===========================================================================
+\section{Experimental Setup}\label{sec:setup}
+%% ===========================================================================
+%TODO(MSE2): splits, hyper-parameter grids (TF-IDF models via GridSearchCV; DistilBERT 6-config grid lr x max_len),
+%TODO(MSE2): hardware (RTX 3050 4 GB fp16 / CPU path), metrics (accuracy, P/R, macro-F1, ROC-AUC, latency).
+Placeholder --- to be written for MSE2.
+
+%% ===========================================================================
+\section{Results}\label{sec:results}
+%% ===========================================================================
+%TODO(MSE2 partial, ESE final): classifier table, cross-dataset WELFake<->ISOT with artefact-removal ablation,
+%TODO(ESE): stance accuracy on FEVER subset, end-to-end 5-class results on the Live Claims Set,
+%TODO(ESE): ablation (classifier-only / +evidence / +temporal / offline-only), latency table, confusion matrices.
+Placeholder --- to be written for MSE2 (partial) and ESE (final).
+
+%% ===========================================================================
+\section{Discussion and Comparison with Existing Systems}\label{sec:discussion}
+%% ===========================================================================
+%TODO(ESE): comparison table (master doc Section 19), error analysis of >= 20 items, five case studies, limitations
+%TODO(ESE): (English only, search-bound latency, dependence on fact-checker coverage, rule brittleness).
+Placeholder --- to be written for ESE.
+
+%% ===========================================================================
+\section{Conclusion and Future Work}\label{sec:conclusion}
+%% ===========================================================================
+%TODO(ESE): summarise findings against objectives O1-O8; future work: Hindi/Hinglish via translation, image OCR,
+%TODO(ESE): learned fusion, CLEF CheckThat! participation.
+Placeholder --- to be written for ESE.
+
+%% ===========================================================================
+\section*{Acknowledgment}
+%TODO(ESE): guide's name and designation; department; any lab facilities used.
+The authors thank their project guide and the Department of CSE (AI/ML), KIET Group of Institutions, for guidance and facilities.
+
+\bibliographystyle{IEEEtran}
+\bibliography{refs}
+
+\end{document}

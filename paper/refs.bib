@@ -1,0 +1,358 @@
+%% refs.bib -- Fake News & Misinformation Detector (KIET, CSE-AI/ML, 2026)
+%% IEEE style via IEEEtran.bst.  Entries verified against ACL Anthology / publisher pages
+%% on 2026-08-28 (see docs/problem_identification.md, "Verified facts").
+%% Keep bibkeys stable: they are referenced from docs/literature_table.md.
+
+%% ---------------------------------------------------------------- datasets & benchmarks
+
+@inproceedings{wang2017liar,
+  author    = {Wang, William Yang},
+  title     = {``{L}iar, {L}iar {P}ants on {F}ire'': A New Benchmark Dataset for Fake News Detection},
+  booktitle = {Proceedings of the 55th Annual Meeting of the Association for Computational Linguistics (Volume 2: Short Papers)},
+  year      = {2017},
+  pages     = {422--426},
+  address   = {Vancouver, Canada},
+  publisher = {Association for Computational Linguistics},
+  doi       = {10.18653/v1/P17-2067}
+}
+
+@article{shu2020fakenewsnet,
+  author  = {Shu, Kai and Mahudeswaran, Deepak and Wang, Suhang and Lee, Dongwon and Liu, Huan},
+  title   = {{FakeNewsNet}: A Data Repository with News Content, Social Context, and Spatiotemporal Information for Studying Fake News on Social Media},
+  journal = {Big Data},
+  volume  = {8},
+  number  = {3},
+  pages   = {171--188},
+  year    = {2020},
+  doi     = {10.1089/big.2020.0062}
+}
+
+@inproceedings{ahmed2017isot,
+  author    = {Ahmed, Hadeer and Traore, Issa and Saad, Sherif},
+  title     = {Detection of Online Fake News Using {N}-Gram Analysis and Machine Learning Techniques},
+  booktitle = {Intelligent, Secure, and Dependable Systems in Distributed and Cloud Environments (ISDDC 2017)},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {10618},
+  pages     = {127--138},
+  publisher = {Springer},
+  year      = {2017},
+  doi       = {10.1007/978-3-319-69155-8_9}
+}
+
+@article{ahmed2018opinion,
+  author  = {Ahmed, Hadeer and Traore, Issa and Saad, Sherif},
+  title   = {Detecting Opinion Spams and Fake News Using Text Classification},
+  journal = {Security and Privacy},
+  volume  = {1},
+  number  = {1},
+  pages   = {e9},
+  year    = {2018},
+  doi     = {10.1002/spy2.9}
+}
+
+@article{verma2021welfake,
+  author  = {Verma, Pawan Kumar and Agrawal, Prateek and Amorim, Ivone and Prodan, Radu},
+  title   = {{WELFake}: Word Embedding Over Linguistic Features for Fake News Detection},
+  journal = {IEEE Transactions on Computational Social Systems},
+  volume  = {8},
+  number  = {4},
+  pages   = {881--893},
+  year    = {2021},
+  doi     = {10.1109/TCSS.2021.3068519}
+}
+
+@inproceedings{thorne2018fever,
+  author    = {Thorne, James and Vlachos, Andreas and Christodoulopoulos, Christos and Mittal, Arpit},
+  title     = {{FEVER}: A Large-scale Dataset for Fact Extraction and {VERification}},
+  booktitle = {Proceedings of the 2018 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long Papers)},
+  year      = {2018},
+  pages     = {809--819},
+  address   = {New Orleans, Louisiana},
+  publisher = {Association for Computational Linguistics},
+  doi       = {10.18653/v1/N18-1074}
+}
+
+@inproceedings{augenstein2019multifc,
+  author    = {Augenstein, Isabelle and Lioma, Christina and Wang, Dongsheng and Chaves Lima, Lucas and Hansen, Casper and Hansen, Christian and Simonsen, Jakob Grue},
+  title     = {{MultiFC}: A Real-World Multi-Domain Dataset for Evidence-Based Fact Checking of Claims},
+  booktitle = {Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP)},
+  year      = {2019},
+  pages     = {4685--4697},
+  address   = {Hong Kong, China},
+  publisher = {Association for Computational Linguistics},
+  doi       = {10.18653/v1/D19-1475}
+}
+
+@inproceedings{arslan2020claimbuster,
+  author    = {Arslan, Fatma and Hassan, Naeemul and Li, Chengkai and Tremayne, Mark},
+  title     = {A Benchmark Dataset of Check-worthy Factual Claims},
+  booktitle = {Proceedings of the Fourteenth International AAAI Conference on Web and Social Media (ICWSM)},
+  volume    = {14},
+  pages     = {821--829},
+  year      = {2020},
+  doi       = {10.1609/icwsm.v14i1.7346}
+}
+
+%% ---------------------------------------------------------------- content-based classifiers
+
+@inproceedings{devlin2019bert,
+  author    = {Devlin, Jacob and Chang, Ming-Wei and Lee, Kenton and Toutanova, Kristina},
+  title     = {{BERT}: Pre-training of Deep Bidirectional Transformers for Language Understanding},
+  booktitle = {Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers)},
+  year      = {2019},
+  pages     = {4171--4186},
+  address   = {Minneapolis, Minnesota},
+  publisher = {Association for Computational Linguistics},
+  doi       = {10.18653/v1/N19-1423}
+}
+
+@article{sanh2019distilbert,
+  author  = {Sanh, Victor and Debut, Lysandre and Chaumond, Julien and Wolf, Thomas},
+  title   = {{DistilBERT}, a distilled version of {BERT}: smaller, faster, cheaper and lighter},
+  journal = {arXiv preprint arXiv:1910.01108},
+  year    = {2019},
+  note    = {Presented at the 5th Workshop on Energy Efficient Machine Learning and Cognitive Computing (NeurIPS 2019)}
+}
+
+@article{kaliyar2021fakebert,
+  author  = {Kaliyar, Rohit Kumar and Goswami, Anurag and Narang, Pratik},
+  title   = {{FakeBERT}: Fake news detection in social media with a {BERT}-based deep learning approach},
+  journal = {Multimedia Tools and Applications},
+  volume  = {80},
+  pages   = {11765--11788},
+  year    = {2021},
+  doi     = {10.1007/s11042-020-10183-2}
+}
+
+@inproceedings{perezrosas2018automatic,
+  author    = {P{\'e}rez-Rosas, Ver{\'o}nica and Kleinberg, Bennett and Lefevre, Alexandra and Mihalcea, Rada},
+  title     = {Automatic Detection of Fake News},
+  booktitle = {Proceedings of the 27th International Conference on Computational Linguistics (COLING)},
+  year      = {2018},
+  pages     = {3391--3401},
+  address   = {Santa Fe, New Mexico, USA},
+  publisher = {Association for Computational Linguistics}
+}
+
+%% ---------------------------------------------------------------- claims, retrieval, verification, stance
+
+@inproceedings{hassan2017claimbuster,
+  author    = {Hassan, Naeemul and Arslan, Fatma and Li, Chengkai and Tremayne, Mark},
+  title     = {Toward Automated Fact-Checking: Detecting Check-worthy Factual Claims by {ClaimBuster}},
+  booktitle = {Proceedings of the 23rd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining},
+  year      = {2017},
+  pages     = {1803--1812},
+  address   = {Halifax, NS, Canada},
+  publisher = {ACM},
+  doi       = {10.1145/3097983.3098131}
+}
+
+@inproceedings{nie2019nsmn,
+  author    = {Nie, Yixin and Chen, Haonan and Bansal, Mohit},
+  title     = {Combining Fact Extraction and Verification with Neural Semantic Matching Networks},
+  booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
+  volume    = {33},
+  number    = {01},
+  pages     = {6859--6866},
+  year      = {2019},
+  doi       = {10.1609/aaai.v33i01.33016859}
+}
+
+@inproceedings{liu2020kgat,
+  author    = {Liu, Zhenghao and Xiong, Chenyan and Sun, Maosong and Liu, Zhiyuan},
+  title     = {Fine-grained Fact Verification with Kernel Graph Attention Network},
+  booktitle = {Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics},
+  year      = {2020},
+  pages     = {7342--7351},
+  publisher = {Association for Computational Linguistics},
+  doi       = {10.18653/v1/2020.acl-main.655}
+}
+
+@inproceedings{popat2018declare,
+  author    = {Popat, Kashyap and Mukherjee, Subhabrata and Yates, Andrew and Weikum, Gerhard},
+  title     = {{DeClarE}: Debunking Fake News and False Claims using Evidence-Aware Deep Learning},
+  booktitle = {Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing},
+  year      = {2018},
+  pages     = {22--32},
+  address   = {Brussels, Belgium},
+  publisher = {Association for Computational Linguistics},
+  doi       = {10.18653/v1/D18-1003}
+}
+
+@inproceedings{reimers2019sbert,
+  author    = {Reimers, Nils and Gurevych, Iryna},
+  title     = {{Sentence-BERT}: Sentence Embeddings using {S}iamese {BERT}-Networks},
+  booktitle = {Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP)},
+  year      = {2019},
+  pages     = {3982--3992},
+  address   = {Hong Kong, China},
+  publisher = {Association for Computational Linguistics},
+  doi       = {10.18653/v1/D19-1410}
+}
+
+@inproceedings{wang2020minilm,
+  author    = {Wang, Wenhui and Wei, Furu and Dong, Li and Bao, Hangbo and Yang, Nan and Zhou, Ming},
+  title     = {{MiniLM}: Deep Self-Attention Distillation for Task-Agnostic Compression of Pre-Trained Transformers},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {33},
+  pages     = {5776--5788},
+  year      = {2020}
+}
+
+@inproceedings{williams2018mnli,
+  author    = {Williams, Adina and Nangia, Nikita and Bowman, Samuel},
+  title     = {A Broad-Coverage Challenge Corpus for Sentence Understanding through Inference},
+  booktitle = {Proceedings of the 2018 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long Papers)},
+  year      = {2018},
+  pages     = {1112--1122},
+  address   = {New Orleans, Louisiana},
+  publisher = {Association for Computational Linguistics},
+  doi       = {10.18653/v1/N18-1101}
+}
+
+@inproceedings{he2023debertav3,
+  author    = {He, Pengcheng and Gao, Jianfeng and Chen, Weizhu},
+  title     = {{DeBERTaV3}: Improving {DeBERTa} using {ELECTRA}-Style Pre-Training with Gradient-Disentangled Embedding Sharing},
+  booktitle = {The Eleventh International Conference on Learning Representations (ICLR)},
+  year      = {2023}
+}
+
+@inproceedings{hanselowski2018stance,
+  author    = {Hanselowski, Andreas and PVS, Avinesh and Schiller, Benjamin and Caspelherr, Felix and Chaudhuri, Debanjan and Meyer, Christian M. and Gurevych, Iryna},
+  title     = {A Retrospective Analysis of the Fake News Challenge Stance-Detection Task},
+  booktitle = {Proceedings of the 27th International Conference on Computational Linguistics (COLING)},
+  year      = {2018},
+  pages     = {1859--1874},
+  address   = {Santa Fe, New Mexico, USA},
+  publisher = {Association for Computational Linguistics}
+}
+
+%% ---------------------------------------------------------------- explainability
+
+@inproceedings{ribeiro2016lime,
+  author    = {Ribeiro, Marco Tulio and Singh, Sameer and Guestrin, Carlos},
+  title     = {``{W}hy Should {I} Trust You?'': Explaining the Predictions of Any Classifier},
+  booktitle = {Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining},
+  year      = {2016},
+  pages     = {1135--1144},
+  address   = {San Francisco, CA, USA},
+  publisher = {ACM},
+  doi       = {10.1145/2939672.2939778}
+}
+
+@inproceedings{lundberg2017shap,
+  author    = {Lundberg, Scott M. and Lee, Su-In},
+  title     = {A Unified Approach to Interpreting Model Predictions},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {30},
+  pages     = {4765--4774},
+  year      = {2017}
+}
+
+@inproceedings{shu2019defend,
+  author    = {Shu, Kai and Cui, Limeng and Wang, Suhang and Lee, Dongwon and Liu, Huan},
+  title     = {{dEFEND}: Explainable Fake News Detection},
+  booktitle = {Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery \& Data Mining},
+  year      = {2019},
+  pages     = {395--405},
+  address   = {Anchorage, AK, USA},
+  publisher = {ACM},
+  doi       = {10.1145/3292500.3330935}
+}
+
+%% ---------------------------------------------------------------- spread, temporal & context, surveys
+
+@article{vosoughi2018spread,
+  author  = {Vosoughi, Soroush and Roy, Deb and Aral, Sinan},
+  title   = {The spread of true and false news online},
+  journal = {Science},
+  volume  = {359},
+  number  = {6380},
+  pages   = {1146--1151},
+  year    = {2018},
+  doi     = {10.1126/science.aap9559}
+}
+
+@article{zubiaga2018rumours,
+  author  = {Zubiaga, Arkaitz and Aker, Ahmet and Bontcheva, Kalina and Liakata, Maria and Procter, Rob},
+  title   = {Detection and Resolution of Rumours in Social Media: A Survey},
+  journal = {ACM Computing Surveys},
+  volume  = {51},
+  number  = {2},
+  pages   = {32:1--32:36},
+  year    = {2018},
+  doi     = {10.1145/3161603}
+}
+
+@article{alzaman2021india,
+  author  = {Al-Zaman, Md. Sayeed},
+  title   = {{COVID}-19-Related Social Media Fake News in {I}ndia},
+  journal = {Journalism and Media},
+  volume  = {2},
+  number  = {1},
+  pages   = {100--114},
+  year    = {2021},
+  doi     = {10.3390/journalmedia2010007}
+}
+
+@article{zhou2020survey,
+  author  = {Zhou, Xinyi and Zafarani, Reza},
+  title   = {A Survey of Fake News: Fundamental Theories, Detection Methods, and Opportunities},
+  journal = {ACM Computing Surveys},
+  volume  = {53},
+  number  = {5},
+  pages   = {109:1--109:40},
+  year    = {2020},
+  doi     = {10.1145/3395046}
+}
+
+@article{guo2022survey,
+  author  = {Guo, Zhijiang and Schlichtkrull, Michael and Vlachos, Andreas},
+  title   = {A Survey on Automated Fact-Checking},
+  journal = {Transactions of the Association for Computational Linguistics},
+  volume  = {10},
+  pages   = {178--206},
+  year    = {2022},
+  doi     = {10.1162/tacl_a_00454}
+}
+
+%% ---------------------------------------------------------------- motivation statistics (non-ML sources)
+
+@article{islam2020infodemic,
+  author  = {Islam, Md Saiful and Sarkar, Tonmoy and Khan, Sazzad Hossain and Mostofa Kamal, Abu-Hena and Hasan, S. M. Murshid and Kabir, Alamgir and Yeasmin, Dalia and Islam, Mohammad Ariful and Amin Chowdhury, Kamal Ibne and Anwar, Kazi Selim and Chughtai, Abrar Ahmad and Seale, Holly},
+  title   = {{COVID}-19--Related Infodemic and Its Impact on Public Health: A Global Social Media Analysis},
+  journal = {The American Journal of Tropical Medicine and Hygiene},
+  volume  = {103},
+  number  = {4},
+  pages   = {1621--1629},
+  year    = {2020},
+  doi     = {10.4269/ajtmh.20-0812}
+}
+
+@techreport{wef2024risks,
+  author      = {{World Economic Forum}},
+  title       = {The Global Risks Report 2024},
+  institution = {World Economic Forum},
+  address     = {Geneva, Switzerland},
+  year        = {2024},
+  month       = jan,
+  note        = {19th edition. \url{https://www.weforum.org/publications/global-risks-report-2024/}}
+}
+
+@misc{bbc2018whatsapp,
+  author       = {Bathini, Deepthi},
+  title        = {How {WhatsApp} helped turn an {I}ndian village into a lynch mob},
+  howpublished = {BBC News, \url{https://www.bbc.com/news/world-asia-india-44856910}},
+  year         = {2018},
+  month        = jul,
+  note         = {18 July 2018; accessed 28 Aug 2026}
+}
+
+@misc{aljazeera2018whatsapp,
+  author       = {{Al Jazeera}},
+  title        = {In {I}ndia, {WhatsApp} stirs up deadly rumours},
+  howpublished = {\url{https://www.aljazeera.com/features/2018/7/17/in-india-whatsapp-stirs-up-deadly-rumours}},
+  year         = {2018},
+  month        = jul,
+  note         = {17 July 2018; accessed 28 Aug 2026}
+}
