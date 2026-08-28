@@ -4,7 +4,9 @@
 
 B.Tech semester project (NLP, Dept. of CSE-AI/ML, KIET Group of Institutions, Aug–Dec 2026). A locally runnable web app that takes a headline / article / URL, extracts claims, retrieves evidence (online free sources + an offline FAISS fact-check index), runs NLI stance detection, checks dates ("old news presented as new"), and fuses everything into one of five verdicts — **REAL / FAKE / PARTIALLY TRUE / MISLEADING / UNVERIFIABLE** — with confidence, evidence cards (source + date) and a plain-language explanation. Team of five: Navishka Sharma, Naitik Kukreja, Naveen, Prateek Srivastava, Nikhil.
 
-**Current status: MSE1 foundation + TF-IDF baselines built (2026-08-28)** — env, `make download`, `make data`, `notebooks/00_datasets.ipynb`, `tests/test_data.py`; `make train-baselines` (NB/LR/SVM on WELFake + ISOT → `data/models/tfidf_*_v0.joblib`, `docs/results/classifier_table.md`), `notebooks/02_baselines.ipynb`, `docs/model_identification.md`, `tests/test_models.py`. Not yet: DistilBERT, retrieval, stance, API, UI (MSE2/ESE).
+**Current status: MSE1 foundation + TF-IDF baselines built (2026-08-28)** — env, `make download`, `make data`, `notebooks/00_datasets.ipynb`, `tests/test_data.py`; `make train-baselines` (NB/LR/SVM on WELFake + ISOT → `data/models/tfidf_*_v0.joblib`, `docs/results/classifier_table.md`), `notebooks/02_baselines.ipynb`, `docs/model_identification.md`, `tests/test_models.py`; **EDA: `notebooks/01_eda.ipynb` (`make eda` → 18 figures `docs/figures/eda_*.png`, `docs/eda_summary.md`, `tests/test_eda.py`)**. Not yet: DistilBERT, retrieval, stance, API, UI (MSE2/ESE).
+
+**EDA findings every agent must respect** (numbers in `docs/eda_summary.md`, details in `agent-docs/README.md`): 99.6 % of processed ISOT articles are verbatim inside WELFake — a WELFake→ISOT "cross-dataset" test is in-domain unless the shared articles (hash-match `text.str.lower().str.strip()`, plus near-dups) are removed from the training side; only 19 % of WELFake inputs fit in 256 DistilBERT tokens (50 % in 512) — max_len 256 is a GPU-budget choice, sweep 256 vs 512 rather than 128 vs 256; ISOT `subject`, publication date and LIAR speaker/party are label proxies — never features; LIAR's official splits contain 5 train∩val / 4 train∩test duplicate statements (kept, disclosed).
 
 ## Where things are
 
@@ -14,6 +16,8 @@ B.Tech semester project (NLP, Dept. of CSE-AI/ML, KIET Group of Institutions, Au
 - `data/README.md` — dataset provenance table (URL, licence, SHA-256, download date, rows) + label conventions + processed layout.
 - Code: `src/config.py` (paths, seed 42, split ratios, label maps, `SCHEMA`), `src/preprocess/{load,artefacts,clean,dedupe,split,run_all}.py`, `scripts/download_data.py`, `src/common/seed.py`; stubs with docstrings for `src/{ingest,models,claims,evidence,stance,temporal,fusion,explain,api,eval}`.
 - `notebooks/00_datasets.ipynb` is generated from `scripts/build_notebook_00.py` and executed in place with `make nb-run` (outputs are saved on purpose — examiners need them; never `nbstripout` before a viva).
+- `notebooks/01_eda.ipynb` is generated from `scripts/build_notebook_01.py` (`--py` dumps the code cells for a dry run) and executed with `make eda` (≈ 4 min CPU, peak ≈ 2.5 GB RAM); its last cell writes `docs/eda_summary.md` and `data/processed/eda_numbers.json` — edit the template in the builder, never the .md by hand. RAM rules learned there: never `Series.str.split().str.len()` on the article corpora (+2 GB; use `str.count(r"\S+")`), prefer streaming `Counter`s over `CountVectorizer` for full-corpus counts, and use `tokenizers.Tokenizer.from_pretrained` instead of importing transformers/torch just for a tokenizer.
+- `python -m spacy download en_core_web_sm` silently installs nowhere under the uv venv ("Audited 1 package"); install the wheel instead: `uv pip install --python .venv/bin/python https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl` (done on this laptop 2026-08-28).
 - `src/models/baselines.py` — TF-IDF + NB/LR/SVM: `load_split` (joins `data/splits/*.csv` by id — never re-split), `fit_eval_all` (one TF-IDF per dataset shared by the three classifiers, val metrics), `top_coefficients` / `find_leak_tokens`, `render_classifier_table` (writes `docs/results/classifier_table.md` from `docs/results/train_logs/baselines_*.json`); CLI `python -m src.models.baselines --dataset welfake --model lr`. `src/models/tfidf_baselines.py` is only an alias (the docs use that name). `notebooks/02_baselines.ipynb` is generated from `scripts/build_notebook_02.py` and executed with `make nb-run-baselines`. Viva artefact: `docs/model_identification.md`.
 
 ## How to run
@@ -24,6 +28,7 @@ make download    # data/raw/ (WELFake via Zenodo API, ISOT via UVic zip, LIAR vi
 make data        # src.preprocess.run_all -> data/processed/*.parquet + data/splits/*.csv ; log tee'd to docs/mse1_make_data.log (~5 min)
 make test        # pytest tests/
 make nb-run      # execute notebooks/00_datasets.ipynb in place
+make eda         # execute notebooks/01_eda.ipynb in place -> docs/figures/eda_*.png + docs/eda_summary.md (≈ 4 min)
 make train-baselines   # TF-IDF + NB/LR/SVM on WELFake + ISOT (train -> val, ~2 min CPU, peak RSS ~2.6 GB) -> data/models/, docs/results/
 make nb-run-baselines  # build + execute notebooks/02_baselines.ipynb in place (~2.5 min)
 ```

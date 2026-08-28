@@ -14,6 +14,7 @@ make download   # raw datasets -> data/raw/   (no Kaggle account needed; ~330 MB
 make data       # unify + clean + de-dup + split -> data/processed/*.parquet, data/splits/*.csv  (≈ 5 min CPU; log in docs/mse1_make_data.log)
 make test       # pytest checks on the processed data (schema, split ratios, no leakage, LIAR splits unchanged)
 make nb-run     # execute notebooks/00_datasets.ipynb in place (outputs saved for the viva)
+make eda        # execute notebooks/01_eda.ipynb in place -> docs/figures/eda_*.png + docs/eda_summary.md (≈ 8 min CPU)
 ```
 
 Other Makefile targets (`make help`): `index`, `train-baselines`, `train-distilbert`, `train-liar`, `train`, `models`, `eval-models`, `eval-e2e`, `eval`, `run`, `paper`, `docker-build`, `docker-run` — these print "not implemented until MSE2/ESE" for now.
@@ -30,7 +31,8 @@ src/common/seed.py            # fixed seeds
 data/raw/                     # downloads (git-ignored)   data/processed/*.parquet   data/splits/*.csv
 data/README.md                # dataset table: source URL, licence, download date, SHA-256, rows
 notebooks/00_datasets.ipynb   # counts, schema, label distributions (executed, outputs saved)
-tests/test_data.py            # make test
+notebooks/01_eda.ipynb        # EDA: 18 figures -> docs/figures/eda_*.png, insights -> docs/eda_summary.md (make eda)
+tests/test_data.py, tests/test_eda.py   # make test
 docs/FakeNewsDetector_ProjectDetails.md        # master project document (architecture, datasets, models, plan)
 docs/milestones/{MSE1,MSE2,ESE}_ProjectDetails.md   # per-milestone checklists + viva Q&A
 docs/mse1_make_data.log       # last `make data` run log
