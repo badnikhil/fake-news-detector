@@ -23,9 +23,7 @@
 
 \begin{document}
 
-\title{Beyond Fake or Real: Evidence-Grounded, Explainable Five-Class News Verification with Temporal Context Checking\\
-%TODO(ESE): delete the next line before submission
-{\footnotesize Draft v0.1 -- MSE1 -- Sections I--II only}}
+\title{Beyond Fake or Real: Evidence-Grounded, Explainable Five-Class News Verification with Temporal Context Checking}
 
 \author{%
 \IEEEauthorblockN{Navishka Sharma, Naitik Kukreja, Naveen, Prateek Srivastava, and Nikhil}
@@ -39,8 +37,8 @@ KIET Group of Institutions, Ghaziabad, Uttar Pradesh, India\\
 \maketitle
 
 \begin{abstract}
-%TODO(ESE): every number below is a PLACEHOLDER; replace with measured results from docs/results/ before submission.
-Most automatic ``fake news'' detectors are binary text classifiers: they learn how fabricated articles tend to be written rather than whether the claims in them are true, so they cannot explain a verdict, cannot describe an item that is only partly wrong or true-but-out-of-date, and cannot admit that they do not know. We present a compact, fully open-source verification pipeline that can run on a student laptop. Given a headline, an article or a URL, the system extracts check-worthy claims, retrieves evidence from free online sources and from an offline index of fact-checked statements, labels the stance of every evidence passage with a natural-language-inference cross-encoder, compares publication dates to detect old news recirculated as ``breaking'', and fuses these signals with transparent rules into one of five verdicts---\cls{Real}, \cls{Fake}, \cls{Partially True}, \cls{Misleading} or \cls{Unverifiable}---together with a confidence score, dated evidence cards and a plain-language explanation. A fine-tuned DistilBERT content classifier with LIME token attributions contributes only to the confidence estimate. On the WELFake corpus the classifier reaches a macro-F1 of \todo{0.xx}, and on a hand-labelled set of about 100 recent claims the complete pipeline reaches a five-class macro-F1 of \todo{0.xx}; a cross-dataset audit shows why in-domain accuracies near 99\,\% do not transfer. Code, data splits and the claim set are released.
+%TODO(ESE): add the measured headline numbers (classifier macro-F1, end-to-end 5-class macro-F1) once trained.
+Most automatic ``fake news'' detectors are binary text classifiers: they learn how fabricated articles tend to be written rather than whether the claims in them are true, so they cannot explain a verdict, cannot describe an item that is only partly wrong or true-but-out-of-date, and cannot admit that they do not know. We present a compact, fully open-source verification pipeline that can run on a student laptop. Given a headline, an article or a URL, the system extracts check-worthy claims, retrieves evidence from free online sources and from an offline index of fact-checked statements, labels the stance of every evidence passage with a natural-language-inference cross-encoder, compares publication dates to detect old news recirculated as ``breaking'', and fuses these signals with transparent rules into one of five verdicts---\cls{Real}, \cls{Fake}, \cls{Partially True}, \cls{Misleading} or \cls{Unverifiable}---together with a confidence score, dated evidence cards and a plain-language explanation. A fine-tuned DistilBERT content classifier with LIME token attributions contributes only to the confidence estimate. A cross-dataset audit shows why the in-domain accuracies near 99\,\% reported on standard corpora do not transfer. Code, data splits and the claim set are released.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -129,7 +127,6 @@ MultiFC~\cite{augenstein2019multifc}    & per-site & \checkmark & --  & --  & --
 %TODO(MSE2): LIAR (6->5 and 3-way mapping, offline index), FEVER subset (stance), FakeNewsNet PolitiFact titles,
 %TODO(MSE2): ClaimBuster (optional), Live Claims Set (~100 items, 5-class). Splits 80/10/10 stratified, seed 42.
 %TODO(MSE2): Preprocessing: cleaning, de-duplication, artefact removal (Reuters datelines etc.), sentence split.
-Placeholder --- to be written for MSE2.
 
 %% ===========================================================================
 \section{Methodology}\label{sec:method}
@@ -138,14 +135,12 @@ Placeholder --- to be written for MSE2.
 %TODO(MSE2): evidence retrieval (ddgs / Wikipedia / Google Fact Check Tools / offline FAISS), stance (nli-deberta-v3-small),
 %TODO(MSE2): temporal & context check (old-news flag, out-of-context flag, headline-body mismatch),
 %TODO(MSE2): fusion decision table R0-R9 and the confidence formula; explanation generation (LIME + evidence templates).
-Placeholder --- to be written for MSE2.
 
 %% ===========================================================================
 \section{Experimental Setup}\label{sec:setup}
 %% ===========================================================================
 %TODO(MSE2): splits, hyper-parameter grids (TF-IDF models via GridSearchCV; DistilBERT 6-config grid lr x max_len),
 %TODO(MSE2): hardware (RTX 3050 4 GB fp16 / CPU path), metrics (accuracy, P/R, macro-F1, ROC-AUC, latency).
-Placeholder --- to be written for MSE2.
 
 %% ===========================================================================
 \section{Results}\label{sec:results}
@@ -153,21 +148,18 @@ Placeholder --- to be written for MSE2.
 %TODO(MSE2 partial, ESE final): classifier table, cross-dataset WELFake<->ISOT with artefact-removal ablation,
 %TODO(ESE): stance accuracy on FEVER subset, end-to-end 5-class results on the Live Claims Set,
 %TODO(ESE): ablation (classifier-only / +evidence / +temporal / offline-only), latency table, confusion matrices.
-Placeholder --- to be written for MSE2 (partial) and ESE (final).
 
 %% ===========================================================================
 \section{Discussion and Comparison with Existing Systems}\label{sec:discussion}
 %% ===========================================================================
 %TODO(ESE): comparison table (master doc Section 19), error analysis of >= 20 items, five case studies, limitations
 %TODO(ESE): (English only, search-bound latency, dependence on fact-checker coverage, rule brittleness).
-Placeholder --- to be written for ESE.
 
 %% ===========================================================================
 \section{Conclusion and Future Work}\label{sec:conclusion}
 %% ===========================================================================
 %TODO(ESE): summarise findings against objectives O1-O8; future work: Hindi/Hinglish via translation, image OCR,
 %TODO(ESE): learned fusion, CLEF CheckThat! participation.
-Placeholder --- to be written for ESE.
 
 %% ===========================================================================
 \section*{Acknowledgment}
