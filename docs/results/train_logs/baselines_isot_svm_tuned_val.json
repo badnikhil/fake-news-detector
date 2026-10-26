@@ -1,0 +1,54 @@
+{
+  "dataset": "isot",
+  "model": "svm",
+  "split": "val",
+  "n_train": 30053,
+  "n_eval": 3757,
+  "accuracy": 0.9901517167953154,
+  "precision_macro": 0.9901132060734188,
+  "recall_macro": 0.9899325583892093,
+  "f1_macro": 0.9900222260264508,
+  "precision_fake": 0.9897775105231509,
+  "recall_fake": 0.9879951980792316,
+  "f1_fake": 0.9888855512165815,
+  "confusion": [
+    [
+      2074,
+      17
+    ],
+    [
+      20,
+      1646
+    ]
+  ],
+  "vectoriser_seconds": 24.281106003996683,
+  "fit_seconds": 1.165787530997477,
+  "predict_seconds": 0.00467977300286293,
+  "n_features": 200000,
+  "params": {
+    "tfidf": {
+      "ngram_range": [
+        1,
+        2
+      ],
+      "max_features": 200000,
+      "sublinear_tf": true,
+      "lowercase": true,
+      "min_df": 2,
+      "max_df": 0.95,
+      "strip_accents": "unicode"
+    },
+    "clf": {
+      "C": 1.0,
+      "loss": "squared_hinge",
+      "max_iter": 5000
+    }
+  },
+  "artefact": "data/models/tfidf_svm_isot.joblib",
+  "variant": "tuned",
+  "train_seconds": 25.44689353499416,
+  "labels": [
+    "real",
+    "fake"
+  ]
+}

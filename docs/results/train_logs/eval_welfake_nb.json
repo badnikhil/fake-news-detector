@@ -1,0 +1,64 @@
+{
+  "dataset": "welfake",
+  "model": "nb",
+  "artefact": "data/models/tfidf_nb.joblib",
+  "params": {
+    "tfidf": {
+      "ngram_range": [
+        1,
+        2
+      ],
+      "max_features": 200000,
+      "sublinear_tf": true,
+      "min_df": 2
+    },
+    "clf": {
+      "alpha": 0.1
+    }
+  },
+  "score": "predict_proba",
+  "val": {
+    "accuracy": 0.8743421052631579,
+    "precision_macro": 0.8715836511966633,
+    "recall_macro": 0.874642169536278,
+    "f1_macro": 0.8728067466049452,
+    "precision_fake": 0.8414192614047792,
+    "recall_fake": 0.8769811320754717,
+    "f1_fake": 0.8588322246858833,
+    "confusion": [
+      [
+        2992,
+        438
+      ],
+      [
+        326,
+        2324
+      ]
+    ],
+    "roc_auc": 0.9442743825292921,
+    "n": 6080,
+    "predict_seconds": 3.8
+  },
+  "test": {
+    "accuracy": 0.8771381578947368,
+    "precision_macro": 0.87439800988847,
+    "recall_macro": 0.8781500632598053,
+    "f1_macro": 0.8757745729279125,
+    "precision_fake": 0.840673111349803,
+    "recall_fake": 0.8860377358490567,
+    "f1_fake": 0.8627595076244718,
+    "confusion": [
+      [
+        2985,
+        445
+      ],
+      [
+        302,
+        2348
+      ]
+    ],
+    "roc_auc": 0.9443125584465593,
+    "n": 6080,
+    "predict_seconds": 3.6
+  }
+}

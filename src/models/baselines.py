@@ -40,6 +40,7 @@ from sklearn.metrics import (
     confusion_matrix,
     precision_recall_fscore_support,
 )
+from sklearn.model_selection import GridSearchCV, ParameterGrid, StratifiedKFold
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 from sklearn.svm import LinearSVC
@@ -101,6 +102,7 @@ class EvalResult:
     n_features: int
     params: dict = field(default_factory=dict)
     artefact: str | None = None
+    variant: str = "v0"                 # "v0" = MSE1 single config, "tuned" = GridSearchCV winner (MSE2)
 
     @property
     def train_seconds(self) -> float:
@@ -287,6 +289,147 @@ def demo_headlines() -> list[tuple[str, str]]:
 
 
 # ---------------------------------------------------------------------------------------------------
+# MSE2 hyperparameter tuning: GridSearchCV, 5-fold on WELFake train, scoring macro-F1 (MSE2 §4)
+# ---------------------------------------------------------------------------------------------------
+CV_FOLDS = 5
+TFIDF_GRID = {"ngram_range": [(1, 1), (1, 2)], "max_features": [50_000, 100_000, 200_000], "sublinear_tf": [True, False]}
+CLF_GRID = {"nb": {"alpha": [0.1, 0.5, 1.0]}, "lr": {"C": [0.1, 1.0, 10.0]}, "svm": {"C": [0.1, 1.0, 10.0]}}
+# NB grid = 18 rows (MSE2 §4 DoD): sublinear_tf is fixed at the MSE1 value instead of searched.
+NB_FIXED_TFIDF = {"sublinear_tf": [True]}
+
+
+def gridsearch_csv(model: str) -> Path:
+    return RESULTS_DIR / f"gridsearch_{model}.csv"
+
+
+def param_grid(model: str) -> list[dict]:
+    """GridSearchCV grid as a list of dicts, one per TF-IDF combination (so candidates sharing a TF-IDF config are
+    consecutive — that is what lets :class:`FoldCachedTfidf` fit each (config, fold) only once)."""
+    tf = {**TFIDF_GRID, **(NB_FIXED_TFIDF if model == "nb" else {})}
+    clf = {f"clf__{k}": v for k, v in CLF_GRID[model].items()}
+    return [{**{f"tfidf__{k}": [v] for k, v in combo.items()}, **clf} for combo in ParameterGrid(tf)]
+
+
+class FoldCachedTfidf(TfidfVectorizer):
+    """``TfidfVectorizer`` that memoises ``fit_transform`` / ``transform`` per (params, rows) — GridSearchCV only.
+
+    GridSearchCV refits the vectoriser for every candidate × fold although only the classifier's C/alpha changed.
+    Results are identical to a plain ``TfidfVectorizer`` (``tests/test_models.py`` checks it); only time is saved.
+    ponytail: in-process cache, cleared whenever the TF-IDF params change -> needs n_jobs=1 and the grouped
+    :func:`param_grid` order; a joblib disk cache would allow n_jobs>1 but costs ~6 GB of disk.
+    """
+
+    _cache: dict = {}
+
+    def _pkey(self) -> str:
+        return repr(sorted((k, v) for k, v in self.get_params().items() if k != "dtype"))
+
+    def fit_transform(self, raw_documents, y=None, **kw):
+        c = FoldCachedTfidf._cache
+        if c.get("params") != self._pkey():
+            c.clear()
+            c["params"] = self._pkey()
+        key = ("fit", hash(tuple(raw_documents.index)))
+        if key in c:
+            self.__dict__.update(c[key][0])
+        else:
+            Xt = super().fit_transform(raw_documents)
+            c[key] = (dict(self.__dict__), Xt)
+        self._fold_key = key[1]
+        return c[key][1]
+
+    def fit(self, raw_documents, y=None):
+        self.fit_transform(raw_documents)
+        return self
+
+    def transform(self, raw_documents):
+        c = FoldCachedTfidf._cache
+        key = ("transform", getattr(self, "_fold_key", None), hash(tuple(raw_documents.index)))
+        if c.get("params") != self._pkey() or key[1] is None:
+            return super().transform(raw_documents)
+        if key not in c:
+            c[key] = super().transform(raw_documents)
+        return c[key]
+
+
+def grid_search(model: str, dataset: str = "welfake", train_df: pd.DataFrame | None = None, n_jobs: int = 1,
+                verbose: int = 1, out: Path | None = None) -> pd.DataFrame:
+    """Run GridSearchCV (5-fold stratified, seed 42, macro-F1) on ``{dataset}`` train; write the raw ``cv_results_``
+    to ``docs/results/gridsearch_{model}.csv`` (+ a ``best`` flag column) and a JSON log; return the frame."""
+    set_seed(SEED)
+    FoldCachedTfidf._cache.clear()
+    train_df = load_split(dataset, "train") if train_df is None else train_df
+    X, y = make_input(train_df), train_df["label"].to_numpy()
+    pipe = Pipeline([("tfidf", FoldCachedTfidf(**TFIDF_DEFAULTS)), ("clf", build_classifier(model))])
+    gs = GridSearchCV(pipe, param_grid(model), scoring="f1_macro", n_jobs=n_jobs, refit=False, verbose=verbose,
+                      cv=StratifiedKFold(CV_FOLDS, shuffle=True, random_state=SEED), error_score="raise")
+    t0 = time.perf_counter()
+    gs.fit(X, y)
+    wall = time.perf_counter() - t0
+    FoldCachedTfidf._cache.clear()
+    res = pd.DataFrame(gs.cv_results_)
+    res.insert(0, "model", model)
+    res["best"] = res["rank_test_score"] == 1
+    out = out or gridsearch_csv(model)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    res.to_csv(out, index=False)
+    log = {"model": model, "dataset": dataset, "n_train": int(len(X)), "cv": f"StratifiedKFold({CV_FOLDS}, shuffle, seed {SEED})",
+           "scoring": "f1_macro", "n_candidates": int(len(res)), "n_jobs": n_jobs, "wall_seconds": round(wall, 1),
+           "best_params": {k: (list(v) if isinstance(v, tuple) else v) for k, v in gs.best_params_.items()},
+           "best_cv_f1_macro": float(gs.best_score_), "fixed_tfidf": {k: v for k, v in TFIDF_DEFAULTS.items() if k != "dtype"
+                                                                      and k not in TFIDF_GRID},
+           "csv": str(out.relative_to(ROOT)) if out.is_relative_to(ROOT) else str(out)}
+    TRAIN_LOG_DIR.mkdir(parents=True, exist_ok=True)
+    (TRAIN_LOG_DIR / f"gridsearch_{model}.json").write_text(json.dumps(log, indent=2, default=str))
+    if verbose:
+        print(f"[gridsearch {model}] {len(res)} candidates x {CV_FOLDS} folds in {wall/60:.1f} min; best "
+              f"{gs.best_score_:.4f} {gs.best_params_}")
+    return res
+
+
+def best_params(model: str, csv: Path | None = None) -> tuple[dict, dict] | None:
+    """(tfidf_overrides, clf_overrides) of the ``best`` row in ``gridsearch_{model}.csv``; None if no CSV yet."""
+    import ast
+    csv = csv or gridsearch_csv(model)
+    if not Path(csv).exists():
+        return None
+    df = pd.read_csv(csv)
+    row = df[df["best"]].sort_values("mean_test_score", ascending=False).iloc[0]
+    params = ast.literal_eval(row["params"])
+    tf = {k.split("__", 1)[1]: v for k, v in params.items() if k.startswith("tfidf__")}
+    clf = {k.split("__", 1)[1]: v for k, v in params.items() if k.startswith("clf__")}
+    return tf, clf
+
+
+def tuned_artefact_path(dataset: str, model: str) -> Path:
+    """Canonical MSE2 names: ``tfidf_{nb,lr,svm}.joblib`` for WELFake (master §24), ``tfidf_{m}_isot.joblib`` for ISOT."""
+    return MODELS_DIR / (f"tfidf_{model}.joblib" if dataset == "welfake" else f"tfidf_{model}_{dataset}.joblib")
+
+
+def train_tuned(dataset: str, models: Iterable[str] = MODEL_NAMES, save: bool = True) -> dict[str, EvalResult]:
+    """Fit each model with its WELFake GridSearchCV winner on ``{dataset}`` train (val metrics), save + log it.
+
+    Falls back to the MSE1 defaults (and says so) when ``gridsearch_{model}.csv`` does not exist yet.
+    """
+    out = {}
+    for m in models:
+        bp = best_params(m)
+        if bp is None:
+            print(f"[{dataset}] {m}: no {gridsearch_csv(m).name} -> MSE1 defaults (run `make tune-baselines`)")
+        tf, clf = bp or ({}, {})
+        pipes, results, _ = fit_eval_all(dataset, [m], tfidf=tf, clf=clf)
+        res = results[m]
+        res.variant = "tuned" if bp else "v0-defaults"
+        if save:
+            saved = save_pipeline(pipes[m], tuned_artefact_path(dataset, m))
+            res.artefact = str(saved.relative_to(ROOT)) if saved.is_relative_to(ROOT) else str(saved)
+            print(f"saved {res.artefact} ({saved.stat().st_size / 2**20:.1f} MB)")
+        print("log  ", save_log(res))
+        out[m] = res
+    return out
+
+
+# ---------------------------------------------------------------------------------------------------
 # artefacts
 # ---------------------------------------------------------------------------------------------------
 def default_artefact_path(dataset: str, model: str) -> Path:
@@ -312,7 +455,8 @@ def save_log(result: EvalResult, log_dir: Path = TRAIN_LOG_DIR) -> Path:
     the artefact name is kept so that a notebook re-run does not blank the column in ``classifier_table.md``.
     """
     log_dir.mkdir(parents=True, exist_ok=True)
-    p = log_dir / f"baselines_{result.dataset}_{result.model}_{result.split}.json"
+    tag = "" if result.variant == "v0" else f"_{result.variant}"
+    p = log_dir / f"baselines_{result.dataset}_{result.model}{tag}_{result.split}.json"
     if result.artefact is None and p.exists():
         try:
             prev = json.loads(p.read_text()).get("artefact")
@@ -330,25 +474,57 @@ def save_log(result: EvalResult, log_dir: Path = TRAIN_LOG_DIR) -> Path:
 MODEL_LABEL = {"nb": "TF-IDF + Multinomial NB", "lr": "TF-IDF + Logistic Regression", "svm": "TF-IDF + LinearSVC"}
 
 PENDING_ROWS = [
-    # (model, dataset, split, notes)
-    ("TF-IDF + NB / LR / SVM (GridSearchCV best)", "WELFake", "test", "MSE2 — `make train-baselines` full grid, `docs/results/gridsearch_{nb,lr,svm}.csv`"),
+    # (model, dataset, split, notes) — rows no MSE2 eval log covers yet
     ("Bi-LSTM + GloVe 100d (optional)", "WELFake", "val / test", "MSE2 — only if time permits (week 9)"),
-    ("DistilBERT-base-uncased fine-tuned (best of 6-config sweep)", "WELFake", "val", "MSE2 — `docs/results/distilbert_sweep.md`"),
-    ("DistilBERT-base-uncased fine-tuned", "WELFake", "test", "MSE2 — final number; ROC-AUC + `docs/figures/cm_distilbert_welfake.png`"),
-    ("Best classical + DistilBERT", "ISOT", "test", "MSE2 — in-domain ISOT (leakage story)"),
-    ("Cross-dataset: WELFake∖ISOT ↔ ISOT (redesigned)", "WELFake∖ISOT ↔ ISOT", "test", "MSE2 — `docs/results/cross_dataset.md`, with / without artefact removal. **Protocol (master §18):** ≈ 99.9 % of processed ISOT texts occur verbatim in WELFake (MSE1 finding, `docs/model_identification.md` §4.2), so WELFake → ISOT is in-domain; train on the hash-join-defined WELFake∖ISOT subset (≈ 23.3k rows, near-duplicates removed) as the second domain"),
     ("DistilBERT (or TF-IDF + LR) LIAR 3-way head", "LIAR", "test", "MSE2 — `docs/results/liar_head.md`"),
 ]
+DISTILBERT_PENDING = ("DistilBERT-base-uncased fine-tuned (`distilbert-welfake-v1`)", "WELFake / ISOT", "val + test",
+                      "filled automatically by `make eval-models` once `data/models/distilbert-welfake-v1/` exists "
+                      "(`make train-distilbert`); sweep: `docs/results/distilbert_sweep.md`")
 
 
 def _fmt_cm(cm: list[list[int]]) -> str:
     return f"[[{cm[0][0]}, {cm[0][1]}], [{cm[1][0]}, {cm[1][1]}]]"
 
 
+def _mse2_section(log_dir: Path) -> list[str]:
+    """MSE2 rows from ``eval_{dataset}_{model}.json`` (written by ``make eval-models``): val + test, ROC-AUC."""
+    recs = [json.loads(p.read_text()) for p in sorted(log_dir.glob("eval_*.json"))]
+    if not recs:
+        return ["", "## MSE2 — tuned models, val + test", "", "_No eval logs yet — run `make train-baselines && make eval-models`._"]
+    order = {"welfake": 0, "isot": 1}
+    morder = {"nb": 0, "lr": 1, "svm": 2, "distilbert": 3}
+    recs.sort(key=lambda r: (order.get(r["dataset"], 9), morder.get(r["model"], 9)))
+    label = {**MODEL_LABEL, "distilbert": "DistilBERT-base-uncased fine-tuned"}
+    f = lambda v: "—" if v is None else f"{v:.4f}"  # noqa: E731
+    lines = ["", "## MSE2 — tuned models (GridSearchCV winners / DistilBERT), val + **test**", "",
+             "Generated by `make eval-models` (`src/eval/eval_models.py`) from `docs/results/train_logs/eval_*.json`. "
+             "TF-IDF models use the WELFake GridSearchCV winner (`docs/results/gridsearch_{nb,lr,svm}.csv`, 5-fold CV on train, macro-F1), "
+             "refitted on the dataset's full train split. ROC-AUC: NB/LR `predict_proba`, LinearSVC `decision_function`, DistilBERT softmax. "
+             "Gap = val macro-F1 − test macro-F1 (over-fitting check).", "",
+             "| Model | Dataset | Hyper-parameters | val Macro-F1 | test Acc | test P (macro) | test R (macro) | **test Macro-F1** | test ROC-AUC | P/R (fake) | Confusion [[TN, FP],[FN, TP]] | Gap |",
+             "|---|---|---|---|---|---|---|---|---|---|---|---|"]
+    for r in recs:
+        t, v = r["test"], r.get("val") or {}
+        hp = r.get("params", {})
+        if r["model"] == "distilbert":
+            hps = ", ".join(f"{k}={hp[k]}" for k in ("lr", "max_len", "epochs") if k in hp)
+        else:
+            tf, clf = hp.get("tfidf", {}), hp.get("clf", {})
+            hps = (f"ngram {tuple(tf.get('ngram_range', []))}, max_features {tf.get('max_features', 0):,}, "
+                   f"sublinear_tf={tf.get('sublinear_tf')}; " + ", ".join(f"{k}={x}" for k, x in clf.items()))
+        gap = f"{v['f1_macro'] - t['f1_macro']:+.4f}" if v.get("f1_macro") is not None else "—"
+        ds = "WELFake" if r["dataset"] == "welfake" else "ISOT (in-domain)"
+        lines.append(f"| {label.get(r['model'], r['model'])} | {ds} | {hps} | {f(v.get('f1_macro'))} | {f(t['accuracy'])} | "
+                     f"{f(t['precision_macro'])} | {f(t['recall_macro'])} | **{f(t['f1_macro'])}** | {f(t.get('roc_auc'))} | "
+                     f"{t['precision_fake']:.3f} / {t['recall_fake']:.3f} | {_fmt_cm(t['confusion'])} | {gap} |")
+    return lines
+
+
 def render_classifier_table(log_dir: Path = TRAIN_LOG_DIR, out: Path = CLASSIFIER_TABLE) -> Path:
     """Write ``docs/results/classifier_table.md`` from every ``baselines_*.json`` log + the MSE2 pending rows."""
     logs = sorted(log_dir.glob("baselines_*.json"))
-    rows = [json.loads(p.read_text()) for p in logs]
+    rows = [r for r in (json.loads(p.read_text()) for p in logs) if r.get("variant", "v0") == "v0"]
     order = {"welfake": 0, "isot": 1, "liar": 2}
     morder = {"nb": 0, "lr": 1, "svm": 2}
     rows.sort(key=lambda r: (order.get(r["dataset"], 9), r["split"] != "val", morder.get(r["model"], 9)))
@@ -377,18 +553,24 @@ def render_classifier_table(log_dir: Path = TRAIN_LOG_DIR, out: Path = CLASSIFIE
             f"| {r['split']} | {r['n_train']:,} / {r['n_eval']:,} | {r['accuracy']:.4f} | {r['precision_macro']:.4f} | {r['recall_macro']:.4f} "
             f"| **{r['f1_macro']:.4f}** | {r['precision_fake']:.3f} / {r['recall_fake']:.3f} | {_fmt_cm(r['confusion'])} "
             f"| {r['train_seconds']:.1f} (tfidf {r['vectoriser_seconds']:.1f} + fit {r['fit_seconds']:.1f}) | {note} |")
+    lines += _mse2_section(log_dir)
     lines += [
         "",
-        "## MSE2 — pending rows (to be filled by `make train-distilbert` / `make eval-models`)",
+        "## Still pending",
         "",
-        "| Model | Dataset | Split | Acc | P | R | Macro-F1 | ROC-AUC | Train time | Status / notes |",
-        "|---|---|---|---|---|---|---|---|---|---|",
+        "| Model | Dataset | Split | Status / notes |",
+        "|---|---|---|---|",
     ]
-    for model, ds, split, note in PENDING_ROWS:
-        lines.append(f"| {model} | {ds} | {split} | — | — | — | — | — | — | **pending (MSE2)** — {note} |")
+    pending = list(PENDING_ROWS)
+    if not (log_dir / "eval_welfake_distilbert.json").exists():
+        pending.insert(0, DISTILBERT_PENDING)
+    for model, ds, split, note in pending:
+        lines.append(f"| {model} | {ds} | {split} | **pending** — {note} |")
     lines += [
         "",
-        "Sanity bar (MSE1 §3.5 DoD): LR macro-F1 on WELFake val ≥ 0.90. Target O1 (≥ 0.95 macro-F1) applies to the final model on **test** at MSE2.",
+        "Cross-dataset (WELFake∖ISOT ↔ ISOT, with / without artefact removal): `docs/results/cross_dataset.md`. "
+        "ISOT rows above are **in-domain** (ISOT ⊂ WELFake, `docs/model_identification.md` §4.2) — never a cross-dataset number.",
+        "Sanity bar (MSE1 §3.5 DoD): LR macro-F1 on WELFake val ≥ 0.90. Target O1: DistilBERT macro-F1 ≥ 0.95 on WELFake **test**.",
         "",
     ]
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -408,13 +590,25 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--out", type=Path, default=None, help="joblib path (single model only); default = canonical name")
     ap.add_argument("--no-save", action="store_true", help="do not write joblib artefacts")
     ap.add_argument("--render-table", action="store_true", help="only (re)write docs/results/classifier_table.md from the logs")
+    ap.add_argument("--grid-search", action="store_true",
+                    help="MSE2: GridSearchCV (5-fold on train, macro-F1) -> docs/results/gridsearch_{model}.csv")
+    ap.add_argument("--tuned", action="store_true",
+                    help="MSE2: fit the GridSearchCV winner(s) on train -> data/models/tfidf_{model}.joblib (+ val log)")
     args = ap.parse_args(argv)
+    models = MODEL_NAMES if args.model == "all" else [args.model]
 
     if args.render_table:
         print("wrote", render_classifier_table())
         return 0
+    if args.grid_search:
+        for m in models:
+            grid_search(m, args.dataset, verbose=3)
+        return 0
+    if args.tuned:
+        train_tuned(args.dataset, models, save=not args.no_save)
+        print("wrote", render_classifier_table())
+        return 0
 
-    models = MODEL_NAMES if args.model == "all" else [args.model]
     t0 = time.perf_counter()
     pipelines, results, _ = fit_eval_all(args.dataset, models, eval_split=args.split,
                                          tfidf={"max_features": args.max_features})

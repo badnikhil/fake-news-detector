@@ -1,0 +1,22 @@
+# Fusion v1 thresholds (master doc §13.4, §14). Defaults frozen at MSE2; the dev-slice grid search
+# (docs/results/fusion_thresholds.md) may revise tau / min_evidence / N_months later.
+tau: 0.6                    # |S_1| >= tau -> main_stance SUPPORTS / REFUTES
+N_months: 6                 # old-news gap (recency cue AND t_post - t_event >= N months)
+k: 5                        # top-k claims per input and top-k offline-index hits per claim
+min_evidence: 2             # E_i needed for R3 / R5 / R6 / R7 (E_i = non-neutral items with w_s >= 0.5)
+reliable_weight: 0.5        # w_s threshold that makes an item count towards E_i
+important_claim: 0.6        # c_i >= this = "important claim" (R5 / R6)
+factcheck_match_cosine: 0.75  # R2: Tier-1 fact-check item must match the main claim at least this well
+offline_min_cosine: 0.55    # offline FAISS hits below this are dropped
+max_evidence_per_claim: 10
+factcheck_p: 0.95           # p_stance given to a fact-checker rating (§13.3)
+tiebreak_fake: 0.85         # R8: p_fake >= this and stance REFUTES -> FAKE
+tiebreak_real: 0.15         # R8: p_fake <= this and stance SUPPORTS -> REAL
+clf_agree_fake: 0.7         # confidence: classifier "agrees" with FAKE when p_fake >= 0.7
+clf_agree_real: 0.3         #             ... with REAL when p_fake <= 0.3
+clf_adj: 0.10               # +/- classifier confidence adjustment (the classifier's only other influence)
+conf_min: 0.05
+conf_max: 0.98
+mismatch_p: 0.7             # headline-body mismatch: NLI REFUTES with p >= 0.7
+satire_confidence: 0.9      # policy constant for R0 (input domain on the satire/hoax list)
+recency_cues: [breaking, just in, just now, moments ago, today, this morning, tonight, right now, happening now, live]

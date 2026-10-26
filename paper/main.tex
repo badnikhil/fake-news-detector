@@ -2,7 +2,7 @@
 %% Fake News & Misinformation Detector -- IEEE conference paper (IEEEtran)
 %% B.Tech semester project, Dept. of CSE (AI/ML), KIET Group of Institutions
 %% Build: latexmk -pdf main.tex   (or: tectonic main.tex, or: make -C paper)
-%% Status: MSE1 draft -- Sections I and II written; III-VIII are stubs.
+%% Status: MSE2 draft -- Sections I-VI written (numbers from docs/results/); VII-VIII are ESE stubs.
 %% ---------------------------------------------------------------------------
 \documentclass[conference]{IEEEtran}
 \IEEEoverridecommandlockouts
@@ -81,7 +81,7 @@ The earliest and still most common approach treats detection as document classif
 
 \subsection{Claim Detection, Evidence Retrieval and Fact Verification}
 
-ClaimBuster~\cite{hassan2017claimbuster} showed that check-worthy sentences in political debates can be ranked with sentence-level features and a supervised classifier, and its later benchmark release~\cite{arslan2020claimbuster} is the standard training set for the task; our claim identifier combines similar hand-crafted cues with an optional classifier trained on that data. For verification, the FEVER baseline~\cite{thorne2018fever} chains document retrieval, sentence selection and an NLI model and scored 31.9 FEVER points; the shared-task winner, NSMN~\cite{nie2019nsmn}, unified the three steps with semantic matching networks, and KGAT~\cite{liu2020kgat} propagates evidence through a kernel-based graph attention network to exceed 70 FEVER points---the current ceiling for Wikipedia-grounded verification. DeClarE~\cite{popat2018declare} verifies free-text claims against web search results with attention over the retrieved articles and a source-credibility embedding, which is close in spirit to our online path. Two components make retrieval and stance practical at our scale: Sentence-BERT~\cite{reimers2019sbert} bi-encoders (we use the 22M-parameter MiniLM variant~\cite{wang2020minilm}) turn semantic search over thousands of fact-checked statements into a millisecond nearest-neighbour lookup, while a small DeBERTaV3 cross-encoder~\cite{he2023debertav3} trained on MultiNLI~\cite{williams2018mnli} and FEVER-NLI provides an off-the-shelf three-way stance judgement on CPU. Hanselowski \emph{et al.}~\cite{hanselowski2018stance} re-examined the Fake News Challenge and showed that headline-body stance systems that looked strong under the challenge metric had far lower macro-F1 on the minority \emph{agree}/\emph{disagree} classes---a caution we take into account by reporting macro-F1 throughout.
+ClaimBuster~\cite{hassan2017claimbuster} showed that check-worthy sentences in political debates can be ranked with sentence-level features and a supervised classifier, and its later benchmark release~\cite{arslan2020claimbuster} is the standard training set for the task; our claim identifier combines similar hand-crafted cues with an optional classifier trained on that data. For verification, the FEVER baseline~\cite{thorne2018fever} chains document retrieval, sentence selection and an NLI model and scored 31.9 FEVER points; the shared-task winner, NSMN~\cite{nie2019nsmn}, unified the three steps with semantic matching networks, and KGAT~\cite{liu2020kgat} propagates evidence through a kernel-based graph attention network to exceed 70 FEVER points---the current ceiling for Wikipedia-grounded verification. DeClarE~\cite{popat2018declare} verifies free-text claims against web search results with attention over the retrieved articles and a source-credibility embedding, which is close in spirit to our online path. Two components make retrieval and stance practical at our scale: Sentence-BERT~\cite{reimers2019sbert} bi-encoders (we use the 22M-parameter MiniLM variant~\cite{wang2020minilm}) turn semantic search over thousands of fact-checked statements into a millisecond nearest-neighbour lookup, while a small DeBERTaV3 cross-encoder~\cite{he2023debertav3} trained on SNLI and MultiNLI~\cite{williams2018mnli} provides an off-the-shelf three-way stance judgement on CPU. Hanselowski \emph{et al.}~\cite{hanselowski2018stance} re-examined the Fake News Challenge and showed that headline-body stance systems that looked strong under the challenge metric had far lower macro-F1 on the minority \emph{agree}/\emph{disagree} classes---a caution we take into account by reporting macro-F1 throughout.
 
 \subsection{Explainability}
 
@@ -122,32 +122,246 @@ MultiFC~\cite{augenstein2019multifc}    & per-site & \checkmark & --  & --  & --
 %% ===========================================================================
 \section{Datasets and Preprocessing}\label{sec:data}
 %% ===========================================================================
-%TODO(MSE2): condense master doc Sections 10-11 -- WELFake (primary), ISOT (leakage audit; ISOT is contained in WELFake, so the
-%   cross-dataset pair is WELFake-minus-ISOT <-> ISOT -- state the overlap numbers from docs/model_identification.md Sec. 4.2),
-%TODO(MSE2): LIAR (6->5 and 3-way mapping, offline index), FEVER subset (stance), FakeNewsNet PolitiFact titles,
-%TODO(MSE2): ClaimBuster (optional), Live Claims Set (~100 items, 5-class). Splits 80/10/10 stratified, seed 42.
-%TODO(MSE2): Preprocessing: cleaning, de-duplication, artefact removal (Reuters datelines etc.), sentence split.
+%% Every number in Sections III--VI is copied from data/README.md, docs/results/*.md or docs/results/train_logs/*.json.
+
+Table~\ref{tab:data} lists the corpora and the role each plays. \textbf{WELFake}~\cite{verma2021welfake} (72{,}134 articles) is the primary training set for the content classifier and \textbf{ISOT}~\cite{ahmed2017isot} (44{,}898 articles) the secondary one. \textbf{LIAR}~\cite{wang2017liar} (12{,}836 PolitiFact statements, official splits) trains a three-way truthfulness head and, together with 1{,}056 \textbf{FakeNewsNet}~\cite{shu2020fakenewsnet} PolitiFact titles, populates the offline fact-check index. A balanced \textbf{FEVER}~\cite{thorne2018fever} subset (20{,}000 train + 3{,}000 dev claims) evaluates the stance model. LIAR's six grades map onto our scheme as true/mostly-true $\rightarrow$ \cls{Real}, half-true $\rightarrow$ \cls{Partially True}, barely-true $\rightarrow$ \cls{Misleading} and false/pants-fire $\rightarrow$ \cls{Fake}; the three-way collapse used for the LIAR head is TRUE / MIXED / FALSE. \cls{Unverifiable} has no counterpart in any corpus---it arises only from retrieval failure at run time.
+
+\textbf{Live Claims Set.} For end-to-end evaluation we built 95 recent claims (fact-checks published between February~2025 and 25~October~2026, 93 of them in 2026) from PolitiFact (46), Snopes (31), Lead Stories (9), BOOM (4), Alt News (3) and Full Fact (2). Each rating, claim text and date was read from the live fact-check page and mapped to the five classes (e.g.\ Snopes \emph{Miscaptioned}/\emph{Outdated} $\rightarrow$ \cls{Misleading}); \cls{Unverifiable} comes only from Lead Stories evidence-absence ratings. Class counts are \cls{Fake} 27, \cls{Real} 21, \cls{Partially True} 19, \cls{Misleading} 19, \cls{Unverifiable} 9. A stratified 30-item dev slice (seed 42) is reserved for tuning fusion thresholds; the remaining 65 items are held out.
+
+\begin{table}[t]
+\caption{Datasets after preprocessing (\texttt{make data}).}
+\label{tab:data}
+\centering\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}l r l l@{}}
+\toprule
+Dataset & Rows & Labels & Role \\
+\midrule
+WELFake & 60{,}799 & real / fake & classifier (primary) \\
+ISOT & 37{,}567 & real / fake & leakage, cross-dom. \\
+LIAR & 12{,}836 & 6 $\rightarrow$ 3-way & LIAR head, index \\
+FEVER subset & 23{,}000 & S / R / NEI & stance evaluation \\
+FakeNewsNet (PF) & 1{,}056 & real / fake & offline index \\
+Live Claims (ours) & 95 & 5-class & end-to-end (ESE) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Preprocessing.} All corpora are converted to one schema (\texttt{id, title, text, label, \dots, split}). For WELFake and ISOT we (i) strip publisher and format boilerplate with 26 named text patterns and 2 title patterns---Reuters datelines, photo credits, captions, bylines, \texttt{[VIDEO]} tags, outlet suffixes, URL debris---while keeping content words such as ``told Reuters''; (ii) drop empty and very short texts; (iii) de-duplicate greedily, first exact SHA-1 matches and then MinHash near-duplicates (Jaccard $\geq 0.9$); and (iv) split 80/10/10, stratified, seed 42, giving 48{,}639 / 6{,}080 / 6{,}080 WELFake and 30{,}053 / 3{,}757 / 3{,}757 ISOT rows. Splits are stored as id lists and every model reads the same ids.
+
+\textbf{Leakage audit: ISOT $\subset$ WELFake.} WELFake was assembled from four corpora, one of which is ISOT. Hashing normalised text shows that 37{,}542 of the 37{,}567 processed ISOT articles (99.93\,\%) occur verbatim in processed WELFake, so ``train on WELFake, test on ISOT'' is an in-domain experiment. For the cross-domain experiment we therefore use \textbf{WELFake$\setminus$ISOT}: the WELFake rows not hash-matched to ISOT, minus 25 MinHash near-duplicates, i.e.\ 23{,}232 rows. A second audit trains a logistic regression on the 26 artefact-pattern counts alone (no words): it reaches 0.9973 five-fold accuracy on raw ISOT but 0.5568 on processed ISOT, which confirms that raw ISOT can be separated by source boilerplate alone and that our stripping removes that shortcut.
 
 %% ===========================================================================
 \section{Methodology}\label{sec:method}
 %% ===========================================================================
-%TODO(MSE2): pipeline figure (figures/pipeline.pdf), claim identification (heuristic score + optional ClaimBuster LR),
-%TODO(MSE2): evidence retrieval (ddgs / Wikipedia / Google Fact Check Tools / offline FAISS), stance (nli-deberta-v3-small),
-%TODO(MSE2): temporal & context check (old-news flag, out-of-context flag, headline-body mismatch),
-%TODO(MSE2): fusion decision table R0-R9 and the confidence formula; explanation generation (LIME + evidence templates).
+
+Fig.~\ref{fig:pipeline} shows the pipeline; every box is a module under \texttt{src/} and runs behind one FastAPI endpoint, \texttt{POST /analyze}, in an online and an offline mode.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{pipeline.pdf}
+\caption{System pipeline. The content classifier (dashed) influences only the confidence and the single-source tie-break R8; the verdict comes from evidence.}
+\label{fig:pipeline}
+\end{figure}
+
+\subsection{Claim Identification}
+The input is cleaned and sentence-split with spaCy \texttt{en\_core\_web\_sm}. Sentences of fewer than six tokens, questions and imperatives are dropped; each remaining sentence $s$ at position $i$ receives the check-worthiness score
+\begin{multline}
+h(s) = 1.0\,[\mathrm{NE}] + 0.8\,[\mathrm{NUM}] + 0.6\,[\mathrm{REP}] + 0.5\,[i<3] \\
+ + 0.4\,[\mathrm{CMP}] - 0.8\,[\mathrm{OPN}] - 0.5\,[\mathrm{HDG}],
+\end{multline}
+where the indicators denote a PERSON/ORG/GPE/EVENT/NORP/LOC entity, a CARDINAL/PERCENT/MONEY/DATE/QUANTITY entity, a reporting verb (\emph{said, announced, according to}, \dots), a lead sentence, a number or comparative, a first-person opinion cue (\emph{I think, should, must}) and a hedge (\emph{may, might, could}). The score is normalised to $[0,1]$ by its maximum (3.3) and clipped. Near-duplicate sentences (MiniLM cosine $>0.85$) are removed and the top $k=5$ are kept; a headline is always claim~1 with score 1. The optional ClaimBuster-trained classifier~\cite{arslan2020claimbuster} is not used yet.
+
+\subsection{Evidence Retrieval}
+\emph{Online}, each claim is sent to DuckDuckGo text search (\texttt{ddgs}), the Wikipedia search API (top page intros) and, when an API key is configured, the Google Fact Check Tools \texttt{claims:search} endpoint, each with a 6\,s timeout. Result pages are fetched and extracted with trafilatura~\cite{barbaresi2021trafilatura}, dated with htmldate, and reduced to the three sentences most similar to the claim. All network answers are cached in SQLite so that runs are repeatable. \emph{Offline}, the claim is embedded with \texttt{all-MiniLM-L6-v2}~\cite{reimers2019sbert,wang2020minilm} and searched in a FAISS~\cite{johnson2021faiss} \texttt{IndexFlatIP} over L2-normalised vectors (cosine) of all 12{,}836 LIAR statements and 1{,}056 FakeNewsNet titles (13{,}892 vectors, 20.35\,MB); hits with cosine $<0.55$ are discarded. Each item receives a source-reliability weight $w_s$ from an editable domain list: fact-checkers 1.0, wire services and official sites 0.8, Wikipedia 0.6, unknown domains 0.3, satire/hoax sites 0 (flagged).
+
+\subsection{Stance Detection}
+Each (claim, evidence) pair is scored by the cross-encoder \texttt{cross-encoder/nli-deberta-v3-small}, a DeBERTaV3~\cite{he2023debertav3} model trained on SNLI~\cite{bowman2015snli} and MultiNLI~\cite{williams2018mnli} only; we do not fine-tune it. With premise = evidence and hypothesis = claim, entailment, contradiction and neutral map to \textsc{Supports}, \textsc{Refutes} and \textsc{Neutral} with probability $p$. For items that carry a fact-checker rating (LIAR, FakeNewsNet, Google Fact Check) the rating is turned into a stance with $p=0.95$, but only when the claim restates the rated statement (NLI entailment, or cosine $\geq 0.75$ without contradiction). The signed contribution of an item is $\sigma(e)=\mathrm{sign}(\mathrm{stance})\cdot p\cdot w_s$.
+
+\subsection{Temporal and Context Check}
+Three flags are computed for the main claim. \emph{Old news}: the input contains a recency cue (\emph{breaking, just in, today, \dots}) and the gap between the input date $t_\mathrm{post}$ and the (lower) median date of the supporting evidence is at least $N=6$ months. \emph{Out of context}: the claim's GPE/DATE/EVENT entities conflict with those of at least two supporting passages. \emph{Headline--body mismatch}: NLI with the body as premise refutes the headline with $p\geq 0.7$.
+
+\subsection{Verdict Fusion and Confidence}
+For claim $i$ let $S_i=\sum_e \sigma(e)$ and let $E_i$ be the number of non-neutral items with $w_s\geq 0.5$. The main stance is \textsc{Supports} if $S_1\geq\tau$, \textsc{Refutes} if $S_1\leq-\tau$ and \textsc{Neutral} otherwise, with $\tau=0.6$. Table~\ref{tab:rules} lists the decision rules, evaluated top to bottom (first match wins); the thresholds are those of \texttt{src/fusion/fusion.yaml} ($\tau=0.6$, $N=6$, $k=5$, minimum evidence 2), which are defaults not yet tuned on the dev slice. The content classifier's fake probability $p_\mathrm{fake}$ appears in only two places: the R8 tie-break and a $\pm 0.10$ confidence adjustment.
+
+\begin{table}[t]
+\caption{Fusion rules (\texttt{src/fusion/rules.py}); first match wins. ``Imp.'' = another claim with score $c_i\geq 0.6$.}
+\label{tab:rules}
+\centering\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}l p{5.3cm} l@{}}
+\toprule
+Rule & Condition & Verdict \\
+\midrule
+LANG & input is not English & \cls{Unv.} \\
+R0 & input domain on the satire / hoax list & \cls{Fake} \\
+R1 & no evidence, all evidence neutral, or $E_1=0$ & \cls{Unv.} \\
+R2 & Tier-1 fact-check rated false, stance \textsc{Refutes}, cosine to main claim $\geq 0.75$ & \cls{Fake} \\
+R3 & main \textsc{Refutes} and $E_1\geq 2$ & \cls{Fake} \\
+R4 & main \textsc{Supports} and a temporal/context flag & \cls{Misl.} \\
+R5 & main \textsc{Supports}, an imp.\ claim has $S_i\leq-\tau$, $E_i\geq 2$ & \cls{Part.} \\
+R6 & main \textsc{Neutral}, imp.\ claims split (one $S_i\geq\tau$, one $S_i\leq-\tau$, each $E_i\geq 2$) & \cls{Part.} \\
+R7 & main \textsc{Supports} and $E_1\geq 2$ & \cls{Real} \\
+R8 & main non-neutral and $E_1=1$: \cls{Fake} if \textsc{Refutes} and $p_\mathrm{fake}\geq 0.85$; \cls{Real} if \textsc{Supports} and $p_\mathrm{fake}\leq 0.15$; else & \cls{Unv.} \\
+R9 & anything else & \cls{Unv.} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The confidence combines how one-sided, how broad and how reliable the evidence for the main claim is:
+\begin{align}
+a &= |S_1| \,/\, \textstyle\left(\sum_e p_e w_e + 10^{-6}\right), \quad c = \min(E_1,4)/4,\\
+q &= \mathrm{mean}(w_s \text{ over non-neutral items}),\\
+\mathrm{conf} &= \mathrm{clip}\!\left(0.5a + 0.3c + 0.2q + \delta,\; 0.05,\; 0.98\right),
+\end{align}
+where $\delta=+0.10$ if the classifier agrees with a \cls{Fake}/\cls{Real} verdict ($p_\mathrm{fake}\geq 0.7$ / $\leq 0.3$), $-0.10$ if it disagrees and 0 otherwise. For \cls{Unverifiable}, $\mathrm{conf}=1-\max(a,0.2)$, i.e.\ how sure the system is that it cannot tell. R0 and the language check use fixed confidences of 0.9 and 0.8. Every response returns the rule that fired, the claims, the evidence cards with source, date, cosine and stance, and the temporal flags.
+
+\subsection{Content Classifiers}
+We train TF-IDF word $n$-gram models with multinomial Naive Bayes, logistic regression and a linear SVM~\cite{pedregosa2011sklearn}, and fine-tune \texttt{distilbert-base-uncased}~\cite{sanh2019distilbert,wolf2020transformers} on \texttt{title [SEP] text}. A second DistilBERT head is fine-tuned on LIAR statements (text only, no speaker or party, which are label proxies) for TRUE / MIXED / FALSE with class-balanced cross-entropy. Until a full-data DistilBERT checkpoint exists, the deployed style signal is the TF-IDF + logistic-regression model.
 
 %% ===========================================================================
 \section{Experimental Setup}\label{sec:setup}
 %% ===========================================================================
-%TODO(MSE2): splits, hyper-parameter grids (TF-IDF models via GridSearchCV; DistilBERT 6-config grid lr x max_len),
-%TODO(MSE2): hardware (RTX 3050 4 GB fp16 / CPU path), metrics (accuracy, P/R, macro-F1, ROC-AUC, latency).
+
+\textbf{Splits and seed.} WELFake and ISOT use the stratified 80/10/10 split (seed 42); LIAR uses its official 10{,}269 / 1{,}284 / 1{,}283 split; the FEVER subset uses 3{,}000 balanced dev claims. Model selection always uses validation macro-F1; the test split is used once per model.
+
+\textbf{Classical models.} \texttt{GridSearchCV} with stratified 5-fold CV on the WELFake training split (48{,}639 rows), scoring macro-F1, over $n$-gram range $\{(1,1),(1,2)\}$ $\times$ max.\ features $\{50\mathrm{k},100\mathrm{k},200\mathrm{k}\}$ $\times$ sublinear TF $\{\mathrm{T},\mathrm{F}\}$ $\times$ $C\in\{0.1,1,10\}$ (LR, SVM; 36 configurations each) or $\alpha\in\{0.1,0.5,1.0\}$ (NB; 18). Winners (best CV macro-F1): NB $\alpha=0.1$, 200k features (0.8684); LR $C=10$, 100k features (0.9428); SVM $C=1$, 200k features (0.9459); all with $(1,2)$-grams and sublinear TF. The winners are refitted on the full training split of each dataset.
+
+\textbf{DistilBERT.} Planned grid: learning rate $\{2,3,5\}\times10^{-5}$ $\times$ max.\ length $\{256,512\}$ on a 20{,}000-row stratified subset of WELFake train, 3 epochs with the best epoch kept, AdamW with linear schedule, warmup ratio 0.1, weight decay 0.01, fp16, batch 16 at length 256 (8 $\times$ 2 gradient accumulation at 512), evaluated on the full validation split (6{,}080). The three length-256 runs were completed; the length-512 runs and the full-data retrain of the winner were stopped on a team decision and are deferred to the final evaluation. LIAR head: learning rate $\{2,3\}\times10^{-5}$ $\times$ epochs $\{3,5\}$, max.\ length 64, batch 16, same optimiser settings.
+
+\textbf{Hardware and software.} One laptop with an NVIDIA GeForce RTX 2050 (4\,GB), 8 CPU threads and 13\,GB RAM; the stance evaluation and the API run on CPU. Python 3.11, PyTorch 2.14.1, transformers 4.57.6, scikit-learn 1.9.1, sentence-transformers 5.7.0, faiss-cpu 1.15.1, spaCy 3.8.16, FastAPI 0.162.0. \textbf{Metrics:} accuracy, macro precision/recall/F1 and ROC-AUC (SVM from decision margins).
 
 %% ===========================================================================
 \section{Results}\label{sec:results}
 %% ===========================================================================
-%TODO(MSE2 partial, ESE final): classifier table, cross-dataset WELFake<->ISOT with artefact-removal ablation,
-%TODO(ESE): stance accuracy on FEVER subset, end-to-end 5-class results on the Live Claims Set,
-%TODO(ESE): ablation (classifier-only / +evidence / +temporal / offline-only), latency table, confusion matrices.
+%% Tables I-VI: copied from docs/results/{classifier_table,cross_dataset,distilbert_sweep,liar_head,stance_fever,error_analysis}.md.
+
+\subsection{Content Classifiers (In-Domain)}
+Table~\ref{tab:clf} gives held-out test results of the tuned classical models. On WELFake the linear SVM is best (macro-F1 0.9481, ROC-AUC 0.9884, Fig.~\ref{fig:roc}), logistic regression is within 0.003, and Naive Bayes trails by about 0.07. Validation--test gaps are at most 0.0086, so the grid search did not over-fit the validation split. ISOT scores (up to 0.9876) are higher, but ISOT is in-domain here and is single-source on the real side. No DistilBERT test number exists yet (Section~\ref{sec:res-bert}); objective O1 (DistilBERT macro-F1 $\geq 0.95$ on WELFake test) is therefore not yet checked.
+
+\begin{table}[t]
+\caption{Tuned TF-IDF classifiers, test split (in-domain). Val = validation macro-F1.}
+\label{tab:clf}
+\centering\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}l l c c c c c c@{}}
+\toprule
+Data & Model & Val & Acc & P & R & \textbf{F1} & AUC \\
+\midrule
+WELFake & NB  & 0.8728 & 0.8771 & 0.8744 & 0.8782 & \textbf{0.8758} & 0.9443 \\
+        & LR  & 0.9455 & 0.9462 & 0.9457 & 0.9449 & \textbf{0.9453} & 0.9875 \\
+        & SVM & 0.9495 & 0.9490 & 0.9485 & 0.9478 & \textbf{0.9481} & 0.9884 \\
+\midrule
+ISOT    & NB  & 0.9550 & 0.9470 & 0.9458 & 0.9472 & \textbf{0.9464} & 0.9865 \\
+        & LR  & 0.9892 & 0.9848 & 0.9854 & 0.9839 & \textbf{0.9846} & 0.9986 \\
+        & SVM & 0.9900 & 0.9878 & 0.9882 & 0.9870 & \textbf{0.9876} & 0.9990 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.82\columnwidth]{roc_welfake.png}
+\caption{ROC curves of the tuned classifiers on the WELFake test split.}
+\label{fig:roc}
+\end{figure}
+
+\subsection{Cross-Domain Transfer and Artefacts}
+Table~\ref{tab:cross} trains on one domain and tests on the other, using the disjoint WELFake$\setminus$ISOT domain. Leaving the training domain costs 0.29--0.30 macro-F1 from WELFake$\setminus$ISOT to ISOT and 0.43--0.44 in the other direction, so the near-perfect in-domain numbers say little about unseen sources. Evaluated on raw text with the artefacts kept, transfer looks better (e.g.\ 0.7616 instead of 0.6638 for LR, W$\setminus$I $\rightarrow$ ISOT), i.e.\ part of what ``transfers'' is boilerplate. This is the empirical reason that, in our system, evidence and not the classifier decides the verdict.
+
+\begin{table}[t]
+\caption{Cross-domain macro-F1, test splits (rows = train, columns = test). Proc.\ = artefacts stripped; raw = artefacts kept.}
+\label{tab:cross}
+\centering\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{@{}l l c c c c@{}}
+\toprule
+ & & \multicolumn{2}{c}{Processed} & \multicolumn{2}{c}{Raw} \\
+\cmidrule(lr){3-4}\cmidrule(l){5-6}
+Model & Train & W$\setminus$I & ISOT & W$\setminus$I & ISOT \\
+\midrule
+LR  & W$\setminus$I & 0.9583 & 0.6638 & 0.9645 & 0.7616 \\
+    & ISOT          & 0.5502 & 0.9846 & 0.5663 & 0.9933 \\
+SVM & W$\setminus$I & 0.9601 & 0.6611 & 0.9676 & 0.7611 \\
+    & ISOT          & 0.5480 & 0.9876 & 0.5601 & 0.9949 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Error analysis.} The SVM misclassifies 310 of the 6{,}080 WELFake test articles (164 missed fakes, 146 false alarms). Assigned by fixed, ordered rules, 154 are style overlap (wire-style fakes or tabloid-style real articles), 71 opinion or first-person commentary, 68 cases where a source cue (e.g.\ ``Reuters'', ``via'') points the wrong way, 7 satire, 5 short texts, 4 republished wire copy on fake-labelled sites and 1 near-duplicate with a conflicting label---again errors of style, not of fact.
+
+\subsection{DistilBERT Sweep}\label{sec:res-bert}
+Table~\ref{tab:sweep} lists every completed run. At length 256 the three learning rates lie within 0.0008 validation macro-F1 (0.9863--0.9871), all peaking at epoch 3; at $5\times10^{-5}$ the training loss is lowest (0.0077) while validation loss rises from epoch 2 (0.0572) to 3 (0.0671), the onset of over-fitting. These are validation numbers of models trained on a 20k subset; the length-512 runs, the full-data retrain and the test evaluation are deferred to the final evaluation, so no DistilBERT test result is reported.
+
+\begin{table}[t]
+\caption{DistilBERT sweep on WELFake (20k-row training subset, full validation split, 3 epochs, best epoch 3 in all runs).}
+\label{tab:sweep}
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}c c c c c@{}}
+\toprule
+lr & max\_len & val macro-F1 & val acc & min \\
+\midrule
+$2\times10^{-5}$ & 256 & 0.9869 & 0.9872 & 14.8 \\
+$3\times10^{-5}$ & 256 & 0.9863 & 0.9865 & 14.3 \\
+$5\times10^{-5}$ & 256 & 0.9871 & 0.9873 & 15.2 \\
+$\{2,3,5\}\times10^{-5}$ & 512 & \multicolumn{3}{c}{deferred to ESE} \\
+full-train retrain & -- & \multicolumn{3}{c}{deferred to ESE} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{LIAR Truthfulness Head}
+The best configuration (lr $3\times10^{-5}$, 3 epochs, best epoch 2, validation macro-F1 0.4773) reaches 0.4669 test accuracy and 0.4667 macro-F1 on the three-way task, against 0.3749 for the majority class (Table~\ref{tab:liar}). Its six-way twin with the same settings reaches 0.2689 accuracy, on par with Wang's text-only CNN (0.270)~\cite{wang2017liar}: short statements carry little truth signal in their wording, which is why the head is only an auxiliary signal.
+
+\begin{table}[t]
+\caption{LIAR official test split (1{,}283 statements).}
+\label{tab:liar}
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}l c c c@{}}
+\toprule
+Model & Labels & Acc & Macro-F1 \\
+\midrule
+Majority class & 3 & 0.3749 & -- \\
+DistilBERT 3-way head (ours) & 3 & \textbf{0.4669} & \textbf{0.4667} \\
+Majority class & 6 & 0.2081 & -- \\
+DistilBERT 6-way twin (ours) & 6 & 0.2689 & 0.2686 \\
+Wang (2017) text-only CNN & 6 & 0.270 & n/r \\
+Wang (2017) hybrid CNN & 6 & 0.274 & n/r \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Stance Detection on FEVER}
+On 3{,}000 balanced FEVER dev pairs (gold evidence text from the FEVER 2017 Wikipedia dump; NEI claims paired with the sentences retrieved for them by the Papelo system~\cite{malon2018papelo}; premise prefixed with the page title) the cross-encoder reaches \textbf{0.7267 accuracy} and 0.7121 macro-F1 (Table~\ref{tab:stance}, Fig.~\ref{fig:cmstance}). This is a \emph{zero-shot} result---the model was trained on SNLI and MultiNLI only, not on FEVER---and it \textbf{misses our objective O4} ($\geq 0.85$). The shortfall is concentrated in NEI: on the gold \textsc{Supports}/\textsc{Refutes} pairs accuracy is 0.8790, but 479 of 1{,}000 NEI pairs are predicted \textsc{Refutes}, because the retrieved sentences concern the same entity and state a different fact. Without the page-title prefix accuracy falls to 0.6337. In the pipeline this error mode is damped by R3, which needs two reliable refuting sources; a \textsc{Refutes} threshold tuned on FEVER training pairs and an optional one-epoch fine-tune are planned.
+
+\begin{table}[t]
+\caption{Zero-shot stance on 3{,}000 balanced FEVER dev pairs.}
+\label{tab:stance}
+\centering\footnotesize
+\begin{tabular}{@{}l c c c@{}}
+\toprule
+Class & Precision & Recall & F1 \\
+\midrule
+\textsc{Supports} & 0.8488 & 0.8870 & 0.8675 \\
+\textsc{Refutes}  & 0.6190 & 0.8710 & 0.7237 \\
+\textsc{Neutral} (NEI) & 0.7701 & 0.4220 & 0.5452 \\
+\midrule
+Accuracy / macro-F1 & \multicolumn{3}{c}{0.7267 / 0.7121} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.7\columnwidth]{cm_stance_fever.png}
+\caption{Stance confusion matrix on the FEVER dev subset (rows = gold).}
+\label{fig:cmstance}
+\end{figure}
+
+\subsection{End-to-End Evaluation}
+The offline pipeline runs end to end behind \texttt{POST /analyze}, and the 95-item Live Claims Set (Section~\ref{sec:data}) is labelled and split. End-to-end five-class results, fusion-threshold tuning on the dev slice, the ablation (classifier only / $+$evidence / $+$temporal / offline only) and latency measurements are deferred to ESE.
 
 %% ===========================================================================
 \section{Discussion and Comparison with Existing Systems}\label{sec:discussion}

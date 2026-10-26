@@ -1,0 +1,15 @@
+# Source reliability tiers (master doc §14.3). Editable. Matching = exact domain or any parent domain;
+# "*.gov" style entries match by suffix. Tier 0 = satire / known hoax (weight 0, input flagged by R0).
+# The satire list is the initial hand list from §14.3 [verify before use]; extend from public satire lists.
+tiers:
+  1: {weight: 1.0, domains: [politifact.com, snopes.com, factcheck.org, fullfact.org, altnews.in, boomlive.in,
+                            factly.in, vishvasnews.com, factchecker.in, pib.gov.in, afp.com, leadstories.com]}
+  2: {weight: 0.8, domains: [reuters.com, apnews.com, bbc.com, bbc.co.uk, thehindu.com, indianexpress.com, ndtv.com,
+                            ptinews.com, hindustantimes.com, timesofindia.indiatimes.com, theguardian.com, nytimes.com,
+                            aljazeera.com, economictimes.indiatimes.com, who.int, un.org, isro.gov.in, nasa.gov,
+                            rbi.org.in, eci.gov.in, "*.gov", "*.gov.in", "*.nic.in", "*.edu", "*.ac.in"]}
+  3: {weight: 0.6, domains: [en.wikipedia.org, wikipedia.org]}
+  0: {weight: 0.0, domains: [theonion.com, fakingnews.com, babylonbee.com, worldnewsdailyreport.com, empirenews.net]}
+default: {tier: 4, weight: 0.3}
+# Path-level fact-check sections of Tier-2 outlets are Tier 1 (§14.3).
+path_tier1: [apnews.com/ap-fact-check, reuters.com/fact-check, thequint.com/news/webqoof, factcheck.afp.com]

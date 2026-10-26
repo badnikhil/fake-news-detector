@@ -1,0 +1,27 @@
+{
+  "model": "lr",
+  "dataset": "welfake",
+  "n_train": 48639,
+  "cv": "StratifiedKFold(5, shuffle, seed 42)",
+  "scoring": "f1_macro",
+  "n_candidates": 36,
+  "n_jobs": 1,
+  "wall_seconds": 2709.5,
+  "best_params": {
+    "clf__C": 10.0,
+    "tfidf__max_features": 100000,
+    "tfidf__ngram_range": [
+      1,
+      2
+    ],
+    "tfidf__sublinear_tf": true
+  },
+  "best_cv_f1_macro": 0.9428289746163966,
+  "fixed_tfidf": {
+    "lowercase": true,
+    "min_df": 2,
+    "max_df": 0.95,
+    "strip_accents": "unicode"
+  },
+  "csv": "docs/results/gridsearch_lr.csv"
+}

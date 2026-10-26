@@ -21,9 +21,9 @@
       2506
     ]
   ],
-  "vectoriser_seconds": 45.96897731200443,
-  "fit_seconds": 1.718269714001508,
-  "predict_seconds": 0.007150650999392383,
+  "vectoriser_seconds": 44.47528683100245,
+  "fit_seconds": 1.6786526500000036,
+  "predict_seconds": 0.006803030002629384,
   "n_features": 100000,
   "params": {
     "tfidf": {
@@ -45,7 +45,8 @@
     }
   },
   "artefact": "data/models/tfidf_svm_welfake_v0.joblib",
-  "train_seconds": 47.687247026005934,
+  "variant": "v0",
+  "train_seconds": 46.15393948100245,
   "labels": [
     "real",
     "fake"

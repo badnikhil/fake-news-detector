@@ -102,3 +102,61 @@ def test_saved_mse1_artefact_reloads_in_one_line():
     preds = clf.predict([h for _, h in B.demo_headlines()])
     assert len(preds) == 3 and set(preds) <= {"real", "fake"}
     assert clf.named_steps["tfidf"].max_features == B.TFIDF_DEFAULTS["max_features"]
+
+
+# ---------------------------------------------------------------------------------------------------
+# MSE2: GridSearchCV grid + fold-cached TF-IDF
+# ---------------------------------------------------------------------------------------------------
+def test_param_grid_sizes_match_mse2_spec():
+    from sklearn.model_selection import ParameterGrid
+    assert {m: len(ParameterGrid(B.param_grid(m))) for m in B.MODEL_NAMES} == {"nb": 18, "lr": 36, "svm": 36}
+
+
+def test_fold_cached_tfidf_gives_identical_cv_scores(welfake_sample):
+    """The cache only saves time: cv_results_ must equal a plain-TfidfVectorizer GridSearchCV."""
+    from sklearn.model_selection import GridSearchCV, StratifiedKFold
+    from sklearn.pipeline import Pipeline
+    train, _ = welfake_sample
+    X, y = B.make_input(train.iloc[:600]), train["label"].iloc[:600].to_numpy()
+    grid = [{"tfidf__ngram_range": [(1, 1)], "tfidf__max_features": [2_000], "clf__C": [0.1, 1.0]},
+            {"tfidf__ngram_range": [(1, 2)], "tfidf__max_features": [5_000], "clf__C": [0.1, 1.0]}]
+    scores = []
+    for vec in (B.FoldCachedTfidf(**B.TFIDF_DEFAULTS), B.build_vectoriser()):
+        B.FoldCachedTfidf._cache.clear()
+        gs = GridSearchCV(Pipeline([("tfidf", vec), ("clf", B.build_classifier("svm"))]), grid, scoring="f1_macro",
+                          cv=StratifiedKFold(3, shuffle=True, random_state=42), refit=False).fit(X, y)
+        scores.append(gs.cv_results_["mean_test_score"])
+    B.FoldCachedTfidf._cache.clear()
+    np.testing.assert_allclose(scores[0], scores[1])
+
+
+def test_best_params_parses_csv(tmp_path):
+    csv = tmp_path / "g.csv"
+    pd.DataFrame({"params": [str({"clf__C": 1.0, "tfidf__ngram_range": (1, 2)}), str({"clf__C": 10.0, "tfidf__ngram_range": (1, 1)})],
+                  "mean_test_score": [0.9, 0.8], "best": [True, False]}).to_csv(csv, index=False)
+    assert B.best_params("svm", csv) == ({"ngram_range": (1, 2)}, {"C": 1.0})
+    assert B.best_params("svm", tmp_path / "missing.csv") is None
+
+
+def test_welfake_minus_isot_removes_exact_and_near_copies():
+    from src.eval.cross_dataset import welfake_minus_isot
+    base = " ".join(f"word{i}" for i in range(300))
+    isot = pd.DataFrame({"id": ["i1", "i2"], "text": [base, "completely different isot article " * 10],
+                         "label": ["real", "fake"], "split": ["train", "test"]})
+    welfake = pd.DataFrame({"id": ["w1", "w2", "w3"],
+                            "text": [base.upper() + " !!", base + " word300", "an unrelated welfake story " * 10],
+                            "label": ["real", "real", "fake"], "split": ["train", "val", "test"]})
+    rows, stats = welfake_minus_isot(welfake, isot)
+    assert stats["welfake_in_isot"] == 1 and stats["welfake_minus_isot_exact"] == 2   # w1 = case/punct variant of i1
+    assert stats["near_dups_of_isot_removed"] == 1                                     # w2 = i1 + one word
+    assert list(rows["id"]) == ["w3"] and list(rows.columns) == ["id", "label", "split"]
+
+
+def test_fake_scores_orientation_for_svm_and_lr(welfake_sample):
+    """Higher score must mean 'more fake' for both predict_proba (LR) and decision_function (LinearSVC)."""
+    from src.eval.eval_models import fake_scores
+    train, val = welfake_sample
+    for m in ("lr", "svm"):
+        pipes, _, _ = B.fit_eval_all("welfake", [m], train_df=train, eval_df=val, verbose=False)
+        pred, score = fake_scores(pipes[m], B.make_input(val))
+        assert score[pred == "fake"].min() >= score[pred == "real"].max()

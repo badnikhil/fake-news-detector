@@ -1,0 +1,64 @@
+{
+  "dataset": "isot",
+  "model": "nb",
+  "artefact": "data/models/tfidf_nb_isot.joblib",
+  "params": {
+    "tfidf": {
+      "ngram_range": [
+        1,
+        2
+      ],
+      "max_features": 200000,
+      "sublinear_tf": true,
+      "min_df": 2
+    },
+    "clf": {
+      "alpha": 0.1
+    }
+  },
+  "score": "predict_proba",
+  "val": {
+    "accuracy": 0.955549640670748,
+    "precision_macro": 0.9547145199761479,
+    "recall_macro": 0.9553089528494325,
+    "f1_macro": 0.9550032548859326,
+    "precision_fake": 0.9469290399522957,
+    "recall_fake": 0.9531812725090036,
+    "f1_fake": 0.9500448698773557,
+    "confusion": [
+      [
+        2002,
+        89
+      ],
+      [
+        78,
+        1588
+      ]
+    ],
+    "roc_auc": 0.9899873866332759,
+    "n": 3757,
+    "predict_seconds": 1.6
+  },
+  "test": {
+    "accuracy": 0.9470322065477775,
+    "precision_macro": 0.9457939555030518,
+    "recall_macro": 0.9471691115470579,
+    "f1_macro": 0.9464310369719944,
+    "precision_fake": 0.9332545776727702,
+    "recall_fake": 0.9483793517406963,
+    "f1_fake": 0.94075617743376,
+    "confusion": [
+      [
+        1978,
+        113
+      ],
+      [
+        86,
+        1580
+      ]
+    ],
+    "roc_auc": 0.9864898613677895,
+    "n": 3757,
+    "predict_seconds": 1.6
+  }
+}

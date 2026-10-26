@@ -4,6 +4,8 @@ subtitle: "Fake News & Misinformation Detector (evidence-grounded, explainable 5
 date: "v1.0 — 27 August 2026 (prepared for the MSE 2 window, weeks 12–13, 2–15 Nov 2026)"
 ---
 
+> **Status (2026-10-26, integration pass):** classical models tuned + tested (GridSearchCV NB 18 / LR 36 / SVM 36 configs, all completed), cross-dataset WELFake∖ISOT ↔ ISOT table, leakage audit, error analysis, LIAR 3-way head, zero-shot FEVER stance eval (0.7267 — misses O4), offline FAISS index, claims/temporal/fusion v1 and `POST /analyze` (offline) are **done**; Live Claims Set = 95 items; paper §III–VI drafted (`make paper` builds, 8 pp.). **Deferred to ESE (user decision 2026-10-26: no more GPU training):** DistilBERT max_len-512 runs, full-train retrain, DistilBERT test row and the O1 check (`data/models/distilbert-welfake-v1/` does not exist; the served classifier is TF-IDF + LR). **Not done yet:** `docs/results/fusion_thresholds.md` (fusion.yaml values are untuned defaults) and all end-to-end numbers. Each DoD box below is ticked only if genuinely done; open boxes carry the reason.
+
 # 1. Title Block
 
 | Field | Value |
@@ -54,13 +56,13 @@ date: "v1.0 — 27 August 2026 (prepared for the MSE 2 window, weeks 12–13, 2�
 
 **Definition of Done**
 
-- [ ] `make train-baselines` runs on a fresh clone in < 10 min and writes the three `.joblib` files.
-- [ ] `data/models/distilbert-welfake-v1/` exists, loads with `AutoModelForSequenceClassification`, and is the model served by `POST /classify`.
-- [ ] A training log for **every** model (incl. the LIAR head) is saved under `docs/results/train_logs/` with seed, full config, wall-clock, hardware (GPU/CPU/Colab) and per-epoch metrics.
-- [ ] `docs/figures/train_distilbert.png` shows train loss decreasing and val macro-F1 per epoch; best epoch marked.
-- [ ] Stance model evaluated on the 3k FEVER dev subset; table + CM saved; accuracy reported against the O4 target (≥ 85 %).
-- [ ] `make index` builds `data/index/` in < 5 min; a query returns top-5 hits with cosine scores and record IDs.
-- [ ] All models use the same `data/splits/` IDs (assert in scripts; no train/test overlap).
+- [x] `make train-baselines` runs on a fresh clone in < 10 min and writes the three `.joblib` files. *(~2 min CPU; fresh clone verified at MSE1)*
+- [ ] `data/models/distilbert-welfake-v1/` exists, loads with `AutoModelForSequenceClassification`, and is the model served by `POST /classify`. — **deferred to ESE** (GPU training stopped 2026-10-26; full retrain not run; `/classify` serves TF-IDF + LR and switches automatically once the checkpoint exists).
+- [ ] A training log for **every** model (incl. the LIAR head) is saved under `docs/results/train_logs/` with seed, full config, wall-clock, hardware (GPU/CPU/Colab) and per-epoch metrics. — logs exist for every model that was trained (baselines, tuned baselines, 3 DistilBERT sweep runs, LIAR head); the full DistilBERT run is **deferred to ESE**.
+- [ ] `docs/figures/train_distilbert.png` shows train loss decreasing and val macro-F1 per epoch; best epoch marked. — figure exists but shows the best **20k-subset sweep run**, not a full-train run (**deferred to ESE**).
+- [x] Stance model evaluated on the 3k FEVER dev subset; table + CM saved; accuracy reported against the O4 target (≥ 85 %). *(0.7267 zero-shot — O4 **not met**, stated in the paper)*
+- [x] `make index` builds `data/index/` in < 5 min; a query returns top-5 hits with cosine scores and record IDs. *(83.6 s, 13,892 vectors)*
+- [x] All models use the same `data/splits/` IDs (assert in scripts; no train/test overlap).
 
 **Verify in ≤ 3 minutes.** (1) `cat docs/results/classifier_table.md` — five rows, all metrics filled. (2) `cat data/models/distilbert-welfake-v1/trainer_state.json | head -60` — epochs, loss, `eval_macro_f1`. (3) Open `docs/figures/train_distilbert.png`. (4) `MODE=offline make run`, then `curl -s -X POST localhost:8000/classify -H 'content-type: application/json' -d '{"text":"<paste a headline>"}'` — returns `p_fake` from the checkpoint.
 
@@ -72,7 +74,7 @@ date: "v1.0 — 27 August 2026 (prepared for the MSE 2 window, weeks 12–13, 2�
 4. *Early stopping?* Val macro-F1 evaluated every epoch, best checkpoint kept (`load_best_model_at_end`), stop when no improvement — 2–3 epochs suffice for 58k examples; more epochs overfit.
 5. *How do you guarantee identical splits across models?* Stratified 80/10/10 with `random_state=42`, saved as ID lists in `data/splits/`; every script loads those IDs and asserts zero overlap.
 6. *How did CPU-only members train?* 10k subset, max_len 128, 2 epochs (1.5–3 h), or Colab free T4; checkpoints shared via HF Hub — others only need inference.
-7. *Was the stance model trained?* No — `nli-deberta-v3-small` is pre-trained on SNLI/MNLI/FEVER-NLI; we evaluate it (premise = evidence, hypothesis = claim; entailment/contradiction/neutral → SUPPORTS/REFUTES/NEUTRAL). A 1-epoch fine-tune on 20k FEVER pairs is optional.
+7. *Was the stance model trained?* No — `nli-deberta-v3-small` is pre-trained on SNLI + MultiNLI only (model card; *not* FEVER-NLI, as earlier drafts wrongly said), so our FEVER evaluation is zero-shot; we evaluate it (premise = evidence, hypothesis = claim; entailment/contradiction/neutral → SUPPORTS/REFUTES/NEUTRAL). A 1-epoch fine-tune on 20k FEVER pairs is optional.
 8. *What is in the offline index and why?* 12,836 LIAR statements with PolitiFact rulings + ~1,056 FakeNewsNet PolitiFact titles, 384-d `all-MiniLM-L6-v2` vectors, FAISS `IndexFlatIP` on normalised vectors (= cosine), top-5 with cosine ≥ 0.55 — so the demo works with no internet.
 
 # 4. Criterion 2 — Hyperparameter Tuning (5 marks)
@@ -91,12 +93,12 @@ date: "v1.0 — 27 August 2026 (prepared for the MSE 2 window, weeks 12–13, 2�
 
 **Definition of Done**
 
-- [ ] Tuning tables list **every** configuration tried (no cherry-picking) with val macro-F1; the winner is marked and its val-vs-test gap is reported.
-- [ ] `gridsearch_*.csv` are the raw `cv_results_` exports (36 rows per LR/SVM grid, 18 for NB).
-- [ ] `distilbert_sweep.md` includes the lr = 5e-5 runs and a one-line explanation of their behaviour.
-- [ ] The config used for `distilbert-welfake-v1` equals the sweep winner (stated in `train_logs`).
-- [ ] `fusion.yaml` values match `docs/results/fusion_thresholds.md`; dev slice IDs are disjoint from evaluation items.
-- [ ] `make eval-models` regenerates the sweep figures from the CSV/MD tables.
+- [x] Tuning tables list **every** configuration tried (no cherry-picking) with val macro-F1; the winner is marked and its val-vs-test gap is reported. *(classical: gap column in `classifier_table.md`; DistilBERT: no test number yet — ESE)*
+- [x] `gridsearch_*.csv` are the raw `cv_results_` exports (36 rows per LR/SVM grid, 18 for NB).
+- [x] `distilbert_sweep.md` includes the lr = 5e-5 runs and a one-line explanation of their behaviour. *(max_len 256 only; 512 deferred to ESE)*
+- [ ] The config used for `distilbert-welfake-v1` equals the sweep winner (stated in `train_logs`). — **deferred to ESE** (3 of 6 configs run, no winner, no retrain).
+- [ ] `fusion.yaml` values match `docs/results/fusion_thresholds.md`; dev slice IDs are disjoint from evaluation items. — dev/eval slices are disjoint (`tests/test_live_claims.py`), but **`fusion_thresholds.md` not produced yet**: fusion.yaml holds untuned defaults (τ 0.6, N 6, k 5).
+- [x] `make eval-models` regenerates the sweep figures from the CSV/MD tables. *(classical heat-maps; the DistilBERT sweep plot is rendered by `make train-distilbert --render`)*
 
 **Verify in ≤ 3 minutes.** `column -s, -t docs/results/gridsearch_svm.csv | sort -k<macroF1 col> -r | head`; `cat docs/results/distilbert_sweep.md`; open `docs/figures/sweep_distilbert_lr.png`; `cat src/fusion/fusion.yaml`.
 
@@ -128,13 +130,13 @@ date: "v1.0 — 27 August 2026 (prepared for the MSE 2 window, weeks 12–13, 2�
 
 **Definition of Done**
 
-- [ ] Test-set table complete for NB, LR, SVM, DistilBERT on **both** WELFake and ISOT (in-domain).
-- [ ] Cross-dataset table has all four cells (W∖I→W∖I, W∖I→I, I→W∖I, I→I, where W∖I = WELFake minus the ISOT articles) × {raw, artefact-removed}; F1 drop quantified in one sentence; the overlap (≈ 99.6 % of ISOT inside WELFake) stated next to the table.
-- [ ] Artefact-only classifier accuracy on ISOT reported (expected very high) and discussed as leakage.
-- [ ] CM + ROC figures exist for every model; DistilBERT CM annotated with counts and percentages.
-- [ ] `error_analysis.md` has ≥ 20 categorised examples and a category-frequency table.
-- [ ] Objective O1 checked: DistilBERT macro-F1 ≥ 0.95 on WELFake test (or the shortfall explained).
-- [ ] `make eval-models` regenerates every number and figure above from the saved checkpoints.
+- [ ] Test-set table complete for NB, LR, SVM, DistilBERT on **both** WELFake and ISOT (in-domain). — NB/LR/SVM done on both; **DistilBERT row deferred to ESE**.
+- [x] Cross-dataset table has all four cells (W∖I→W∖I, W∖I→I, I→W∖I, I→I, where W∖I = WELFake minus the ISOT articles) × {raw, artefact-removed}; F1 drop quantified in one sentence; the overlap (≈ 99.6 % of ISOT inside WELFake) stated next to the table.
+- [x] Artefact-only classifier accuracy on ISOT reported (expected very high) and discussed as leakage.
+- [ ] CM + ROC figures exist for every model; DistilBERT CM annotated with counts and percentages. — done for NB/LR/SVM × WELFake/ISOT; **DistilBERT CM deferred to ESE**.
+- [x] `error_analysis.md` has ≥ 20 categorised examples and a category-frequency table. *(25 examples, 310 errors categorised, LinearSVC)*
+- [ ] Objective O1 checked: DistilBERT macro-F1 ≥ 0.95 on WELFake test (or the shortfall explained). — **not checked, deferred to ESE** (no DistilBERT test number; the 20k-subset val 0.987 must not be quoted as O1).
+- [x] `make eval-models` regenerates every number and figure above from the saved checkpoints. *(for the classical models)*
 
 **Verify in ≤ 3 minutes.** `cat docs/results/classifier_table.md docs/results/cross_dataset.md`; open `docs/figures/cm_distilbert_welfake.png`; `head -40 docs/results/error_analysis.md`; optionally `make eval-models` (start before the viva; ≈ 10 min on CPU).
 
@@ -146,7 +148,7 @@ date: "v1.0 — 27 August 2026 (prepared for the MSE 2 window, weeks 12–13, 2�
 4. *Why WELFake∖ISOT ↔ ISOT and not WELFake ↔ ISOT?* WELFake was assembled from Kaggle + McIntire + Reuters/ISOT + BuzzFeed, so ≈ 99.6 % of ISOT is verbatim inside WELFake (≈ 79 % of ISOT val/test rows sit in WELFake *train*); "train WELFake → test ISOT" is a train-on-test number (MSE1 preview 0.985 macro-F1 vs 0.83 for ISOT → WELFake). We remove the hash-matched articles and their MinHash near-duplicates from the WELFake side to get two disjoint domains.
 4. *Interpret this confusion matrix.* Rows = true, columns = predicted; the fake→real cell is the dangerous one for users (missed fakes); we report it separately as fake-class recall.
 5. *How do you get ROC-AUC for LinearSVC without probabilities?* From `decision_function` margins (AUC is threshold-free), or `CalibratedClassifierCV` if calibrated probabilities are needed.
-6. *How was the stance model evaluated on FEVER?* 3k balanced dev claims with gold Wikipedia evidence; NEI claims paired with a random sentence from the same page; accuracy / macro-F1 / CM. Caveat stated openly: FEVER-NLI is in the model's pre-training mix, so the score is optimistic for news-domain evidence.
+6. *How was the stance model evaluated on FEVER?* 3k balanced dev claims with gold Wikipedia evidence (text from `copenlu/fever_gold_evidence`, premise = "Page title: sentence"); NEI claims paired with the Papelo-retrieved sentences shipped for them; accuracy / macro-F1 / CM. Zero-shot: the model card lists SNLI + MultiNLI only, no FEVER. Result 0.7267 accuracy / 0.7121 macro-F1 — O4 (≥ 0.85) not met; 47.9 % of NEI pairs are predicted REFUTES. Still optimistic for news-domain evidence (FEVER claims are short rewrites of the gold sentence).
 7. *Most common error category and fix?* `<fill from error_analysis.md>` — e.g., long articles truncated at 256 tokens → use head + tail truncation; satire → satire-domain list (rule R0).
 
 # 6. Criterion 4 — Research Paper: Methodology (2.5 marks)
@@ -164,10 +166,10 @@ date: "v1.0 — 27 August 2026 (prepared for the MSE 2 window, weeks 12–13, 2�
 
 **Definition of Done**
 
-- [ ] Every module named in §IV exists as code under `src/` (claims, evidence, stance, temporal, fusion) — an examiner can cross-check.
-- [ ] Rule table in the paper equals `src/fusion/rules.py` and `fusion.yaml` (τ = 0.6, N = 6, k = 5).
-- [ ] Pipeline figure has the same boxes as §9 of the master doc; dataset table numbers equal `notebooks/00_datasets.ipynb` output.
-- [ ] §V lists seed 42, 80/10/10 split, the winning hyperparameters, RTX 2050/3050-class 4 GB / Colab T4, library versions.
+- [x] Every module named in §IV exists as code under `src/` (claims, evidence, stance, temporal, fusion) — an examiner can cross-check.
+- [x] Rule table in the paper equals `src/fusion/rules.py` and `fusion.yaml` (τ = 0.6, N = 6, k = 5). *(incl. the LANG pre-check)*
+- [x] Pipeline figure has the same boxes as §9 of the master doc; dataset table numbers equal `notebooks/00_datasets.ipynb` output. *(`paper/figures/pipeline.{tex,pdf}`, TikZ; UI and LIME boxes folded into input/output since they are ESE)*
+- [x] §V lists seed 42, 80/10/10 split, the winning hyperparameters, RTX 2050/3050-class 4 GB / Colab T4, library versions. *(classical winners; DistilBERT winner deferred)*
 
 **Verify in ≤ 3 minutes.** Open `paper/main.pdf` pages 2–4; compare the rule table with `cat src/fusion/fusion.yaml`; check the figure against `docs/FakeNewsDetector_ProjectDetails.md` §9.
 
@@ -194,11 +196,11 @@ date: "v1.0 — 27 August 2026 (prepared for the MSE 2 window, weeks 12–13, 2�
 
 **Definition of Done**
 
-- [ ] Every number in §VI equals the corresponding cell in `docs/results/` (spot-check three cells at random).
-- [ ] Tables: model comparison, tuning, cross-dataset, stance; Figures: pipeline, CM, ROC, sweep curve.
-- [ ] Each table has one paragraph of interpretation (what it shows, what it implies).
-- [ ] Preliminary e2e numbers labelled "preliminary (n = 60)"; ESE additions listed in one sentence.
-- [ ] Draft ≈ 5 pages total (§I–VI), compiles with `make paper`.
+- [x] Every number in §VI equals the corresponding cell in `docs/results/` (spot-check three cells at random).
+- [x] Tables: model comparison, tuning, cross-dataset, stance; Figures: pipeline, CM, ROC, sweep curve. *(sweep shown as a table — only 3 points at one max_len; stance CM, WELFake ROC)*
+- [x] Each table has one paragraph of interpretation (what it shows, what it implies).
+- [ ] Preliminary e2e numbers labelled "preliminary (n = 60)"; ESE additions listed in one sentence. — no e2e numbers exist yet; the paper says "deferred to ESE" and lists the ESE additions in one sentence.
+- [x] Draft ≈ 5 pages total (§I–VI), compiles with `make paper`. *(8 pp. incl. references and stub §VII–VIII)*
 
 **Verify in ≤ 3 minutes.** Open `paper/main.pdf` §VI; pick any three numbers and `grep` them in `docs/results/classifier_table.md` / `cross_dataset.md`.
 
@@ -245,7 +247,7 @@ Everyone answers questions on every module.
 |---|---|
 | "The UI is basic / no LIME yet." | Scheduled for weeks 13–14 per the plan; MSE 2 is the modelling milestone. The JSON already contains everything the UI will render. |
 | "Only 60 Live Claims items." | Labelling reaches ~100 by week 14; e2e numbers are marked preliminary. |
-| "Stance model not fine-tuned." | Pre-trained NLI meets the O4 target on FEVER; fine-tuning is optional and listed as a stretch goal. |
+| "Stance model not fine-tuned." | Correct — and zero-shot it does **not** meet O4 on FEVER (0.7267 vs ≥ 0.85; the NEI class is the weak spot). Planned ESE fixes: REFUTES threshold tuned on FEVER *train* pairs, then the optional 1-epoch fine-tune. |
 | "WELFake 95 %+ is easy." | Agreed — that is why we report cross-dataset and artefact-only numbers, and why evidence, not the classifier, decides. |
 | "Online retrieval untested at scale." | ddgs + Wikipedia work with caching; Google Fact Check key obtained; rate limits mitigated by the SQLite cache and offline mode. |
 | "Fusion thresholds tuned on 30 items." | Yes — reported as preliminary; frozen in `fusion.yaml`; revisited with the full Live Claims Set at ESE. |

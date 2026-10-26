@@ -21,9 +21,9 @@
       1621
     ]
   ],
-  "vectoriser_seconds": 19.96401162999973,
-  "fit_seconds": 1.7159692929999437,
-  "predict_seconds": 0.004734368994832039,
+  "vectoriser_seconds": 19.060578739998164,
+  "fit_seconds": 1.6873279930005083,
+  "predict_seconds": 0.004421454999828711,
   "n_features": 100000,
   "params": {
     "tfidf": {
@@ -45,7 +45,8 @@
     }
   },
   "artefact": "data/models/tfidf_lr_isot_v0.joblib",
-  "train_seconds": 21.679980922999675,
+  "variant": "v0",
+  "train_seconds": 20.747906732998672,
   "labels": [
     "real",
     "fake"

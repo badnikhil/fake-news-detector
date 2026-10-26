@@ -1,0 +1,64 @@
+{
+  "dataset": "welfake",
+  "model": "svm",
+  "artefact": "data/models/tfidf_svm.joblib",
+  "params": {
+    "tfidf": {
+      "ngram_range": [
+        1,
+        2
+      ],
+      "max_features": 200000,
+      "sublinear_tf": true,
+      "min_df": 2
+    },
+    "clf": {
+      "C": 1.0
+    }
+  },
+  "score": "decision_function",
+  "val": {
+    "accuracy": 0.9503289473684211,
+    "precision_macro": 0.9493316624895572,
+    "recall_macro": 0.9497123054073382,
+    "f1_macro": 0.949519292891803,
+    "precision_fake": 0.9413533834586466,
+    "recall_fake": 0.9449056603773585,
+    "f1_fake": 0.9431261770244821,
+    "confusion": [
+      [
+        3274,
+        156
+      ],
+      [
+        146,
+        2504
+      ]
+    ],
+    "roc_auc": 0.9897629132515541,
+    "n": 6080,
+    "predict_seconds": 3.7
+  },
+  "test": {
+    "accuracy": 0.9490131578947368,
+    "precision_macro": 0.9484825351377655,
+    "recall_macro": 0.9477738049397657,
+    "f1_macro": 0.9481194340834398,
+    "precision_fake": 0.9445288753799392,
+    "recall_fake": 0.9381132075471698,
+    "f1_fake": 0.9413101098068913,
+    "confusion": [
+      [
+        3284,
+        146
+      ],
+      [
+        164,
+        2486
+      ]
+    ],
+    "roc_auc": 0.9883873700423564,
+    "n": 6080,
+    "predict_seconds": 3.5
+  }
+}

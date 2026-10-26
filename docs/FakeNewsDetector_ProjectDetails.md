@@ -306,7 +306,7 @@ For NEI claims we pair the claim with a randomly retrieved Wikipedia sentence fr
 | Middle (optional) | Bi-LSTM + GloVe 100d | Shows sequence modelling; cheap on the 4 GB GPU | Only if time permits (week 9) |
 | Final | **DistilBERT-base-uncased fine-tuned** | Best accuracy/size trade-off; 66M params; fits 4 GB GPU with fp16 | Content classifier in production |
 | Fine-grained | DistilBERT (or TF-IDF+LR) on LIAR 3-way | Gives a truth-shade probability for short claims | Confidence adjustment in fusion |
-| Stance | `cross-encoder/nli-deberta-v3-small` (pre-trained on SNLI/MNLI/FEVER-NLI etc.) | Ready-made NLI cross-encoder, ~140M params, CPU-usable | Stance detection; optional fine-tune on FEVER subset |
+| Stance | `cross-encoder/nli-deberta-v3-small` (pre-trained on SNLI + MultiNLI only, per the model card — not FEVER; the FEVER evaluation is zero-shot) | Ready-made NLI cross-encoder, ~140M params, CPU-usable | Stance detection; optional fine-tune on FEVER subset |
 | Embedding | `all-MiniLM-L6-v2` (22M params) | Fast sentence embeddings for the offline index and passage re-ranking | Retrieval |
 | Claims (optional) | TF-IDF + LR on ClaimBuster | Cheap check-worthiness classifier | Combined with heuristics |
 
