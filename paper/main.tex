@@ -363,6 +363,27 @@ Accuracy / macro-F1 & \multicolumn{3}{c}{0.7267 / 0.7121} \\
 \subsection{End-to-End Evaluation}
 The offline pipeline runs end to end behind \texttt{POST /analyze}, and the 95-item Live Claims Set (Section~\ref{sec:data}) is labelled and split. End-to-end five-class results, fusion-threshold tuning on the dev slice, the ablation (classifier only / $+$evidence / $+$temporal / offline only) and latency measurements are deferred to ESE.
 
+\subsection{Expected Outcomes for Deferred Experiments}\label{sec:expected}
+Table~\ref{tab:expected} states where the experiments deferred to ESE are expected to land. \textbf{None of these values is measured}; each is marked $^\dagger$ and will be replaced by the ESE run. They are derived only from our own measurements in this section or from the project's target objectives, and no objective is claimed as met on their basis.
+
+\begin{table}[t]
+\caption{Expected outcomes for experiments deferred to ESE ($^\dagger$expected, not measured; to be replaced by the ESE run).}
+\label{tab:expected}
+\centering\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.27\columnwidth} >{\raggedright\arraybackslash}p{0.25\columnwidth} >{\raggedright\arraybackslash}p{0.40\columnwidth}@{}}
+\toprule
+Experiment (deferred to ESE) & Expected$^\dagger$ (not measured) & Basis \\
+\midrule
+DistilBERT full-train, WELFake test macro-F1 (O1) & \emph{$\approx$0.98--0.99}$^\dagger$; O1 ($\geq 0.95$) expected met$^\dagger$, not checked & 20k-subset val 0.9863--0.9871 (Table~\ref{tab:sweep}); classical WELFake val--test gaps within $\pm$0.003 \\
+DistilBERT, ISOT test (in-domain) & \emph{high}$^\dagger$, no range & ISOT $\subset$ WELFake; ${\sim}$80\,\% of ISOT test rows in WELFake train \\
+DistilBERT, cross-dataset W$\setminus$I $\leftrightarrow$ ISOT & \emph{sharp drop, like the classical models}$^\dagger$ (direction only) & SVM test 0.6611 W$\setminus$I$\to$ISOT, 0.5480 ISOT$\to$W$\setminus$I \\
+Fusion thresholds (dev-slice tuning) & \emph{$\tau = 0.6$, $N = 6$ months, $k = 5$}$^\dagger$ & current untuned \texttt{fusion.yaml} defaults \\
+End-to-end 5-class, Live Claims Set (O6) & \emph{target}$^\dagger$: macro-F1 $\geq 0.55$, \textsc{Unverifiable} precision $\geq 0.7$ & project objective O6 (a target, not a prediction) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 %% ===========================================================================
 \section{Discussion and Comparison with Existing Systems}\label{sec:discussion}
 %% ===========================================================================

@@ -478,6 +478,23 @@ PENDING_ROWS = [
     ("Bi-LSTM + GloVe 100d (optional)", "WELFake", "val / test", "MSE2 — only if time permits (week 9)"),
     ("DistilBERT (or TF-IDF + LR) LIAR 3-way head", "LIAR", "test", "MSE2 — `docs/results/liar_head.md`"),
 ]
+# Rendered while DistilBERT is pending. Expected values only (own measured numbers as basis), never measured.
+DISTILBERT_EXPECTED = [
+    "",
+    "### DistilBERT — expected (not measured), deferred to ESE",
+    "",
+    "| Model | Dataset | Expected test Macro-F1 † — not measured | Basis |",
+    "|---|---|---|---|",
+    "| DistilBERT (`distilbert-welfake-v1`) | WELFake | *≈ 0.98–0.99* † (O1 ≥ 0.95 *expected* met †; not checked) "
+    "| 20k-subset val macro-F1 0.9863–0.9871 (`distilbert_sweep.md`); WELFake val–test gaps of the tuned classical models "
+    "within ±0.003 (table above) |",
+    "| DistilBERT (`distilbert-welfake-v1`) | ISOT (in-domain) | *expected high* † (no range) "
+    "| ISOT ⊂ WELFake; ~80 % of ISOT test rows are in WELFake train |",
+    "| DistilBERT (`distilbert-welfake-v1`) | WELFake∖ISOT ↔ ISOT (cross-dataset) | *expected to drop sharply, like the "
+    "classical models* † (direction only) | measured SVM test macro-F1 0.6611 W∖I→ISOT, 0.5480 ISOT→W∖I (`cross_dataset.md`) |",
+    "",
+    "† expected, not measured; to be replaced by the ESE run. These cells are not results.",
+]
 DISTILBERT_PENDING = ("DistilBERT-base-uncased fine-tuned (`distilbert-welfake-v1`)", "WELFake / ISOT", "val + test",
                       "filled automatically by `make eval-models` once `data/models/distilbert-welfake-v1/` exists "
                       "(`make train-distilbert`); sweep: `docs/results/distilbert_sweep.md`")
@@ -566,6 +583,8 @@ def render_classifier_table(log_dir: Path = TRAIN_LOG_DIR, out: Path = CLASSIFIE
         pending.insert(0, DISTILBERT_PENDING)
     for model, ds, split, note in pending:
         lines.append(f"| {model} | {ds} | {split} | **pending** — {note} |")
+    if not (log_dir / "eval_welfake_distilbert.json").exists():
+        lines += DISTILBERT_EXPECTED
     lines += [
         "",
         "Cross-dataset (WELFake∖ISOT ↔ ISOT, with / without artefact removal): `docs/results/cross_dataset.md`. "

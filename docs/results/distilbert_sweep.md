@@ -16,3 +16,5 @@
 
 **lr = 5e-5:** at max_len 256 it fits the 20k subset fastest (train loss 0.0077 at epoch 3 vs 0.0153 / 0.0105 for 2e-5 / 3e-5) and its val loss rises from epoch 2 (0.0572) to epoch 3 (0.0671), i.e. it starts to overfit, while val macro-F1 stays flat (0.9870 -> 0.9871); it ties lr 2e-5 (0.9869) within 0.0002 — no lr is clearly better at 256.
 
+**Expected — not measured** (†expected, not measured; to be replaced by the ESE run). Full-train WELFake **test** macro-F1 of the retrained winner: *≈ 0.98–0.99*† — basis: the three completed 20k-subset runs reach val macro-F1 0.9863–0.9871, and the WELFake val–test gaps of the three tuned classical models are within ±0.003 (`classifier_table.md`); training on all 48,639 rows is not expected to lower it. On that basis O1 (≥ 0.95) is *expected* to be met† — it is still **not checked**. ISOT test (in-domain, ISOT ⊂ WELFake, ~80 % of ISOT test rows are in WELFake train): *expected high*†, no numeric range. Cross-dataset WELFake∖ISOT ↔ ISOT: *expected to drop sharply, like the classical models*† (measured SVM test macro-F1 0.6611 W∖I→ISOT and 0.5480 ISOT→W∖I, `cross_dataset.md`) — direction only, no number.
+
