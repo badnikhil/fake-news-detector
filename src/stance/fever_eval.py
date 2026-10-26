@@ -208,6 +208,21 @@ It is still optimistic for our use case: FEVER claims are short single-fact rewr
 whereas news claims paired with retrieved news / fact-check passages are longer, noisier and often only topically
 related. The end-to-end Live Claims evaluation (ESE) is the realistic number. NEI premises here are retrieved
 sentences, not random ones, which is likely a harder NEUTRAL test than the "random sentence" variant.
+
+## Published reference points (other work) — not our measurement
+
+Copied from the model cards (read 2026-10-26); we did not reproduce them, and they are in-domain NLI test numbers,
+not FEVER numbers, so they are **not comparable** to the 0.7267 FEVER-dev accuracy above.
+
+| source | model | dataset / split | metric | published value |
+|---|---|---|---|---|
+| model card `cross-encoder/nli-deberta-v3-small` | the cross-encoder we use | SNLI test | accuracy | 91.65 |
+| model card `cross-encoder/nli-deberta-v3-small` | the cross-encoder we use | MNLI mismatched | accuracy | 87.55 |
+| model card `microsoft/deberta-v3-small` (He et al., DeBERTaV3) | DeBERTa-v3-small fine-tuned by Microsoft | MNLI-m / mm | accuracy | 88.3 / 87.7 |
+
+Sources: <https://huggingface.co/cross-encoder/nli-deberta-v3-small>, <https://huggingface.co/microsoft/deberta-v3-small>.
+The gap between ≈ 88–92 % in-domain NLI and our 72.7 % on FEVER dev is the zero-shot transfer cost described above,
+concentrated in the NEUTRAL (NOT ENOUGH INFO) class.
 """)
     return path
 

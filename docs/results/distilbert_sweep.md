@@ -18,3 +18,18 @@
 
 **Expected — not measured** (†expected, not measured; to be replaced by the ESE run). Full-train WELFake **test** macro-F1 of the retrained winner: *≈ 0.98–0.99*† — basis: the three completed 20k-subset runs reach val macro-F1 0.9863–0.9871, and the WELFake val–test gaps of the three tuned classical models are within ±0.003 (`classifier_table.md`); training on all 48,639 rows is not expected to lower it. On that basis O1 (≥ 0.95) is *expected* to be met† — it is still **not checked**. ISOT test (in-domain, ISOT ⊂ WELFake, ~80 % of ISOT test rows are in WELFake train): *expected high*†, no numeric range. Cross-dataset WELFake∖ISOT ↔ ISOT: *expected to drop sharply, like the classical models*† (measured SVM test macro-F1 0.6611 W∖I→ISOT and 0.5480 ISOT→W∖I, `cross_dataset.md`) — direction only, no number.
 
+## Published reference points (other work) — not our measurement
+
+Numbers copied from the cited sources; we did not reproduce any of them. They are **not directly comparable** to ours: those works use raw WELFake / ISOT with their own random splits, no Reuters-dateline / credit / caption artefact stripping and no cross-corpus de-duplication (ISOT ⊂ WELFake), so their scores may include the boiler-plate leakage our preprocessing removes.
+
+| source | model | dataset / split | metric | published value |
+|---|---|---|---|---|
+| Verma et al. 2021, IEEE TCSS 8(4) (WELFake paper; abstract) | WELFake (word embedding over linguistic features) | WELFake | accuracy | 96.73 % (reported as +1.31 % over BERT, +4.25 % over CNN) |
+| Abdo & Roki 2026, IJCA 187(119), Table 4 | DistilBERT-base (lr 3e-5, 5 ep., batch 32, max_len 512) | WELFake, stratified 80/10/10, test n = 7,214 | accuracy / macro-F1 | 95.38 % / 0.9538 |
+| Abdo & Roki 2026, IJCA 187(119), Table 4 | BERT-base (lr 2e-5, 4 ep.) | same | accuracy / macro-F1 | 95.92 % / 0.9592 |
+| Abdo & Roki 2026, IJCA 187(119), Table 4 | RoBERTa-base (lr 2e-5, 4 ep.) | same | accuracy / macro-F1 | 96.84 % / 0.9684 |
+| Blackledge & Atapour-Abarghouei 2021, arXiv:2109.09796, Table II | DistilBERT / BERT / DeBERTa | ISOT, 80 % train / 10 % test | accuracy (F1) | 0.989 (0.989) / 0.990 (0.989) / 0.997 (0.989) |
+| same, Table IV | DistilBERT / BERT / DeBERTa | train ISOT → test Combined Corpus (Khan et al.) | accuracy (F1) | 0.670 (0.655) / 0.670 (0.702) / 0.697 (0.695) |
+| same, Table V | DistilBERT / BERT / DeBERTa | train Combined Corpus → test ISOT | accuracy (F1) | 0.775 (0.750) / 0.670 (0.610) / 0.730 (0.695) |
+
+Sources: <https://c3.itec.aau.at/?p=138> (WELFake abstract; DOI 10.1109/TCSS.2021.3068519), <https://ijcaonline.org/archives/volume187/number119/abdo-ijca-2026-464629276ffa.pdf>, <https://arxiv.org/abs/2109.09796>. Our deferred DistilBERT test cells above stay "deferred to ESE"; these rows do not fill them. The published in-domain → cross-corpus drop (≈ 0.99 → 0.66–0.78 accuracy) matches the direction of our expected† cross-dataset result, but the Combined Corpus is not our WELFake∖ISOT split.

@@ -77,7 +77,7 @@ LIAR~\cite{wang2017liar} collects 12.8k short political statements rated by Poli
 
 \subsection{Content-Based Classifiers}
 
-The earliest and still most common approach treats detection as document classification. Ahmed \emph{et al.}~\cite{ahmed2017isot} reported that TF-IDF n-grams with a linear SVM reach roughly 92\,\% accuracy on ISOT, and P{\'e}rez-Rosas \emph{et al.}~\cite{perezrosas2018automatic} found linear models on lexical, syntactic and readability features to be competitive on crowd-sourced fake news. Pre-trained transformers~\cite{devlin2019bert} raised these numbers further: FakeBERT~\cite{kaliyar2021fakebert} feeds BERT embeddings through parallel convolutional blocks and reports 98.9\,\% accuracy on a Kaggle corpus, and WELFake's own linguistic-feature model reports 96.7\,\%. DistilBERT~\cite{sanh2019distilbert} keeps about 97\,\% of BERT's language-understanding performance at 40\,\% fewer parameters, which is what makes fine-tuning on a 4\,GB consumer GPU feasible and is why we adopt it. What these papers share is an in-domain, binary evaluation; none reports cross-corpus transfer, and none can tell a user \emph{why} an article is suspicious beyond its wording. We keep such a classifier, but only as a secondary signal.
+The earliest and still most common approach treats detection as document classification. Ahmed \emph{et al.}~\cite{ahmed2017isot} reported that TF-IDF n-grams with a linear SVM reach roughly 92\,\% accuracy on ISOT, and P{\'e}rez-Rosas \emph{et al.}~\cite{perezrosas2018automatic} found linear models on lexical, syntactic and readability features to be competitive on crowd-sourced fake news. Pre-trained transformers~\cite{devlin2019bert} raised these numbers further: FakeBERT~\cite{kaliyar2021fakebert} feeds BERT embeddings through parallel convolutional blocks and reports 98.9\,\% accuracy on a Kaggle corpus, and WELFake's own linguistic-feature model reports 96.7\,\%. DistilBERT~\cite{sanh2019distilbert} keeps about 97\,\% of BERT's language-understanding performance at 40\,\% fewer parameters, which is what makes fine-tuning on a 4\,GB consumer GPU feasible and is why we adopt it. A recent benchmark on raw WELFake reports 0.954 macro-F1 for fine-tuned DistilBERT and 0.968 for RoBERTa~\cite{abdo2026ijca}. Blackledge and Atapour-Abarghouei~\cite{blackledge2021transforming} are a rare exception to in-domain-only evaluation: DistilBERT, BERT and DeBERTa reach 0.989--0.997 accuracy on an ISOT hold-out but only 0.670--0.697 when the ISOT-trained models are tested on another corpus. Apart from that study, what these papers share is an in-domain, binary evaluation without cross-corpus transfer, and none can tell a user \emph{why} an article is suspicious beyond its wording. We keep such a classifier, but only as a secondary signal.
 
 \subsection{Claim Detection, Evidence Retrieval and Fact Verification}
 
@@ -381,6 +381,28 @@ DistilBERT, cross-dataset W$\setminus$I $\leftrightarrow$ ISOT & \emph{sharp dro
 Fusion thresholds (dev-slice tuning) & \emph{$\tau = 0.6$, $N = 6$ months, $k = 5$}$^\dagger$ & current untuned \texttt{fusion.yaml} defaults \\
 End-to-end 5-class, Live Claims Set (O6) & \emph{target}$^\dagger$: macro-F1 $\geq 0.55$, \textsc{Unverifiable} precision $\geq 0.7$ & project objective O6 (a target, not a prediction) \\
 \bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Published Reference Results (Other Work)}\label{sec:published}
+Table~\ref{tab:published} places the deferred experiments next to results \emph{published by other authors}. \textbf{These are not our measurements}: we copied them from the cited papers and model cards and did not reproduce any of them, and they do not fill the deferred cells of Tables~\ref{tab:sweep} and~\ref{tab:expected}, which stay ``deferred to ESE''. They are not directly comparable to our protocol$^\ddagger$.
+
+\begin{table}[t]
+\caption{Published reference results of other work --- \textbf{not our measurement} (copied from the cited sources; $^\ddagger$see note).}
+\label{tab:published}
+\centering\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.25\columnwidth} >{\raggedright\arraybackslash}p{0.38\columnwidth} >{\raggedright\arraybackslash}p{0.29\columnwidth}@{}}
+\toprule
+Our deferred experiment & Published result (other work) & Setup of that work \\
+\midrule
+DistilBERT, WELFake test & DistilBERT acc.\ 95.38\,\%, macro-F1 0.9538; BERT 0.9592; RoBERTa 0.9684~\cite{abdo2026ijca} & raw WELFake (72{,}134), stratified 80/10/10, test $n=7{,}214$, max.\ len.\ 512 \\
+WELFake (reference model) & acc.\ 96.73\,\%, reported as $+$1.31\,\% over BERT~\cite{verma2021welfake} & WELFake paper's own model and split \\
+DistilBERT, ISOT test (in-domain) & acc.\ (F1) DistilBERT 0.989 (0.989), BERT 0.990 (0.989), DeBERTa 0.997 (0.989)~\cite{blackledge2021transforming} & ISOT with only URLs/punctuation removed, 80\,\% train / 10\,\% test \\
+DistilBERT, cross-dataset & ISOT$\to$CC: DistilBERT 0.670 (0.655), BERT 0.670 (0.702); CC$\to$ISOT: DistilBERT 0.775 (0.750)~\cite{blackledge2021transforming} & CC = Combined Corpus of Khan \emph{et al.}, not our W$\setminus$I split \\
+Stance model, in-domain NLI & \texttt{nli-deberta-v3-small}: SNLI test 91.65, MNLI mism.\ 87.55 acc.~\cite{hf2021crossencoderdebertav3small}; DeBERTa-v3-small MNLI-m/mm 88.3/87.7~\cite{hf2021debertav3small} & model cards; NLI test sets, not FEVER (ours: 0.7267, Section~\ref{sec:results}) \\
+\bottomrule
+\multicolumn{3}{@{}p{0.95\columnwidth}@{}}{\scriptsize $^\ddagger$The cited works train and test on raw WELFake/ISOT with their own random splits, without our artefact stripping (Reuters datelines, credits, captions, bylines, title tags) and without cross-corpus de-duplication; WELFake contains ISOT, and artefacts alone separate raw ISOT at 0.9973 accuracy (Section~\ref{sec:data}), so their scores can include leakage our protocol removes. Accuracy and F1 are as printed by each source.}
 \end{tabular}
 \end{table}
 
