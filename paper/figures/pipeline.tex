@@ -2,23 +2,19 @@
 \documentclass[tikz,border=2pt]{standalone}
 \usetikzlibrary{positioning,arrows.meta}
 \begin{document}
-\begin{tikzpicture}[font=\sffamily\scriptsize, node distance=3.2mm and 3mm,
-  box/.style={draw, rounded corners=1.5pt, align=center, minimum height=7mm, text width=#1, fill=gray!8},
-  box/.default=23mm, arr/.style={-{Stealth[length=1.6mm]}, thick}]
-\node[box=40mm] (in) {Input: headline / article text / URL\\(FastAPI \texttt{POST /analyze})};
-\node[box=40mm, below=of in] (ing) {Ingest: trafilatura + htmldate;\\clean, spaCy sentence split};
-\node[box, below left=4mm and -14mm of ing] (clm) {Claim identification\\heuristic score $h$, top-$k$};
-\node[box=18mm, below right=4mm and -14mm of ing] (cls) {Content classifier\\(style signal, $p_\mathrm{fake}$)};
-\node[box, below=of clm] (ret) {Evidence retrieval\\ddgs $|$ Wikipedia $|$ Fact Check\\offline FAISS (LIAR+FNN)};
-\node[box, below=of ret] (sta) {Stance (NLI)\\nli-deberta-v3-small};
-\node[box=18mm, right=of sta] (tmp) {Temporal / context\\check ($N{=}6$ mo.)};
-\node[box=46mm, below=6mm of sta.south east, anchor=north] (fus) {Verdict fusion: rules R0--R9 + confidence};
-\node[box=46mm, below=of fus] (out) {5-class verdict, confidence, rule fired,\\dated evidence cards, explanation};
-\draw[arr] (in) -- (ing);
-\draw[arr] (ing) -- (clm); \draw[arr] (ing) -- (cls);
-\draw[arr] (clm) -- (ret); \draw[arr] (ret) -- (sta); \draw[arr] (sta) -- (tmp);
-\draw[arr] (sta) -- (sta |- fus.north); \draw[arr] (tmp) -- (tmp |- fus.north);
-\draw[arr, dashed] (cls.east) -- ++(2mm,0) |- node[pos=0.25, right, align=left, font=\sffamily\tiny]{confidence /\\R8 tie only} (fus.east);
-\draw[arr] (fus) -- (out);
+\begin{tikzpicture}[font=\sffamily\small, node distance=4mm,
+  box/.style={draw, rounded corners=2pt, align=center, minimum height=8mm, text width=46mm, fill=gray!8},
+  arr/.style={-{Stealth[length=2mm]}, thick}]
+\node[box] (in)  {Input: headline / article / URL};
+\node[box, below=of in]  (clm) {Claim identification};
+\node[box, below=of clm] (ret) {Evidence retrieval\\(online + offline index)};
+\node[box, below=of ret] (sta) {Stance (NLI)};
+\node[box, below=of sta] (tmp) {Temporal check};
+\node[box, below=of tmp] (fus) {Fusion rules};
+\node[box, below=of fus, fill=gray!20] (out) {Verdict + explanation};
+\node[draw, dashed, rounded corners=2pt, align=center, text width=17mm, minimum height=8mm,
+      font=\sffamily\footnotesize, right=6mm of tmp] (cls) {Content\\classifier};
+\foreach \a/\b in {in/clm, clm/ret, ret/sta, sta/tmp, tmp/fus, fus/out} \draw[arr] (\a) -- (\b);
+\draw[arr, dashed] (cls) |- (fus);
 \end{tikzpicture}
 \end{document}
