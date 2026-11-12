@@ -9,7 +9,7 @@ SPACY_MODEL_URL ?= https://github.com/explosion/spacy-models/releases/download/e
 NOT_YET = @echo "make $@: not implemented until MSE2/ESE"
 
 .PHONY: setup download data index train-baselines tune-baselines train-distilbert train-liar train models \
-        eval-models eval-e2e tune-fusion eval-temporal eval run test paper docker-build docker-run nb-run lint clean-data help
+        eval-models eval-e2e tune-fusion eval-temporal agreement eval run test paper docker-build docker-run nb-run lint clean-data help
 
 help:
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  %-16s %s\n", $$1, $$2}'
@@ -68,6 +68,8 @@ tune-fusion: ## fusion-threshold grid on the 30 dev Live Claims (online, cached)
 	$(PY) -m src.eval.eval_e2e tune
 eval-temporal: ## O5 old-news flag on data/temporal_set/temporal_set.csv (online) -> docs/results/temporal.md
 	nice -n 19 $(PY) -u -m src.eval.eval_e2e temporal
+agreement: ## Cohen's kappa of data/live_claims/second_labeller_sheet.csv (human) + second_pass_ai.csv (AI-assisted) vs label -> docs/results/agreement.md (seconds)
+	$(PY) -m src.eval.agreement
 eval: eval-models eval-e2e ## everything
 run: ## FastAPI on :8000 (MODE=offline make run = no network; CPU, < 4 GB RAM)
 	$(PY) -m uvicorn src.api.main:app --host 127.0.0.1 --port $${PORT:-8000}

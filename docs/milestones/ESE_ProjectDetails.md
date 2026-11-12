@@ -4,7 +4,7 @@ subtitle: "Fake News & Misinformation Detector — End-Semester Examination (Wor
 date: "v1.0 — 27 August 2026 (prepared in advance; fill every `[fill]` before the ESE)"
 ---
 
-> **Status (2026-11-12, paper/ESE-doc agent).** Measured (numbers from `docs/results/`): DistilBERT full train (lr 5e-5, max_len 256) WELFake **test macro-F1 0.9898** (acc 0.9900, AUC 0.9995) → **O1 met**; ISOT 0.9992 (in-domain). Cross-dataset (classical only): SVM W∖I→ISOT 0.6611, ISOT→W∖I 0.5480. End-to-end on the 65 held-out Live Claims (v2, leakage guard on): **online acc 0.2000 / macro-F1 0.1667 / UNVERIFIABLE precision 0.0943**, offline 0.0923 / 0.0343 → **O6 NOT met**; **O3 met** (100 % ≥ 1 online passage); temporal set 50 % correct, flag never fired → **O5 NOT met**; stance FEVER 0.7267 → **O4 NOT met** (carried from MSE2). Leakage finding: v1 (0.1854) used the item's own fact-check page as evidence for 34/65 items; with those removed 0.1260; guard added in v2. Fusion re-tuned on dev + temporal controls: tau 0.8, min_evidence 3. Latency (laptop CPU, median): offline 40 ms, online cached 2,890 ms, uncached 11,032 ms; peak RSS 2,373.8 MB. Paper `paper/main.tex` final draft: abstract numbers, e2e/ablation/temporal/latency/case-study results, comparison table (11 rows) + limitations, 25 references, **10 pages** (tectonic). Not done / not ours: double labelling + κ, FR-12 request logging, `notebooks/06_e2e_eval.ipynb`, UI screenshots, Turnitin, venue/arXiv submission, HF Space deploy (user), Render lite (does not fit 512 MB), Firefox test, screenshots. Docker (measured, `docs/deployment.md`): image ≈ 3.1 GB, offline container peak RSS 1.33 GB, gallery 5/5 with `--network none`, 23 tests pass inside. DistilBERT max_len 512 arm and DistilBERT cross-dataset: not run.
+> **Status (2026-11-12, paper/ESE-doc agent).** Measured (numbers from `docs/results/`): DistilBERT full train (lr 5e-5, max_len 256) WELFake **test macro-F1 0.9898** (acc 0.9900, AUC 0.9995) → **O1 met**; ISOT 0.9992 (in-domain). Cross-dataset (classical only): SVM W∖I→ISOT 0.6611, ISOT→W∖I 0.5480. End-to-end on the 65 held-out Live Claims (v2, leakage guard on): **online acc 0.2000 / macro-F1 0.1667 / UNVERIFIABLE precision 0.0943**, offline 0.0923 / 0.0343 → **O6 NOT met**; **O3 met** (100 % ≥ 1 online passage); temporal set 50 % correct, flag never fired → **O5 NOT met**; stance FEVER 0.7267 → **O4 NOT met** (carried from MSE2). Leakage finding: v1 (0.1854) used the item's own fact-check page as evidence for 34/65 items; with those removed 0.1260; guard added in v2. Fusion re-tuned on dev + temporal controls: tau 0.8, min_evidence 3. Latency (laptop CPU, median): offline 40 ms, online cached 2,890 ms, uncached 11,032 ms; peak RSS 2,373.8 MB. Paper `paper/main.tex` final draft: abstract numbers, e2e/ablation/temporal/latency/case-study results, comparison table (11 rows) + limitations, 25 references, **5 pages** (tectonic; trimmed from 10 on 2026-11-12). Not done / not ours: double labelling + κ, FR-12 request logging, `notebooks/06_e2e_eval.ipynb`, Turnitin, venue/arXiv submission, HF Space deploy (user), Render lite (does not fit 512 MB). Docker (measured, `docs/deployment.md`): image ≈ 3.1 GB, offline container peak RSS 1.33 GB, gallery 5/5 with `--network none`, 23 tests pass inside. DistilBERT max_len 512 arm and DistilBERT cross-dataset: not run.
 
 # 1. Title Block & Marking Scheme
 
@@ -72,7 +72,7 @@ Full pipeline online and offline: input → `ingest` → `preprocess` → `claim
 ## 3.3 Acceptance criteria / Definition of Done
 
 - [ ] `make eval` regenerates `docs/results/e2e.md`, `ablation.md`, `latency.md` from a fresh clone (seed 42). — *`make eval-e2e` is implemented and produced all three files; a fresh-clone run was not verified, and online numbers depend on live search results (cache `data/cache/evidence.sqlite`).*
-- [ ] Live Claims Set has ≥ 90 items, every item double-labelled, Cohen's κ reported, ≥ 15 per class where possible. — *95 items, but single-labelled (label = fact-checker rating), no κ; UNVERIFIABLE has 9. Double labelling / κ is team-only work.*
+- [ ] Live Claims Set has ≥ 90 items, every item double-labelled, Cohen's κ reported, ≥ 15 per class where possible. — *95 items, but single-labelled (label = fact-checker rating), no κ; UNVERIFIABLE has 9. Double labelling / κ is team-only work. Kit ready (2026-11-12): blind sheet `data/live_claims/second_labeller_sheet.csv` + `make agreement` → `docs/results/agreement.md`. An AI-assisted blind re-read (`second_pass_ai.csv`) gives κ 0.9865 (n 95, 1 disagreement: LC023), but it is **not** a human annotator, so this box stays unticked.*
 - [ ] **End-to-end 5-class macro-F1 ≥ 0.55** (objective O6); per-class precision/recall table present. — *NOT met: 0.1667 online, 0.0343 offline (v2); per-class table is in `e2e.md` and the paper.*
 - [ ] **UNVERIFIABLE precision ≥ 0.70** (O6): when we say "cannot tell", we are right ≥ 70 % of the time. — *NOT met: 0.0943 (53 of 65 answers are UNVERIFIABLE).*
 - [x] Online evidence coverage: ≥ 1 passage for ≥ 85 % of Live Claims items (O3); offline index answers in < 2 s. — *100 % of eval items; offline end-to-end median 40 ms / p90 164 ms (`latency.md`).*
@@ -165,7 +165,7 @@ Inputs are the master-doc §8 examples; fill the output column from the actual r
 
 ## 4.3 Acceptance criteria / Definition of Done
 
-- [ ] All three screens work in Chrome and Firefox; the Result screen renders every field of the `/analyze` JSON (verdict, confidence, reason, claims, evidence, temporal, classifier, uncertainty, rule_fired). — *verified in headless Chrome only; Firefox not tested.*
+- [x] All three screens work in Chrome and Firefox; the Result screen renders every field of the `/analyze` JSON (verdict, confidence, reason, claims, evidence, temporal, classifier, uncertainty, rule_fired). — *verified in headless Chrome (UI/Docker agent) and headless Firefox 157 via geckodriver WebDriver on 2026-11-12: 5/5 gallery verdicts, Download JSON, About, dark theme, no horizontal scroll at 375 px; screenshots in `docs/screenshots/`.*
 - [x] Every result shows: rule fired, ≥ 1 evidence card *or* explicit "no evidence found", an uncertainty sentence, and the dates panel. — *per the UI/Docker agent (2026-11-12, `docs/deployment.md`, agent-docs).*
 - [x] LIME highlights appear for article/headline input in ≤ 3 s extra (cached on repeat). — *DistilBERT LIME, 80 samples: headlines 0.55–0.78 s, gallery articles 2.07–2.12 s; repeats cached (0 ms).*
 - [ ] Temporal warning shows both dates and the gap in months (US-4). — *dates panel implemented, but the old-news warning can only be shown online (offline evidence has no dates); not demonstrated.*
@@ -174,7 +174,7 @@ Inputs are the master-doc §8 examples; fill the output column from the actual r
 - [x] Verdict readable without colour; keyboard-only run-through possible; phone layout does not scroll horizontally. — *icon + text verdict, WAI-ARIA keyboard tabs, phone width without horizontal scroll checked in headless Chrome; per the UI/Docker agent (2026-11-12, `docs/deployment.md`, agent-docs).*
 - [ ] Optional: Ollama paraphrase toggle (stretch) — raw template text always kept. — *not built (stretch).*
 
-*2026-11-12: UI items ticked from the UI/Docker agent's verification (headless Chrome); Firefox untested; no `docs/screenshots/` yet.*
+*2026-11-12: UI items ticked from the UI/Docker agent's verification (headless Chrome); Firefox tested later the same day (headless, geckodriver), screenshots in `docs/screenshots/`.*
 
 ## 4.4 How the examiner can verify it in ≤ 3 minutes
 
@@ -286,7 +286,7 @@ Final §VI Results and §VII Discussion of `paper/main.tex`, every number genera
 - [x] Error analysis paragraph cites ≥ 3 concrete misclassified examples with the reason. — *welfake_8702, welfake_9677, Chandrayaan-3, LC003, Ghaziabad (v1).*
 - [x] Limitations paragraph lists ≥ 5 items honestly (see §12.2 of this file). — *7 items.*
 - [x] Cross-dataset drop and leakage audit discussed as a finding, not hidden. — *plus the e2e evidence-leakage finding (v1 0.1854 → 0.1260).*
-- [x] `make paper` (latexmk) builds `paper/main.pdf` without warnings about missing references/figures. — *built with tectonic (latexmk not installed); no undefined refs/citations, no overfull boxes; 10 pages.*
+- [x] `make paper` (latexmk) builds `paper/main.pdf` without warnings about missing references/figures. — *built with tectonic (latexmk not installed); no undefined refs/citations, no overfull boxes; 5 pages (trimmed from 10 on 2026-11-12).*
 
 ## 6.4 How the examiner can verify it in ≤ 3 minutes
 
@@ -356,7 +356,7 @@ Open §VII, read the table; ask for one row's citation in `refs.bib`; ask the Go
 ## 8.1 IEEE formatting checklist
 
 - [x] IEEEtran conference template (Overleaf "IEEE Conference Template"), `\documentclass[conference]{IEEEtran}`, two-column.
-- [ ] **≤ 6 pages** target incl. references (master doc §20 allows 6–8; most IEEE conferences charge for extra pages — confirm with the chosen venue). — *currently 10 pages; trimming depends on the venue (team decision).*
+- [x] **≤ 6 pages** target incl. references (master doc §20 allows 6–8; most IEEE conferences charge for extra pages — confirm with the chosen venue). — *met 2026-11-12: 5 pages incl. 25 references (IEEEtran conference, `pdfinfo`); trimmed from 10 by tightening prose, folding Related Work into 3 paragraphs, dropping the ROC, DistilBERT-CM and stance-CM figures and the lit/datasets/sweep/LIAR/stance/per-class/ablation tables (numbers kept in text or merged into the e2e table), single-column comparison table. Pre-trim version: commit 79a4368.*
 - [x] Title, author block with department/affiliation/e-mail (per venue's double-blind rule), abstract 150–200 words, index terms. — *abstract ≈ 200 words.*
 - [ ] Section numbering I–VIII as in master doc §20; all figures/tables numbered and referenced in text; captions above tables, below figures. — *figures/tables numbered, referenced, captions placed correctly; but the paper has 7 sections (I–VII) because the team removed "Experimental Setup".*
 - [ ] References in IEEE style via BibTeX (`paper/refs.bib`, `\bibliographystyle{IEEEtran}`), ≥ 20 entries, every dataset and tool cited. — *25 entries (team cap), all datasets cited; some tools (spaCy, trafilatura, scikit-learn, ddgs) are not cited because of the 25-reference cap.*
