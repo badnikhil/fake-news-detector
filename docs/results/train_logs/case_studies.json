@@ -1,0 +1,1540 @@
+{
+ "examples": [
+  {
+   "class": "REAL",
+   "input": {
+    "input_type": "headline",
+    "text": "ISRO's Chandrayaan-3 landed near the lunar south pole on 23 Aug 2023."
+   },
+   "status": 200,
+   "result": {
+    "request_id": "5b7a8c2b6697",
+    "mode": "online",
+    "verdict": "UNVERIFIABLE",
+    "confidence": 0.8,
+    "rule_fired": "R9",
+    "reason": "The evidence is inconclusive.",
+    "claims": [
+     {
+      "text": "ISRO's Chandrayaan-3 landed near the lunar south pole on 23 Aug 2023.",
+      "score": 1.0,
+      "start": null,
+      "end": null,
+      "is_title": true,
+      "evidence": [
+       {
+        "origin": "ddgs",
+        "source": "factcheck.afp.com",
+        "url": "https://factcheck.afp.com/doc.afp.com.33U48GT",
+        "title": "Simulation of India's lunar mission falsely shared as proof ...Chandrayaan-3 - Indian Space Research Organisation (ISRO)Chandrayaan-3: Did NASA Satellite Capture Chandrayaan-3 ...Fact Check: India Did NOT Fake Chandrayaan-3 Landing On The ...Chandrayaan-3 Details - Indian Space Research Organisation (ISRO)Chandrayaan-3 - NASA Science",
+        "snippet": "Jul 7, 2023 \u00b7 Overview of India's historic Chandrayaan-3 mission achieving successful soft landing on the lunar south pole. Sep 5, 2023 \u00b7 The Chandrayaan-3 lander module, named Vikram, did achieve a soft landing near the south pole of the moon on August 23, 2023. Sep 7, 2023 \u00b7 Chandrayaan-3 is an Indian Space Research Organization mission that landed near the south pole of the Moon on Aug.",
+        "date": null,
+        "tier": 1,
+        "w_source": 1.0,
+        "cosine": 0.8017,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.9609,
+         "REFUTES": 0.0012,
+         "NEUTRAL": 0.0379
+        },
+        "stance": "SUPPORTS",
+        "p": 0.9609
+       },
+       {
+        "origin": "ddgs",
+        "source": "leadstories.com",
+        "url": "https://leadstories.com/hoax-alert/2023/09/fact-check-india-did-not-fake-chandrayaan3-landing-on-the-moon-a-simulation-image-was-broadcast-live.html",
+        "title": "Fact Check: India Did NOT Fake Chandrayaan-3 Landing On The ...",
+        "snippet": "Sep 5, 2023 \u00b7 The Chandrayaan-3 lander module, named Vikram, did achieve a soft landing near the south pole of the moon on August 23, 2023. There was no camera prepositioned on the moon's surface to film the landing as it happened -- a simulation of the descent and landing was broadcast live during the actual landing.",
+        "date": null,
+        "tier": 1,
+        "w_source": 1.0,
+        "cosine": 0.7619,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.9426,
+         "REFUTES": 0.0017,
+         "NEUTRAL": 0.0557
+        },
+        "stance": "SUPPORTS",
+        "p": 0.9426
+       },
+       {
+        "origin": "ddgs",
+        "source": "science.nasa.gov",
+        "url": "https://science.nasa.gov/mission/chandrayaan-3/",
+        "title": "Chandrayaan-3 - NASA Science",
+        "snippet": "Chandrayaan-3\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\tActive Mission\n\t\t\t\t\t\t\nChandrayaan-3 is an Indian Space Research Organization mission that landed near the south pole of the Moon on Aug. The mission includes a lander and a rover. It studies every phase in the\u2026\nThis rover and its aerial sidekick were assigned to study the geology of Mars and seek signs of ancient microbial\u2026\nOn a mission to \u201ctouch the Sun,\u201d NASA's Parker Solar Probe became the first spacecraft to fly through the corona\u2026\nNASA\u2019s Juno spacecraft entered orbit around Jupiter in 2016, the first explorer to peer below the planet's dense clouds to\u2026",
+        "date": "2023-06-15",
+        "tier": 2,
+        "w_source": 0.8,
+        "cosine": 0.7539,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0003,
+         "REFUTES": 0.004,
+         "NEUTRAL": 0.9957
+        },
+        "stance": "NEUTRAL",
+        "p": 0.9957
+       },
+       {
+        "origin": "ddgs",
+        "source": "ndtv.com",
+        "url": "https://www.ndtv.com/india-news/did-nasa-satellite-capture-chandrayaan-3-landing-a-fact-check-4327960",
+        "title": "Chandrayaan-3: Did NASA Satellite Capture Chandrayaan-3 ...",
+        "snippet": "Aug 25, 2023 \u00b7 The entire world is congratulating India for the success of Chandrayaan-3, which landed in the south pole region of the Moon - a feat that wasn't achieved till now.",
+        "date": null,
+        "tier": 2,
+        "w_source": 0.8,
+        "cosine": 0.721,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0352,
+         "REFUTES": 0.0992,
+         "NEUTRAL": 0.8656
+        },
+        "stance": "NEUTRAL",
+        "p": 0.8656
+       },
+       {
+        "origin": "ddgs",
+        "source": "isro.gov.in",
+        "url": "https://www.isro.gov.in/Chandrayaan3.html",
+        "title": "Chandrayaan-3 - Indian Space Research Organisation (ISRO)",
+        "snippet": "August 23, 2023\n'I reached my destination and you too!': Chandrayaan-3\nChandrayaan-3 has successfully soft-landed on the moon. The spacecraft is in 151 km x 179 km orbit\nAugust 09, 2023\nChandrayaan-3's orbit is reduced to 174 km x 1437 km following a manuevre performed on August 9, 2023\nAugust 06, 2023\nLBN#2 is successfully completed. Chandrayaan-3, in its precise orbit, has begun its journey to the Moon.",
+        "date": "2023-09-22",
+        "tier": 2,
+        "w_source": 0.8,
+        "cosine": 0.6984,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0729,
+         "REFUTES": 0.026,
+         "NEUTRAL": 0.9011
+        },
+        "stance": "NEUTRAL",
+        "p": 0.9011
+       },
+       {
+        "origin": "ddgs",
+        "source": "isro.gov.in",
+        "url": "https://www.isro.gov.in/Chandrayaan3_Details.html",
+        "title": "Chandrayaan-3 Details - Indian Space Research Organisation (ISRO)",
+        "snippet": "Chandrayaan-3 is a follow-on mission to Chandrayaan-2 to demonstrate end-to-end capability in safe landing and roving on the lunar surface. It consists of Lander and Rover configuration.",
+        "date": null,
+        "tier": 2,
+        "w_source": 0.8,
+        "cosine": 0.686,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0001,
+         "REFUTES": 0.0006,
+         "NEUTRAL": 0.9993
+        },
+        "stance": "NEUTRAL",
+        "p": 0.9993
+       },
+       {
+        "origin": "ddgs",
+        "source": "bbc.com",
+        "url": "https://www.bbc.com/news/world-asia-india-66594520",
+        "title": "Chandrayaan-3: India makes historic landing near Moon's south ...",
+        "snippet": "Aug 23, 2023 \u00b7 India has made history as its Moon mission becomes the first to land in the lunar south pole region. With this, India joins an elite club of countries to achieve a soft landing on the...",
+        "date": null,
+        "tier": 2,
+        "w_source": 0.8,
+        "cosine": 0.6765,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0011,
+         "REFUTES": 0.0002,
+         "NEUTRAL": 0.9987
+        },
+        "stance": "NEUTRAL",
+        "p": 0.9987
+       },
+       {
+        "origin": "ddgs",
+        "source": "en.wikipedia.org",
+        "url": "https://en.wikipedia.org/wiki/Chandrayaan-3",
+        "title": "Chandrayaan-3 - Wikipedia",
+        "snippet": "The impact point is predicted over the North Pacific Ocean and the final ground track did not pass over India.[41][42][43]\nOrbit\n[edit]\nAfter a series of Earth bound manoeuvres that placed Chandrayaan-3 in a trans-lunar injection orbit,[44][45][46] ISRO performed a lunar-orbit insertion (LOI) on 5 August, successfully placing the Chandrayaan-3 spacecraft into an orbit around the Moon. Opening new avenues for new areas of exploration.\"[127]\nBill Nelson, the administrator of NASA wrote \"Congratulations ISRO on your successful Chandrayaan-3 lunar South Pole landing and congratulations to India on being the 4th country to successfully soft-land a spacecraft on the Moon. Chandrayaan-3 becomes 1st probe to land near lunar south pole\".",
+        "date": null,
+        "tier": 3,
+        "w_source": 0.6,
+        "cosine": 0.7763,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0003,
+         "REFUTES": 0.863,
+         "NEUTRAL": 0.1366
+        },
+        "stance": "REFUTES",
+        "p": 0.863
+       },
+       {
+        "origin": "ddgs",
+        "source": "en.wikipedia.org",
+        "url": "https://en.wikipedia.org/wiki/Statio_Shiv_Shakti",
+        "title": "Statio Shiv Shakti - Wikipedia",
+        "snippet": "Statio Shiv Shakti\n| Statio Shiva Shakti |  | \n|---|---|\n| 69\u00b022\u203223\u2033S 32\u00b019\u203208\u2033E / 69.373\u00b0S 32.319\u00b0E |  | \n| Type | Extraterrestrial landing site | \n| Location | Area between Manzinus C and Simpelius N craters, Moon[1] | \n| History |  | \n| Founded |  | \n| Founder | Chandrayaan-3 | \nShiv Shakti Point is the landing site of Chandrayaan-3, the third lunar mission of ISRO. \"Explained | Why did Chandrayaan-3 land on the near side of the moon?\". - \u2191 Chandrayaan 3 - After The Landing What Happens Next?, 27 August 2023, retrieved 2023-08-28\n- \u2191 \"India launches Chandrayaan-3 mission to the lunar surface\".",
+        "date": null,
+        "tier": 3,
+        "w_source": 0.6,
+        "cosine": 0.7001,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0014,
+         "REFUTES": 0.9908,
+         "NEUTRAL": 0.0078
+        },
+        "stance": "REFUTES",
+        "p": 0.9908
+       },
+       {
+        "origin": "wikipedia",
+        "source": "en.wikipedia.org",
+        "url": "https://en.wikipedia.org/wiki/Chandrayaan-3",
+        "title": "Chandrayaan-3",
+        "snippet": "Chandrayaan-3 (CHUN-dr\u0259-YAHN ; ; from Sanskrit: Chandra, \"Moon\" and y\u0101na, \"craft, vehicle\") is the third mission in the Chandrayaan programme, a series of lunar-exploration missions developed by ISRO. Chandrayaan-3 was launched on 14 July 2023, at 14:35 IST from Satish Dhawan Space Centre (SDSC) in Sriharikota, Andhra Pradesh. With this landing, ISRO became the fourth national space agency to successfully land on the Moon, after the Soviet space program, NASA and CNSA, and the first in human history to achieve a soft landing near the lunar south pole.",
+        "date": null,
+        "tier": 3,
+        "w_source": 0.6,
+        "cosine": 0.6861,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0005,
+         "REFUTES": 0.5358,
+         "NEUTRAL": 0.4637
+        },
+        "stance": "REFUTES",
+        "p": 0.5358
+       }
+      ],
+      "stance_summary": "2 supporting / 3 refuting / 5 neutral"
+     }
+    ],
+    "temporal": {
+     "old_news": false,
+     "gap_months": null,
+     "recency_cue": false,
+     "out_of_context": false,
+     "mismatch_headline": false,
+     "mismatch_p": null,
+     "input_date": "2026-11-12",
+     "event_date": null,
+     "evidence_dates": []
+    },
+    "classifier": {
+     "p_fake": 0.9797,
+     "label": "fake",
+     "model": "distilbert-welfake-v1"
+    },
+    "signals": {
+     "main_stance": "NEUTRAL",
+     "S_1": 0.4697,
+     "E_1": 5,
+     "per_claim": [
+      {
+       "S": 0.4697,
+       "E": 5,
+       "stance": "NEUTRAL",
+       "n_evidence": 10
+      }
+     ],
+     "temporal_flags": [],
+     "p_fake": 0.9797
+    },
+    "uncertainty": "We could not find reliable evidence either way. This does not mean the claim is false.",
+    "evidence_count": 10,
+    "latency_ms": 4857,
+    "timings_ms": {
+     "language": 2,
+     "claims": 0,
+     "evidence_offline": 11,
+     "evidence_online": 3464,
+     "stance": 1319,
+     "classifier": 27,
+     "temporal": 31,
+     "fusion": 0
+    },
+    "explanation": "Marked UNVERIFIABLE: the evidence about \"ISRO's Chandrayaan-3 landed near the lunar south pole on 23 Aug 2023\" is inconclusive (2 supporting / 3 refuting / 5 neutral)."
+   }
+  },
+  {
+   "class": "FAKE",
+   "input": {
+    "input_type": "headline",
+    "text": "WHO declared that 5G towers spread COVID-19."
+   },
+   "status": 200,
+   "result": {
+    "request_id": "f1af1552673f",
+    "mode": "online",
+    "verdict": "FAKE",
+    "confidence": 0.8678,
+    "rule_fired": "R3",
+    "reason": "5 reliable sources contradict the main claim.",
+    "claims": [
+     {
+      "text": "WHO declared that 5G towers spread COVID-19.",
+      "score": 1.0,
+      "start": null,
+      "end": null,
+      "is_title": true,
+      "evidence": [
+       {
+        "origin": "ddgs",
+        "source": "snopes.com",
+        "url": "https://www.snopes.com/fact-check/cov-19-inscribed-on-5g-board/",
+        "title": "Is 'COV-19' Inscribed on This Piece of 5G Equipment? - Snopes.com",
+        "snippet": "May 19, 2020 \u00b7 The above-displayed video deals with a widespread (and repeatedly debunked) conspiracy theory that the COVID-19 coronavirus disease was being spread by 5G cellular towers.",
+        "date": null,
+        "tier": 1,
+        "w_source": 1.0,
+        "cosine": 0.8249,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0002,
+         "REFUTES": 0.9974,
+         "NEUTRAL": 0.0024
+        },
+        "stance": "REFUTES",
+        "p": 0.9974
+       },
+       {
+        "origin": "ddgs",
+        "source": "factcheck.afp.com",
+        "url": "https://factcheck.afp.com/covid-19-hoax-circulates-viral-outbreaks-are-linked-new-telecommunication-technologies",
+        "title": "COVID-19: hoax circulates that viral outbreaks are linked to ...Fact check: 5G technology is not linked to coronavirus5G Doesn\u2019t Cause COVID-19, But the Rumor It Does Spread Like ...",
+        "snippet": "Apr 22, 2020 \u00b7 The posts suggest that the ongoing COVID-19 pandemic is linked to the rollout of 5G mobile phone technology. Apr 23, 2020 \u00b7 Arsonists in several countries have burned down 5G cell towers, on a belief they help spread the new coronavirus. But 5G isn\u2019t all that different from 4G, and it certainly doesn\u2019t cause COVID-19 despite such rumors having spread rapidly across the globe.",
+        "date": null,
+        "tier": 1,
+        "w_source": 1.0,
+        "cosine": 0.6623,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0003,
+         "REFUTES": 0.993,
+         "NEUTRAL": 0.0067
+        },
+        "stance": "REFUTES",
+        "p": 0.993
+       },
+       {
+        "origin": "ddgs",
+        "source": "bu.edu",
+        "url": "https://www.bu.edu/sph/news/articles/2021/5g-doesnt-cause-covid-19-but-myth-went-viral/",
+        "title": "5G Doesn\u2019t Cause COVID-19, But the Rumor It Does Spread Like ...",
+        "snippet": "Jan 13, 2021 \u00b7 People\u2019s fear of 5G technology is rational. Such technology does emit radiation, even if it\u2019s at low levels. But 5G isn\u2019t all that different from 4G, and it certainly doesn\u2019t cause COVID-19 despite such rumors having spread rapidly across the globe.",
+        "date": null,
+        "tier": 2,
+        "w_source": 0.8,
+        "cosine": 0.6623,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0002,
+         "REFUTES": 0.8619,
+         "NEUTRAL": 0.1379
+        },
+        "stance": "REFUTES",
+        "p": 0.8619
+       },
+       {
+        "origin": "ddgs",
+        "source": "dot.gov.in",
+        "url": "https://dot.gov.in/static/uploads/2025/08/e2e9258b1f17f7e6b97737cb5dee40f4.pdf",
+        "title": "EMF journey-Document-5 - Department of Telecommunication",
+        "snippet": "Communications that several misleading messages are being circulated on various social media platforms claiming that the second wave of coronavirus has been caused by the testing of the 5G mobile towers. As per a press statement issued by DoT these messages are false and absolutely not correct.",
+        "date": null,
+        "tier": 2,
+        "w_source": 0.8,
+        "cosine": 0.6432,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0006,
+         "REFUTES": 0.9822,
+         "NEUTRAL": 0.0172
+        },
+        "stance": "REFUTES",
+        "p": 0.9822
+       },
+       {
+        "origin": "ddgs",
+        "source": "bbc.co.uk",
+        "url": "https://www.bbc.co.uk/bitesize/articles/zbw492p",
+        "title": "5G and coronavirus: Debunking the fake news stories - BBC",
+        "snippet": "Fake news around the dangers of 5G technology and its links to coronavirus have spread online and on social media, despite the lack of any scientific evidence.",
+        "date": null,
+        "tier": 2,
+        "w_source": 0.8,
+        "cosine": 0.5942,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0013,
+         "REFUTES": 0.0922,
+         "NEUTRAL": 0.9065
+        },
+        "stance": "NEUTRAL",
+        "p": 0.9065
+       },
+       {
+        "origin": "ddgs",
+        "source": "en.wikipedia.org",
+        "url": "https://en.wikipedia.org/wiki/COVID-19_misinformation",
+        "title": "COVID-19 misinformation - Wikipedia",
+        "snippet": "Corbyn described COVID-19 as a \"psychological operation to close down the economy in the interests of mega-corporations\" and stated \"vaccines cause death\".[188]\n5G mobile networks\nThe first conspiracy theories purporting a link between COVID-19 and 5G mobile networks had already appeared by the end of January 2020. Such claims spread rapidly on social media networks, leading to the spread of misinformation in what has been likened to a \"digital wildfire\".[189]\nIn March 2020, Thomas Cowan, a holistic medical practitioner who trained as a physician and operates on probation with the Medical Board of California, alleged that COVID-19 is caused by 5G. \"Conspiracy Theories Grow as COVID-19 Spreads\".",
+        "date": null,
+        "tier": 3,
+        "w_source": 0.6,
+        "cosine": 0.7002,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0093,
+         "REFUTES": 0.005,
+         "NEUTRAL": 0.9856
+        },
+        "stance": "NEUTRAL",
+        "p": 0.9856
+       },
+       {
+        "origin": "ddgs",
+        "source": "en.wikipedia.org",
+        "url": "https://en.wikipedia.org/wiki/5G_misinformation",
+        "title": "5G misinformation - Wikipedia",
+        "snippet": "This is uncommon and mainly a workplace concern for those working with large sources of non-ionizing radiation.\"[12]\nThere have been conspiracy theories suggesting that the spread of the SARS-CoV-2 virus from the epicentre of the pandemic in Wuhan, China, is linked to the large number of 5G towers in the city. \"Conspiracy theories about 5G networks have skyrocketed since COVID-19\". \"COVID-19, 5G conspiracies and infrastructural futures\".",
+        "date": null,
+        "tier": 3,
+        "w_source": 0.6,
+        "cosine": 0.6787,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0098,
+         "REFUTES": 0.0051,
+         "NEUTRAL": 0.9851
+        },
+        "stance": "NEUTRAL",
+        "p": 0.9851
+       },
+       {
+        "origin": "wikipedia",
+        "source": "en.wikipedia.org",
+        "url": "https://en.wikipedia.org/wiki/COVID-19_misinformation",
+        "title": "COVID-19 misinformation",
+        "snippet": "False information, including disinformation and conspiracy theories about the scale of the COVID-19 pandemic and the origin, prevention, diagnosis, and treatment of the disease has been spread through social media, text messaging, and mass media. The spread of COVID-19 misinformation by governments has also been significant. Without evidence, some people have claimed the virus is a bioweapon accidentally or deliberately leaked from a laboratory, a population control scheme, the result of a spy operation, or the side effect of 5G upgrades to cellular networks.",
+        "date": null,
+        "tier": 3,
+        "w_source": 0.6,
+        "cosine": 0.502,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0017,
+         "REFUTES": 0.0061,
+         "NEUTRAL": 0.9923
+        },
+        "stance": "NEUTRAL",
+        "p": 0.9923
+       },
+       {
+        "origin": "wikipedia",
+        "source": "en.wikipedia.org",
+        "url": "https://en.wikipedia.org/wiki/COVID-19_pandemic_in_Singapore",
+        "title": "COVID-19 pandemic in Singapore",
+        "snippet": "The COVID-19 pandemic in Singapore was a part of the worldwide pandemic of coronavirus disease 2019 (COVID-19) caused by severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2). In late March and April, COVID-19 clusters were detected at multiple migrant worker dormitories, which soon contributed to an overwhelming proportion of new cases in the country. The last record of COVID-19 cases was on 4 June 2023, which was at 2,481,404 confirmed cases, 2,456,295 recoveries and 1,727 deaths, with a case fatality rate of 0.08%, one of the lowest in the world.",
+        "date": null,
+        "tier": 3,
+        "w_source": 0.6,
+        "cosine": 0.3676,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0,
+         "REFUTES": 0.9991,
+         "NEUTRAL": 0.0009
+        },
+        "stance": "REFUTES",
+        "p": 0.9991
+       },
+       {
+        "origin": "ddgs",
+        "source": "factguard.org",
+        "url": "https://factguard.org/fact-check/5g-networks-spread-covid-19/",
+        "title": "Do 5G networks spread COVID-19? | FactGuard Fact Check",
+        "snippet": "Jun 7, 2026 \u00b7 COVID-19 is caused by a virus that spreads between people, and it spread widely in places with no 5G infrastructure at all. Health and telecommunications authorities have stated there is no link between 5G and the spread of the disease.",
+        "date": null,
+        "tier": 4,
+        "w_source": 0.3,
+        "cosine": 0.6972,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.001,
+         "REFUTES": 0.9968,
+         "NEUTRAL": 0.0022
+        },
+        "stance": "REFUTES",
+        "p": 0.9968
+       }
+      ],
+      "stance_summary": "0 supporting / 6 refuting / 4 neutral"
+     }
+    ],
+    "temporal": {
+     "old_news": false,
+     "gap_months": null,
+     "recency_cue": false,
+     "out_of_context": false,
+     "mismatch_headline": false,
+     "mismatch_p": null,
+     "input_date": "2026-11-12",
+     "event_date": null,
+     "evidence_dates": []
+    },
+    "classifier": {
+     "p_fake": 0.9951,
+     "label": "fake",
+     "model": "distilbert-welfake-v1"
+    },
+    "signals": {
+     "main_stance": "REFUTES",
+     "S_1": -4.3642,
+     "E_1": 5,
+     "per_claim": [
+      {
+       "S": -4.3642,
+       "E": 5,
+       "stance": "REFUTES",
+       "n_evidence": 10
+      }
+     ],
+     "temporal_flags": [],
+     "p_fake": 0.9951
+    },
+    "uncertainty": "Based on the retrieved evidence only; evidence dates are shown where known.",
+    "evidence_count": 10,
+    "latency_ms": 4463,
+    "timings_ms": {
+     "language": 0,
+     "claims": 0,
+     "evidence_offline": 9,
+     "evidence_online": 3383,
+     "stance": 1046,
+     "classifier": 23,
+     "temporal": 0,
+     "fusion": 0
+    },
+    "explanation": "Marked FAKE because 6 reliable sources (snopes.com, factcheck.afp.com, bu.edu +3 more) contradict \"WHO declared that 5G towers spread COVID-19\"."
+   }
+  },
+  {
+   "class": "PARTIALLY TRUE",
+   "input": {
+    "input_type": "article",
+    "text": "India's population overtook China's in 2023, reaching 2 billion."
+   },
+   "status": 200,
+   "result": {
+    "request_id": "1cd00e014529",
+    "mode": "online",
+    "verdict": "UNVERIFIABLE",
+    "confidence": 0.7484,
+    "rule_fired": "R8",
+    "reason": "Only one source was found; this result could change as more coverage appears.",
+    "claims": [
+     {
+      "text": "India's population overtook China's in 2023, reaching 2 billion.",
+      "score": 1.0,
+      "start": 0,
+      "end": 64,
+      "is_title": false,
+      "evidence": [
+       {
+        "origin": "ddgs",
+        "source": "theguardian.com",
+        "url": "https://www.theguardian.com/world/2023/apr/24/india-overtakes-china-to-become-worlds-most-populous-country",
+        "title": "India overtakes China to become world\u2019s most populous country",
+        "snippet": "Apr 24, 2023 \u00b7 India has overtaken China as the world\u2019s most populous country, according to UN population estimates, the most significant shift in global demographics since records began.",
+        "date": null,
+        "tier": 2,
+        "w_source": 0.8,
+        "cosine": 0.825,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0002,
+         "REFUTES": 0.0003,
+         "NEUTRAL": 0.9995
+        },
+        "stance": "NEUTRAL",
+        "p": 0.9995
+       },
+       {
+        "origin": "ddgs",
+        "source": "desapublications.un.org",
+        "url": "https://desapublications.un.org/policy-briefs/un-desa-policy-brief-no-153-india-overtakes-china-worlds-most-populous-country",
+        "title": "UN DESA Policy Brief No. 153: India overtakes China as the ...",
+        "snippet": "Apr 24, 2023 \u00b7 In April 2023, India\u2019s population is expected to reach 1,425,775,850 people, matching and then surpassing the population of mainland China (figure 1). India\u2019s population is virtually...",
+        "date": null,
+        "tier": 2,
+        "w_source": 0.8,
+        "cosine": 0.8042,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0045,
+         "REFUTES": 0.9908,
+         "NEUTRAL": 0.0047
+        },
+        "stance": "REFUTES",
+        "p": 0.9908
+       },
+       {
+        "origin": "wikipedia",
+        "source": "en.wikipedia.org",
+        "url": "https://en.wikipedia.org/wiki/Economy_of_India",
+        "title": "Economy of India",
+        "snippet": "Nearly 63% of India's population lives in rural areas, which generate about 46% of Indian GDP. As of 2025, India ranks third in the world in total number of billionaires. India is a lower-middle income; its population has been the largest in the world since the mid-2020s.",
+        "date": null,
+        "tier": 3,
+        "w_source": 0.6,
+        "cosine": 0.6689,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0014,
+         "REFUTES": 0.3231,
+         "NEUTRAL": 0.6755
+        },
+        "stance": "NEUTRAL",
+        "p": 0.6755
+       },
+       {
+        "origin": "wikipedia",
+        "source": "en.wikipedia.org",
+        "url": "https://en.wikipedia.org/wiki/Economy_of_the_United_States",
+        "title": "Economy of the United States",
+        "snippet": "It is the world's largest economy by nominal GDP, generating 26% of global economic output. The nation is the second-largest manufacturer, with American manufacturing making up a fifth of the global total. has spent around 3.46% of GDP on cutting-edge research and development across various sectors of the economy since 2023.",
+        "date": null,
+        "tier": 3,
+        "w_source": 0.6,
+        "cosine": 0.4128,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0002,
+         "REFUTES": 0.0032,
+         "NEUTRAL": 0.9966
+        },
+        "stance": "NEUTRAL",
+        "p": 0.9966
+       },
+       {
+        "origin": "ddgs",
+        "source": "populationpyramids.org",
+        "url": "https://populationpyramids.org/blog/china-india-population-swap",
+        "title": "The Great Population Swap: India Just Surpassed China",
+        "snippet": "China vs India: Population Comparison 2026\nBy Marko Visic \u00b7 Updated\nIn the UN projection for 1 July 2026, India has 63,711,489 more people than China (4.5% more): 1.48 billion vs 1.41 billion. By the UN's current estimates (World Population Prospects 2024), India passed China in mid-2022. By the UN's current estimates (World Population Prospects 2024), India passed China in mid-2022.",
+        "date": "2024-01-01",
+        "tier": 4,
+        "w_source": 0.3,
+        "cosine": 0.8209,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0028,
+         "REFUTES": 0.0147,
+         "NEUTRAL": 0.9825
+        },
+        "stance": "NEUTRAL",
+        "p": 0.9825
+       },
+       {
+        "origin": "ddgs",
+        "source": "business-standard.com",
+        "url": "https://www.business-standard.com/india-news/india-overtakes-china-to-become-world-s-most-populous-country-un-report-123041900360_1.html",
+        "title": "India overtakes China to become world's most populous country ...",
+        "snippet": "Apr 19, 2023 \u00b7 India has overtaken China to become the most populous country in the world, suggests data from a newly released United Nations Population Fund (UNFPA) report on Wednesday.",
+        "date": null,
+        "tier": 4,
+        "w_source": 0.3,
+        "cosine": 0.8177,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0002,
+         "REFUTES": 0.0004,
+         "NEUTRAL": 0.9994
+        },
+        "stance": "NEUTRAL",
+        "p": 0.9994
+       },
+       {
+        "origin": "ddgs",
+        "source": "ijrar.org",
+        "url": "https://ijrar.org/papers/IJRAR23C2594.pdf",
+        "title": "India and china population 2023: An Overview",
+        "snippet": "India has 2 million more population than China and the population of the country has crossed 140 crores. So, since the birth rate in China has dropped significantly this year, their population is coming under control.",
+        "date": null,
+        "tier": 4,
+        "w_source": 0.3,
+        "cosine": 0.7829,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.002,
+         "REFUTES": 0.0354,
+         "NEUTRAL": 0.9626
+        },
+        "stance": "NEUTRAL",
+        "p": 0.9626
+       },
+       {
+        "origin": "ddgs",
+        "source": "ourworldindata.org",
+        "url": "https://ourworldindata.org/data-insights/2023-was-a-population-crossroad",
+        "title": "2023 was a population crossroad - Our World in Data",
+        "snippet": "China is no longer the most populated country in the world. According to estimates by the UN World Population Prospects, India took over in 2023. However, as we can see in the chart, China\u2019s population is expected to decline, and India\u2019s growth is expected to slow down.",
+        "date": "2024-04-23",
+        "tier": 4,
+        "w_source": 0.3,
+        "cosine": 0.762,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0003,
+         "REFUTES": 0.0005,
+         "NEUTRAL": 0.9992
+        },
+        "stance": "NEUTRAL",
+        "p": 0.9992
+       },
+       {
+        "origin": "ddgs",
+        "source": "cnn.com",
+        "url": "https://www.cnn.com/2023/04/28/asia/india-population-overtakes-china-graphics-intl-hnk-dst-dg",
+        "title": "How India\u2019s population exploded to overtake China\u2019s and what ...",
+        "snippet": "Counting millions of people is never an easy task, but according to the United Nations, India now has more people than China, an epochal shift in global demographics that happened sometime in late April. India\u2019s population growth is slowing down\nIndia may have overtaken China in total population, but UN data also shows that its growth rate has slowed. According to UN projections, India\u2019s population is expected peak at about 1.7 billion in 2064.",
+        "date": "2023-04-28",
+        "tier": 4,
+        "w_source": 0.3,
+        "cosine": 0.7186,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0035,
+         "REFUTES": 0.7043,
+         "NEUTRAL": 0.2922
+        },
+        "stance": "REFUTES",
+        "p": 0.7043
+       }
+      ],
+      "stance_summary": "0 supporting / 2 refuting / 7 neutral"
+     }
+    ],
+    "temporal": {
+     "old_news": false,
+     "gap_months": null,
+     "recency_cue": false,
+     "out_of_context": false,
+     "mismatch_headline": false,
+     "mismatch_p": null,
+     "input_date": "2026-11-12",
+     "event_date": null,
+     "evidence_dates": []
+    },
+    "classifier": {
+     "p_fake": 0.0001,
+     "label": "real",
+     "model": "distilbert-welfake-v1"
+    },
+    "signals": {
+     "main_stance": "REFUTES",
+     "S_1": -1.0039,
+     "E_1": 1,
+     "per_claim": [
+      {
+       "S": -1.0039,
+       "E": 1,
+       "stance": "REFUTES",
+       "n_evidence": 9
+      }
+     ],
+     "temporal_flags": [],
+     "p_fake": 0.0001
+    },
+    "uncertainty": "We could not find reliable evidence either way. This does not mean the claim is false.",
+    "evidence_count": 9,
+    "latency_ms": 10929,
+    "timings_ms": {
+     "language": 0,
+     "claims": 5,
+     "evidence_offline": 9,
+     "evidence_online": 10309,
+     "stance": 583,
+     "classifier": 20,
+     "temporal": 0,
+     "fusion": 0
+    },
+    "explanation": "Only one reliable source (desapublications.un.org, cnn.com) contradicts \"India's population overtook China's in 2023, reaching 2 billion\"; the writing-style classifier (p_fake = 0.0001) is not decisive, so the result stays UNVERIFIABLE."
+   }
+  },
+  {
+   "class": "MISLEADING",
+   "input": {
+    "input_type": "headline",
+    "text": "BREAKING: Kerala under water today, thousands stranded",
+    "published": "2026-09-10"
+   },
+   "status": 200,
+   "result": {
+    "request_id": "c71eb2525d16",
+    "mode": "online",
+    "verdict": "UNVERIFIABLE",
+    "confidence": 0.8,
+    "rule_fired": "R9",
+    "reason": "The evidence is inconclusive.",
+    "claims": [
+     {
+      "text": "BREAKING: Kerala under water today, thousands stranded",
+      "score": 1.0,
+      "start": null,
+      "end": null,
+      "is_title": true,
+      "evidence": [
+       {
+        "origin": "ddgs",
+        "source": "economictimes.indiatimes.com",
+        "url": "https://economictimes.indiatimes.com/topic/flood-in-kerala",
+        "title": "flood in kerala: Latest News & Videos, Photos about flood in ...",
+        "snippet": "Kerala floods put Bengali workers in deep trouble Bengali labourers are returning home in thousands from Kerala, the southern state hit by its worst floods in a century SC orders to maintain water level of Mullaperiyar dam at 139 feet The Kerala govt had yesterday told the apex court that the sudden release of water from the Mullaperiyar Dam by the Tamil Nadu government was one of the reasons for the devastating deluge in the state. Kerala floods declared 'calamity of severe nature' At least 300 people have lost their lives in the rains, floods and landslides in Kerala where over 7.24 lakh displaced people have been sheltered in 5,645 relief camps. The India Meteorological Department (IMD) expects widespread rainfall in the state for the next four days but the intensity is likely to reduce after a day Centre scales up assistance to flood hit Kerala So far, 2,182 persons have been rescued, 968 stranded people have been evacuated through prompt action of NDRF, Army and Navy, the MHA informed.",
+        "date": "2026-11-12",
+        "tier": 2,
+        "w_source": 0.8,
+        "cosine": 0.6791,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.1199,
+         "REFUTES": 0.0273,
+         "NEUTRAL": 0.8528
+        },
+        "stance": "NEUTRAL",
+        "p": 0.8528
+       },
+       {
+        "origin": "ddgs",
+        "source": "timesofindia.indiatimes.com",
+        "url": "https://timesofindia.indiatimes.com/topic/floods-in-kerala",
+        "title": "Kerala Floods: Latest News and Updates on Kerala Floods",
+        "snippet": "Kerala is located on the southwestern tip of the country. Over the years, Kerala has been hit by many floods. In the last decade, Kerala experienced a couple of devasting floods.",
+        "date": "2024-04-15",
+        "tier": 2,
+        "w_source": 0.8,
+        "cosine": 0.674,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0018,
+         "REFUTES": 0.0004,
+         "NEUTRAL": 0.9978
+        },
+        "stance": "NEUTRAL",
+        "p": 0.9978
+       },
+       {
+        "origin": "ddgs",
+        "source": "economictimes.indiatimes.com",
+        "url": "https://economictimes.indiatimes.com/topic/kerala-flood-situation",
+        "title": "kerala flood situation: Latest News & Videos, Photos about ...",
+        "snippet": "What caused the killer floods in Kerala: Excess rain or human error? Kerala flood situation grim though rains ease Chief minister Pinarayi Vijayan said around 2.25 lakh people have been moved to 1568 relief camps spread in the state. Kerala rain fury kills 26 more, death toll since August 8 nears 100 Most of Kerala is now flooded, with the situation worsening in several places, including Kochi, where backwaters threaten to breach their banks.",
+        "date": "2026-11-12",
+        "tier": 2,
+        "w_source": 0.8,
+        "cosine": 0.6227,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0286,
+         "REFUTES": 0.0292,
+         "NEUTRAL": 0.9422
+        },
+        "stance": "NEUTRAL",
+        "p": 0.9422
+       },
+       {
+        "origin": "ddgs",
+        "source": "thehindu.com",
+        "url": "https://www.thehindu.com/news/national/kerala/kerala-floods-2026-rain-fury-grips-pathanamthitta-for-third-day-rescue-teams-step-up-operations/article71302040.ece",
+        "title": "Kerala floods 2026: rain fury grips Pathanamthitta for third ...",
+        "snippet": "Aug 3, 2026 \u00b7 Kerala's Pathanamthitta faces severe flooding for three days, as rescue teams aid thousands stranded by relentless rain.",
+        "date": null,
+        "tier": 2,
+        "w_source": 0.8,
+        "cosine": 0.6164,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.8995,
+         "REFUTES": 0.0073,
+         "NEUTRAL": 0.0932
+        },
+        "stance": "SUPPORTS",
+        "p": 0.8995
+       },
+       {
+        "origin": "wikipedia",
+        "source": "en.wikipedia.org",
+        "url": "https://en.wikipedia.org/wiki/COVID-19_pandemic_in_Kerala",
+        "title": "COVID-19 pandemic in Kerala",
+        "snippet": "Initially, Kerala's success in containing COVID-19 was widely praised both nationally and internationally, Following high number of cases being reported in March, Kerala had, by April 30, reduced the rate of increase of new cases to less than 0.25% per day. On 12 May 2021 Kerala reported the largest single day spike with 43,529 new cases. As per the official reports from the Government of Kerala, up until September 9, 2022, there were 9,110 active COVID-19 cases, with a cumulative total of 6,767,856 confirmed cases, 6,686,948 recoveries, and 70,913 confirmed deaths.",
+        "date": null,
+        "tier": 3,
+        "w_source": 0.6,
+        "cosine": 0.4992,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0,
+         "REFUTES": 0.9984,
+         "NEUTRAL": 0.0015
+        },
+        "stance": "REFUTES",
+        "p": 0.9984
+       },
+       {
+        "origin": "wikipedia",
+        "source": "en.wikipedia.org",
+        "url": "https://en.wikipedia.org/wiki/The_Goat_Life",
+        "title": "The Goat Life",
+        "snippet": "It is an adaptation of the 2008 Malayalam best-selling novel Aadujeevitham, written by Benyamin, which is loosely based on the story of Najeeb Muhammad, a Malayali immigrant worker in Saudi Arabia. They were eventually repatriated to India via the Indian government's evacuation programme, the Vande Bharat Mission. In Kerala State Awards, the film won multiple awards.",
+        "date": null,
+        "tier": 3,
+        "w_source": 0.6,
+        "cosine": 0.3666,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0002,
+         "REFUTES": 0.1238,
+         "NEUTRAL": 0.876
+        },
+        "stance": "NEUTRAL",
+        "p": 0.876
+       },
+       {
+        "origin": "ddgs",
+        "source": "indiatoday.in",
+        "url": "https://www.indiatoday.in/india-today-insight/story/how-a-monsoon-of-miseries-caught-kerala-underprepared-yet-again-2964347-2026-08-05",
+        "title": "How a monsoon of miseries caught Kerala underprepared yet ...",
+        "snippet": "Aug 5, 2026 \u00b7 Monsoon fury and flash floods have killed at least 30 people in Kerala, with many more reported to be missing. Around 316 relief camps are holding some 11,500 people displaced from homes due to waterlogging and landslides.",
+        "date": null,
+        "tier": 4,
+        "w_source": 0.3,
+        "cosine": 0.5922,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.8322,
+         "REFUTES": 0.0179,
+         "NEUTRAL": 0.1499
+        },
+        "stance": "SUPPORTS",
+        "p": 0.8322
+       },
+       {
+        "origin": "ddgs",
+        "source": "youtube.com",
+        "url": "https://www.youtube.com/watch?v=Mfr_EuJtGVo",
+        "title": "Kerala News | Kerala Flood Crisis Deepens As Rivers Overflow ...Kerala Floods Leave 8 Dead, Hundreds Homeless | Ground Report ...kerala flood situation: Latest News & Videos, Photos about ...Kerala Floods: Latest News and Updates on Kerala Floodsflood in kerala: Latest News & Videos, Photos about flood in ...How a monsoon of miseries caught Kerala underprepared yet ...Kerala floods 2026: rain fury grips Pathanamthitta for third ...",
+        "snippet": "About\nPress\nCopyright\nContact us\nCreator\nAdvertise\nDevelopers\nTerms\nPrivacy\nPolicy & Safety\nHow YouTube works\nTest new features\n\u00a9 2026 Google LLC",
+        "date": "2026-08-05",
+        "tier": 4,
+        "w_source": 0.3,
+        "cosine": -0.0428,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0,
+         "REFUTES": 0.9981,
+         "NEUTRAL": 0.0019
+        },
+        "stance": "REFUTES",
+        "p": 0.9981
+       },
+       {
+        "origin": "ddgs",
+        "source": "youtube.com",
+        "url": "https://www.youtube.com/watch?v=WE4ddGRoKzA",
+        "title": "Kerala Floods Leave 8 Dead, Hundreds Homeless | Ground Report ...kerala flood situation: Latest News & Videos, Photos about ...Kerala Floods: Latest News and Updates on Kerala Floodsflood in kerala: Latest News & Videos, Photos about flood in ...How a monsoon of miseries caught Kerala underprepared yet ...Kerala floods 2026: rain fury grips Pathanamthitta for third ...",
+        "snippet": "About\nPress\nCopyright\nContact us\nCreator\nAdvertise\nDevelopers\nTerms\nPrivacy\nPolicy & Safety\nHow YouTube works\nTest new features\n\u00a9 2026 Google LLC",
+        "date": "2026-08-02",
+        "tier": 4,
+        "w_source": 0.3,
+        "cosine": -0.0428,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0,
+         "REFUTES": 0.9981,
+         "NEUTRAL": 0.0019
+        },
+        "stance": "REFUTES",
+        "p": 0.9981
+       }
+      ],
+      "stance_summary": "2 supporting / 3 refuting / 4 neutral"
+     }
+    ],
+    "temporal": {
+     "old_news": false,
+     "gap_months": null,
+     "recency_cue": true,
+     "out_of_context": false,
+     "mismatch_headline": false,
+     "mismatch_p": null,
+     "input_date": "2026-09-10",
+     "event_date": null,
+     "evidence_dates": []
+    },
+    "classifier": {
+     "p_fake": 1.0,
+     "label": "fake",
+     "model": "distilbert-welfake-v1"
+    },
+    "signals": {
+     "main_stance": "NEUTRAL",
+     "S_1": -0.2286,
+     "E_1": 2,
+     "per_claim": [
+      {
+       "S": -0.2286,
+       "E": 2,
+       "stance": "NEUTRAL",
+       "n_evidence": 9
+      }
+     ],
+     "temporal_flags": [],
+     "p_fake": 1.0
+    },
+    "uncertainty": "We could not find reliable evidence either way. This does not mean the claim is false.",
+    "evidence_count": 9,
+    "latency_ms": 13518,
+    "timings_ms": {
+     "language": 0,
+     "claims": 0,
+     "evidence_offline": 9,
+     "evidence_online": 12221,
+     "stance": 1246,
+     "classifier": 17,
+     "temporal": 23,
+     "fusion": 0
+    },
+    "explanation": "Marked UNVERIFIABLE: the evidence about \"BREAKING: Kerala under water today, thousands stranded\" is inconclusive (2 supporting / 3 refuting / 4 neutral)."
+   }
+  },
+  {
+   "class": "UNVERIFIABLE",
+   "input": {
+    "input_type": "headline",
+    "text": "A local shop in Ghaziabad sold 500 phones in one hour."
+   },
+   "status": 200,
+   "result": {
+    "request_id": "12344b14161a",
+    "mode": "online",
+    "verdict": "FAKE",
+    "confidence": 0.3859,
+    "rule_fired": "R3",
+    "reason": "2 reliable sources contradict the main claim.",
+    "claims": [
+     {
+      "text": "A local shop in Ghaziabad sold 500 phones in one hour.",
+      "score": 1.0,
+      "start": null,
+      "end": null,
+      "is_title": true,
+      "evidence": [
+       {
+        "origin": "ddgs",
+        "source": "ndtv.com",
+        "url": "https://www.ndtv.com/india-news/ghaziabad-cops-busy-with-encounter-thief-robs-shop-400-metres-away-11886899",
+        "title": "Ghaziabad Cops Busy With Encounter, Thief Robs Shop 400 ...",
+        "snippet": "Aug 9, 2026 \u00b7 Armed with the knowledge that the Ghaziabad Police were busy in an encounter with two criminals, a thief stole phones worth Rs 6 lakh, Rs 20,000 in cash and other equipment from a mobile shop.",
+        "date": null,
+        "tier": 2,
+        "w_source": 0.8,
+        "cosine": 0.5789,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0001,
+         "REFUTES": 0.9696,
+         "NEUTRAL": 0.0304
+        },
+        "stance": "REFUTES",
+        "p": 0.9696
+       },
+       {
+        "origin": "ddgs",
+        "source": "hindustantimes.com",
+        "url": "https://www.hindustantimes.com/noida/ghaziabad-fake-company-selling-cheap-phones-as-4g-handsets-busted/story-4AapTC5aFQ3uxqMSn7n0DK.html",
+        "title": "Ghaziabad: Fake company selling cheap phones as 4G handsets ...",
+        "snippet": "The police said that the accused procured cheap Chinese mobile phones from Gaffar Market in Delhi and sold them to customers in Delhi-NCR by branding them as 4G handsets, along with...",
+        "date": null,
+        "tier": 2,
+        "w_source": 0.8,
+        "cosine": 0.5186,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0001,
+         "REFUTES": 0.0017,
+         "NEUTRAL": 0.9982
+        },
+        "stance": "NEUTRAL",
+        "p": 0.9982
+       },
+       {
+        "origin": "ddgs",
+        "source": "ndtv.com",
+        "url": "https://www.ndtv.com/hyderabad-news/uttar-pradesh-ghaziabad-gang-sold-fake-apple-products-at-cheap-prices-in-hyderabad-6-arrested-11429591",
+        "title": "Uttar Pradesh Ghaziabad Gang Sold Fake Apple Products At ...",
+        "snippet": "Apr 30, 2026 \u00b7 According to police, the gang brought fake iPhones, AirPods and Apple smartwatches from Uttar Pradesh's Ghaziabad and sold them in Hyderabad by approaching people directly.",
+        "date": null,
+        "tier": 2,
+        "w_source": 0.8,
+        "cosine": 0.3973,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0,
+         "REFUTES": 0.0053,
+         "NEUTRAL": 0.9947
+        },
+        "stance": "NEUTRAL",
+        "p": 0.9947
+       },
+       {
+        "origin": "ddgs",
+        "source": "thehindu.com",
+        "url": "https://www.thehindu.com/news/national/uttar-pradesh/ghaziabad-deaths-police-probe-family-dynamics-trace-phones-sold-before-incident/article70596811.ece",
+        "title": "Ghaziabad deaths: Police probe family dynamics, trace phones ...",
+        "snippet": "Feb 7, 2026 \u00b7 Police investigate polygynous family dynamics and missing phones in Ghaziabad sisters' suicide case, focusing on emotional impacts.",
+        "date": null,
+        "tier": 2,
+        "w_source": 0.8,
+        "cosine": 0.3275,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0001,
+         "REFUTES": 0.9977,
+         "NEUTRAL": 0.0022
+        },
+        "stance": "REFUTES",
+        "p": 0.9977
+       },
+       {
+        "origin": "wikipedia",
+        "source": "en.wikipedia.org",
+        "url": "https://en.wikipedia.org/wiki/Operations_of_KFC_by_country",
+        "title": "Operations of KFC by country",
+        "snippet": "Brands, one of the largest restaurant companies in the world. There are 4,563 outlets in China, 4,491 in the United States and 9,821 across the rest of the world. Worldwide, the daily average number of food orders at an outlet is 250, with most occurring within a two-hour peak period.",
+        "date": null,
+        "tier": 3,
+        "w_source": 0.6,
+        "cosine": 0.316,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0003,
+         "REFUTES": 0.0404,
+         "NEUTRAL": 0.9593
+        },
+        "stance": "NEUTRAL",
+        "p": 0.9593
+       },
+       {
+        "origin": "ddgs",
+        "source": "olx.in",
+        "url": "https://www.olx.in/ghaziabad_g4059280/mobile-phones_c1453",
+        "title": "Buy Second Hand Mobile Phones - Used Mobile Phones in ... - OLX",
+        "snippet": "6 days ago \u00b7 We currently have a wide range of 31133 used mobile phones listed, perfect for every budget and need. Whether you are looking for an everyday smartphone or a premium flagship device, our inventory in Ghaziabad includes top options from makes like iPhone, Samsung and Vivo and more.",
+        "date": null,
+        "tier": 4,
+        "w_source": 0.3,
+        "cosine": 0.5365,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0002,
+         "REFUTES": 0.0247,
+         "NEUTRAL": 0.9752
+        },
+        "stance": "NEUTRAL",
+        "p": 0.9752
+       },
+       {
+        "origin": "ddgs",
+        "source": "hindi.news18.com",
+        "url": "https://hindi.news18.com/news/uttar-pradesh/ghaziabad-gda-demolition-drive-modinagar-muradnagar-illegal-colonies-action-news-in-hindi-local18-10191900.html",
+        "title": "GDA Demolition Drive Ghaziabad| Illegal Colonies Modinagar ...",
+        "snippet": "Ghaziabad News: \u0917\u093e\u091c\u093f\u092f\u093e\u092c\u093e\u0926 \u0935\u093f\u0915\u093e\u0938 \u092a\u094d\u0930\u093e\u0927\u093f\u0915\u0930\u0923 (GDA) \u0907\u0928 \u0926\u093f\u0928\u094b\u0902 \u092d\u0942-\u092e\u093e\u092b\u093f\u092f\u093e\u0913\u0902 \u0914\u0930 \u0905\u0935\u0948\u0927 \u0928\u093f\u0930\u094d\u092e\u093e\u0923 \u0915\u0930\u0928\u0947 \u0935\u093e\u0932\u094b\u0902 \u0915\u0947 \u0916\u093f\u0932\u093e\u092b \u0938\u0916\u094d\u0924 \u0930\u0941\u0916 \u0905\u092a\u0928\u093e\u090f \u0939\u0941\u090f \u0939\u0948. \u0907\u0938 \u0915\u093e\u0930\u094d\u0930\u0935\u093e\u0908 \u0915\u0947 \u0926\u094c\u0930\u093e\u0928 \u092a\u094d\u0930\u0935\u0930\u094d\u0924\u0928 \u091c\u094b\u0928-2 \u0915\u0940 \u091f\u0940\u092e \u0928\u0947 \u092d\u093e\u0930\u0940 \u092a\u0941\u0932\u093f\u0938 \u092c\u0932 \u0915\u0947 \u0938\u093e\u0925 \u092e\u093f\u0932\u0915\u0930 \u0932\u0917\u092d\u0917 43,000 \u0935\u0930\u094d\u0917 \u092e\u0940\u091f\u0930 \u091c\u092e\u0940\u0928 \u0915\u094b \u0905\u0924\u093f\u0915\u094d\u0930\u092e\u0923 \u092e\u0941\u0915\u094d\u0924 \u0915\u0930\u093e\u092f\u093e. Advertisement\n\u0906\u092e \u091c\u0928\u0924\u093e \u0915\u0947 \u0932\u093f\u090f \u2018\u0916\u0924\u0930\u0947 \u0915\u0940 \u0918\u0902\u091f\u0940\u2019\nGDA \u0915\u0947 \u0905\u0927\u093f\u0915\u093e\u0930\u093f\u092f\u094b\u0902 \u0928\u0947 \u0915\u0947\u0935\u0932 \u0924\u094b\u0921\u093c\u092b\u094b\u0921\u093c \u0939\u0940 \u0928\u0939\u0940\u0902 \u0915\u0940, \u092c\u0932\u094d\u0915\u093f \u092e\u094c\u0915\u0947 \u092a\u0930 \u091a\u0947\u0924\u093e\u0935\u0928\u0940 \u092c\u094b\u0930\u094d\u0921 \u092d\u0940 \u0932\u0917\u093e \u0926\u093f\u090f \u0939\u0948\u0902.",
+        "date": "2026-02-17",
+        "tier": 4,
+        "w_source": 0.3,
+        "cosine": 0.3017,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0002,
+         "REFUTES": 0.975,
+         "NEUTRAL": 0.0248
+        },
+        "stance": "REFUTES",
+        "p": 0.975
+       },
+       {
+        "origin": "ddgs",
+        "source": "scamadviser.com",
+        "url": "https://www.scamadviser.com/",
+        "title": "ScamAdviser | Check Any Website for Scams & Fraud | Free",
+        "snippet": "Don't get scammed online. ScamAdviser's free website checker reveals if a site is legit or hiding fraud, malware, or phishing traps. Check any URL in seconds.",
+        "date": null,
+        "tier": 4,
+        "w_source": 0.3,
+        "cosine": 0.2521,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0002,
+         "REFUTES": 0.0171,
+         "NEUTRAL": 0.9827
+        },
+        "stance": "NEUTRAL",
+        "p": 0.9827
+       },
+       {
+        "origin": "ddgs",
+        "source": "bhaskar.com",
+        "url": "https://www.bhaskar.com/local/uttar-pradesh/ghaziabad/modinagar/",
+        "title": "Latest Modinagar News (\u092e\u094b\u0926\u0940\u0928\u0917\u0930 \u0928\u094d\u092f\u0942\u091c\u093c): \u092a\u0922\u093c\u0947\u0902 11 \u0928\u0935\u092e\u094d\u092c\u0930 \u0915\u0947 \u0924\u093e\u091c\u093c\u093e ...",
+        "snippet": "9 hours ago \u00b7 Read 11 November 4PM Latest Modinagar News @Dainik Bhaskar.",
+        "date": null,
+        "tier": 4,
+        "w_source": 0.3,
+        "cosine": 0.2009,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0,
+         "REFUTES": 0.9942,
+         "NEUTRAL": 0.0058
+        },
+        "stance": "REFUTES",
+        "p": 0.9942
+       },
+       {
+        "origin": "ddgs",
+        "source": "jagran.com",
+        "url": "https://www.jagran.com/uttar-pradesh/ghaziabad",
+        "title": "Ghaziabad News in Hindi: Ghaziabad Latest News,Ghaziabad News ...",
+        "snippet": "6\u0920\u0940 \u092e\u0902\u091c\u093f\u0932 \u0938\u0947 \u0917\u093f\u0930\u0915\u0930 \u092f\u0941\u0935\u0915 \u0915\u0940 \u0926\u0930\u094d\u0926\u0928\u093e\u0915 \u092e\u094c\u0924, 8 \u0926\u093f\u0928 \u092a\u0939\u0932\u0947 \u092c\u0928\u093e \u0925\u093e \u092a\u093f\u0924\u093e ghaziabad17 hours ago\n- \u0917\u093e\u091c\u093f\u092f\u093e\u092c\u093e\u0926 \u0938\u094b\u0938\u093e\u092f\u091f\u0940 \u092e\u0947\u0902 \u0928\u0936\u0947 \u092e\u0947\u0902 \u0927\u0941\u0924 \u092f\u0941\u0935\u0915\u094b\u0902 \u0914\u0930 \u0917\u093e\u0930\u094d\u0921\u094b\u0902 \u0915\u0947 \u092c\u0940\u091a \u092e\u093e\u0930\u092a\u0940\u091f, \u091c\u093e\u0902\u091a \u092e\u0947\u0902 \u091c\u0941\u091f\u0940 \u092a\u0941\u0932\u093f\u0938 ghaziabad23 hours ago\n- ghaziabad1 day ago\n- ghaziabad1 day ago\n- \u091b\u0920 \u092a\u0942\u091c\u093e 2026: \u0938\u093e\u0939\u093f\u092c\u093e\u092c\u093e\u0926 \u092e\u0947\u0902 \u0918\u093e\u091f\u094b\u0902 \u0915\u0940 \u092c\u0926\u0939\u093e\u0932\u0940 \u0938\u0947 \u0915\u0948\u0938\u0947 \u0905\u0930\u094d\u0918\u094d\u092f \u0926\u0947\u0902\u0917\u0947 \u0936\u094d\u0930\u0926\u094d\u0927\u093e\u0932\u0941? 75% \u0924\u0915 \u0915\u093e\u092e \u0905\u0927\u0942\u0930\u0947 ghaziabad1 day ago\n- \u0935\u0938\u0941\u0902\u0927\u0930\u093e \u091a\u094c\u0915\u0940 \u092c\u094d\u0932\u093e\u0938\u094d\u091f \u092e\u0947\u0902 \u0915\u093f\u0938 \u0935\u093f\u0938\u094d\u092b\u094b\u091f\u0915 \u0915\u093e \u0939\u0941\u0906 \u0907\u0938\u094d\u0924\u0947\u092e\u093e\u0932, \u0926\u0940\u0935\u093e\u0932\u0940 \u0915\u0940 \u091b\u0941\u091f\u094d\u091f\u093f\u092f\u094b\u0902 \u0915\u0947 \u091a\u0932\u0924\u0947 \u092b\u0902\u0938\u0940 FSL \u0930\u093f\u092a\u094b\u0930\u094d\u091f ghaziabad1 day ago\n- \u0917\u093e\u091c\u093f\u092f\u093e\u092c\u093e\u0926 \u0915\u0940 \u092c\u0926\u0932\u0947\u0917\u0940 \u0924\u0938\u094d\u0935\u0940\u0930, NH-09 \u092a\u0930 2.84 \u0915\u0930\u094b\u0921\u093c \u0938\u0947 \u092c\u0928\u0947\u0917\u093e \u092d\u0935\u094d\u092f \u092a\u094d\u0930\u0935\u0947\u0936 \u0926\u094d\u0935\u093e\u0930; \u091c\u093e\u0930\u0940 \u0939\u0941\u0906 \u091f\u0947\u0902\u0921\u0930 ghaziabad1 day ago\n- \u092c\u093f\u091c\u0932\u0940 \u092c\u093f\u0932 \u0915\u092e \u0915\u0930\u0928\u0947 \u0915\u0947 \u0932\u093f\u090f UPNEDA \u0928\u0947 \u092c\u0928\u093e\u0908 \u092f\u094b\u091c\u0928\u093e, \u0935\u093f\u0915\u093e\u0938 \u092d\u0935\u0928 \u092e\u0947\u0902 \u091c\u0932\u094d\u0926 \u0932\u0917\u0947\u0917\u093e \u0938\u094b\u0932\u0930 \u092a\u094d\u0932\u093e\u0902\u091f ghaziabad1 day ago\n- \u091b\u0920 \u092a\u0942\u091c\u093e \u092a\u0930 \u0936\u094d\u0930\u0926\u094d\u0927\u093e\u0932\u0941\u0913\u0902 \u0915\u0947 \u0932\u093f\u090f \u0938\u094d\u0935\u093e\u0938\u094d\u0925\u094d\u092f \u0935\u093f\u092d\u093e\u0917 \u092e\u0941\u0938\u094d\u0924\u0948\u0926, 13 \u0918\u093e\u091f\u094b\u0902 \u092a\u0930 \u0924\u0948\u0928\u093e\u0924 \u0930\u0939\u0947\u0902\u0917\u0940 28 \u092e\u0947\u0921\u093f\u0915\u0932 \u091f\u0940\u092e\u0947\u0902 ghaziabad1 day ago",
+        "date": "2026-11-11",
+        "tier": 4,
+        "w_source": 0.3,
+        "cosine": 0.1899,
+        "rating": null,
+        "rating3": null,
+        "is_factcheck": false,
+        "record_id": null,
+        "nli": {
+         "SUPPORTS": 0.0002,
+         "REFUTES": 0.9925,
+         "NEUTRAL": 0.0073
+        },
+        "stance": "REFUTES",
+        "p": 0.9925
+       }
+      ],
+      "stance_summary": "0 supporting / 5 refuting / 5 neutral"
+     }
+    ],
+    "temporal": {
+     "old_news": false,
+     "gap_months": null,
+     "recency_cue": false,
+     "out_of_context": false,
+     "mismatch_headline": false,
+     "mismatch_p": null,
+     "input_date": "2026-11-12",
+     "event_date": null,
+     "evidence_dates": []
+    },
+    "classifier": {
+     "p_fake": 0.0002,
+     "label": "real",
+     "model": "distilbert-welfake-v1"
+    },
+    "signals": {
+     "main_stance": "REFUTES",
+     "S_1": -2.4624,
+     "E_1": 2,
+     "per_claim": [
+      {
+       "S": -2.4624,
+       "E": 2,
+       "stance": "REFUTES",
+       "n_evidence": 10
+      }
+     ],
+     "temporal_flags": [],
+     "p_fake": 0.0002
+    },
+    "uncertainty": "Based on the retrieved evidence only; evidence dates are shown where known.",
+    "evidence_count": 10,
+    "latency_ms": 5184,
+    "timings_ms": {
+     "language": 0,
+     "claims": 0,
+     "evidence_offline": 9,
+     "evidence_online": 1040,
+     "stance": 4110,
+     "classifier": 21,
+     "temporal": 0,
+     "fusion": 0
+    },
+    "explanation": "Marked FAKE because 5 reliable sources (ndtv.com, thehindu.com, hindi.news18.com +2 more) contradict \"A local shop in Ghaziabad sold 500 phones in one hour\"."
+   }
+  }
+ ],
+ "edge": [
+  {
+   "case": "empty text",
+   "status": 422,
+   "verdict": null,
+   "rule_fired": null,
+   "detail": "text is empty"
+  },
+  {
+   "case": "whitespace only",
+   "status": 422,
+   "verdict": null,
+   "rule_fired": null,
+   "detail": "text is empty"
+  },
+  {
+   "case": "whitespace title + real text",
+   "status": 200,
+   "verdict": "UNVERIFIABLE",
+   "rule_fired": "R1",
+   "detail": null
+  },
+  {
+   "case": "emoji only",
+   "status": 200,
+   "verdict": "UNVERIFIABLE",
+   "rule_fired": "R1",
+   "detail": null
+  },
+  {
+   "case": "digits / punctuation only",
+   "status": 200,
+   "verdict": "UNVERIFIABLE",
+   "rule_fired": "R1",
+   "detail": null
+  },
+  {
+   "case": "non-English (Hindi)",
+   "status": 200,
+   "verdict": "UNVERIFIABLE",
+   "rule_fired": "LANG",
+   "detail": null
+  },
+  {
+   "case": "non-English (Spanish)",
+   "status": 200,
+   "verdict": "UNVERIFIABLE",
+   "rule_fired": "LANG",
+   "detail": null
+  },
+  {
+   "case": "very long headline (60k chars)",
+   "status": 200,
+   "verdict": "UNVERIFIABLE",
+   "rule_fired": "R1",
+   "detail": null
+  },
+  {
+   "case": "very long article (60k chars)",
+   "status": 200,
+   "verdict": "UNVERIFIABLE",
+   "rule_fired": "R1",
+   "detail": null
+  },
+  {
+   "case": "article with no check-worthy sentence",
+   "status": 200,
+   "verdict": "UNVERIFIABLE",
+   "rule_fired": "R1",
+   "detail": null
+  },
+  {
+   "case": "URL input in offline mode",
+   "status": 422,
+   "verdict": null,
+   "rule_fired": null,
+   "detail": "URL input needs online mode; paste the text instead"
+  },
+  {
+   "case": "URL input without url",
+   "status": 422,
+   "verdict": null,
+   "rule_fired": null,
+   "detail": "url is required for input_type=url"
+  },
+  {
+   "case": "invalid published date",
+   "status": 200,
+   "verdict": "UNVERIFIABLE",
+   "rule_fired": "R1",
+   "detail": null
+  },
+  {
+   "case": "k out of range (k=50)",
+   "status": 422,
+   "verdict": null,
+   "rule_fired": null,
+   "detail": "[{'type': 'less_than_equal', 'loc': ['body', 'k'], 'msg': 'Input should be less than or equal to 10', 'input': 50, 'ctx'"
+  },
+  {
+   "case": "unknown input_type",
+   "status": 422,
+   "verdict": null,
+   "rule_fired": null,
+   "detail": "[{'type': 'literal_error', 'loc': ['body', 'input_type'], 'msg': \"Input should be 'headline', 'article' or 'url'\", 'inpu"
+  },
+  {
+   "case": "HTML / script injection",
+   "status": 200,
+   "verdict": "UNVERIFIABLE",
+   "rule_fired": "R1",
+   "detail": null
+  }
+ ]
+}

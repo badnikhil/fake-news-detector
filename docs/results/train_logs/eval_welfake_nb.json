@@ -37,7 +37,7 @@
     ],
     "roc_auc": 0.9442743825292921,
     "n": 6080,
-    "predict_seconds": 3.8
+    "predict_seconds": 4.2
   },
   "test": {
     "accuracy": 0.8771381578947368,
@@ -59,6 +59,6 @@
     ],
     "roc_auc": 0.9443125584465593,
     "n": 6080,
-    "predict_seconds": 3.6
+    "predict_seconds": 4.7
   }
 }

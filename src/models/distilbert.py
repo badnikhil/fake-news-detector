@@ -243,9 +243,10 @@ def sweep_records() -> list[dict]:
 
 
 def winner() -> dict:
+    """Best val macro-F1 among the completed sweep runs (the 512 arm was never run - see agent-docs 2026-11-12)."""
     recs = sweep_records()
-    if len(recs) < len(GRID_LR) * len(GRID_MAXLEN):
-        raise SystemExit(f"sweep incomplete ({len(recs)}/6 runs) - run --sweep first")
+    if not recs:
+        raise SystemExit("no sweep runs - run --sweep first")
     return max(recs, key=lambda r: r["best_val_macro_f1"])
 
 
@@ -260,7 +261,8 @@ def run_full(max_len: int | None = None) -> None:
     trainer.state.save_to_json(str(FINAL_DIR / "trainer_state.json"))
     (FINAL_DIR / "training_args.json").write_text(trainer.args.to_json_string())
     rec.update(name="distilbert_welfake_v1_full", dataset="welfake", train_subset="full train split",
-               sweep_winner=w["name"], winner_equals_sweep=(ml == w["config"]["max_len"]), model_dir=str(FINAL_DIR))
+               sweep_winner=w["name"], winner_equals_sweep=(ml == w["config"]["max_len"]), model_dir=str(FINAL_DIR),
+               sweep_runs_completed=len(sweep_records()))
     save_json(rec, FINAL_LOG)
     print(f"full retrain: best epoch {rec['best_epoch']} val macro-F1 {rec['best_val_macro_f1']:.4f} ({rec['minutes']} min)")
 
@@ -324,7 +326,7 @@ def run_eval_test() -> None:
 LR5E5_NOTE = ("at max_len 256 it fits the 20k subset fastest (train loss 0.0077 at epoch 3 vs 0.0153 / 0.0105 for 2e-5 / "
               "3e-5) and its val loss rises from epoch 2 (0.0572) to epoch 3 (0.0671), i.e. it starts to overfit, while val "
               "macro-F1 stays flat (0.9870 -> 0.9871); it ties lr 2e-5 (0.9869) within 0.0002 — no lr is clearly better at 256.")
-NOT_RUN = "not run (stopped on user decision, 2026-10-26) — deferred to ESE"
+NOT_RUN = "not run (stopped on user decision, 2026-10-26; the max_len 512 arm stays deferred at ESE)"
 # Shown while no test log exists. Derived only from our own measured numbers; never a measurement.
 EXPECTED_NOTE = (
     "**Expected — not measured** (†expected, not measured; to be replaced by the ESE run). "
@@ -409,6 +411,8 @@ def render() -> None:
         md += [f"**Best completed run:** lr = {w['config']['lr']:.0e}, max_len = {w['config']['max_len']} "
                f"(val macro-F1 {w['best_val_macro_f1']:.4f} at epoch {w['best_epoch']}). "
                + ("" if len(recs) == len(GRID_LR) * len(GRID_MAXLEN) else
+                  f"Only {len(recs)} of {len(GRID_LR) * len(GRID_MAXLEN)} configs ran (max_len 256 only), so this is the best "
+                  "of the completed runs, not a full-sweep winner." if full else
                   f"Only {len(recs)} of {len(GRID_LR) * len(GRID_MAXLEN)} configs ran, so this is the best of the completed "
                   "runs, not a sweep winner; the sweep runs save no weights, so **no DistilBERT checkpoint exists** and no "
                   "DistilBERT test number exists (`data/models/distilbert-welfake-v1/` was not created; the served classifier "

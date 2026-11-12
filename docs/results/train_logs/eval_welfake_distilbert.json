@@ -1,0 +1,47 @@
+{
+  "dataset": "welfake",
+  "model": "distilbert",
+  "artefact": "data/models/distilbert-welfake-v1",
+  "params": {
+    "max_len": 256,
+    "lr": 5e-05,
+    "epochs": 3,
+    "per_device_batch": 16,
+    "grad_accum": 1,
+    "effective_batch": 16,
+    "warmup_ratio": 0.1,
+    "weight_decay": 0.01,
+    "scheduler": "linear",
+    "fp16": true,
+    "optimizer": "adamw_torch",
+    "class_weights": null,
+    "input": "title [SEP] text (pair), head truncation"
+  },
+  "score": "softmax P(fake)",
+  "test": {
+    "accuracy": 0.9899671052631579,
+    "precision_macro": 0.9905391578266496,
+    "recall_macro": 0.9890912591451675,
+    "f1_macro": 0.9897844485030353,
+    "precision_fake": 0.9946503630110813,
+    "recall_fake": 0.9822641509433963,
+    "f1_fake": 0.9884184545281944,
+    "confusion": [
+      [
+        3416,
+        14
+      ],
+      [
+        47,
+        2603
+      ]
+    ],
+    "roc_auc": 0.9995122393971065,
+    "n": 6080
+  },
+  "val": {
+    "accuracy": 0.9930921052631579,
+    "f1_macro": 0.9929697816238416,
+    "n": null
+  }
+}

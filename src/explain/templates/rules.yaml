@@ -1,0 +1,33 @@
+# One Jinja2 template per fusion rule (master §15 "How it is generated"). Variables come from
+# src/explain/narrative.py:_context(); nothing generative, only the analysed result is filled in.
+LANG: "Marked UNVERIFIABLE: this version only analyses English text."
+R0: "Marked FAKE because the input comes from a satire / known-hoax site{% if domain %} ({{ domain }}){% endif %}."
+R1: >-
+  Marked UNVERIFIABLE because no reliable evidence for or against "{{ claim }}" was found{% if n_ev %}
+  ({{ n_ev }} retrieved item{{ 's' if n_ev != 1 }}, none taking a side){% endif %}.
+R2: >-
+  Marked FAKE because {{ fc.source_label or fc.source }} rated a matching statement ("{{ fc.snippet }}",
+  similarity {{ '%.2f' % fc.cosine }}) as "{{ fc.rating }}".
+R3: >-
+  Marked FAKE because {{ n_ref }} reliable sources ({{ ref_sources }}) contradict "{{ claim }}".
+R4: >-
+  Marked MISLEADING: "{{ claim }}" is supported by {{ n_sup }} source{{ 's' if n_sup != 1 }}, but
+  {%- if t.old_news %} the supporting reports are dated {{ t.event_date }} while the input is dated {{ t.input_date }}
+  ({{ t.gap_months }} months apart){% endif %}
+  {%- if t.out_of_context %} the places or years in the claim do not match those in the supporting reports{% endif %}
+  {%- if t.mismatch_headline %} the article body contradicts its own headline (NLI p = {{ t.mismatch_p }}){% endif %}.
+R5: >-
+  Marked PARTIALLY TRUE: the main claim "{{ claim }}" is supported by {{ n_sup }} source{{ 's' if n_sup != 1 }},
+  but "{{ refuted.text }}" is contradicted by {{ refuted.n }} source{{ 's' if refuted.n != 1 }}.
+R6: >-
+  Marked PARTIALLY TRUE: the important claims are split - "{{ supported.text }}" is supported, while
+  "{{ refuted.text }}" is contradicted.
+R7: >-
+  Marked REAL because {{ n_sup }} reliable sources ({{ sup_sources }}) support "{{ claim }}".
+R8: >-
+  Only one reliable source ({{ sup_sources or ref_sources }}) {{ 'supports' if n_sup else 'contradicts' }} "{{ claim }}";
+  {%- if verdict == 'UNVERIFIABLE' %} the writing-style classifier{% if p_fake is not none %} (p_fake = {{ p_fake }}){% endif %}
+  is not decisive, so the result stays UNVERIFIABLE{% else %} the writing-style classifier (p_fake = {{ p_fake }})
+  breaks the tie, giving {{ verdict }}{% endif %}.
+R9: >-
+  Marked UNVERIFIABLE: the evidence about "{{ claim }}" is inconclusive ({{ summary }}).

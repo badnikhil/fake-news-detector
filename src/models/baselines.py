@@ -476,7 +476,6 @@ MODEL_LABEL = {"nb": "TF-IDF + Multinomial NB", "lr": "TF-IDF + Logistic Regress
 PENDING_ROWS = [
     # (model, dataset, split, notes) — rows no MSE2 eval log covers yet
     ("Bi-LSTM + GloVe 100d (optional)", "WELFake", "val / test", "MSE2 — only if time permits (week 9)"),
-    ("DistilBERT (or TF-IDF + LR) LIAR 3-way head", "LIAR", "test", "MSE2 — `docs/results/liar_head.md`"),
 ]
 # Rendered while DistilBERT is pending. Expected values only (own measured numbers as basis), never measured.
 DISTILBERT_EXPECTED = [

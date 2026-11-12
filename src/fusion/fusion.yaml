@@ -1,9 +1,11 @@
-# Fusion v1 thresholds (master doc §13.4, §14). Defaults frozen at MSE2; the dev-slice grid search
-# (docs/results/fusion_thresholds.md) may revise tau / min_evidence / N_months later.
-tau: 0.6                    # |S_1| >= tau -> main_stance SUPPORTS / REFUTES
+# Fusion thresholds (master doc §13.4, §14).
+# Defaults frozen at MSE2 (tau 0.6, min_evidence 2); v2 dev-slice tuning 2026-11-12 (docs/results/fusion_thresholds.md) set tau 0.8, min_evidence 3.
+tau: 0.8                    # |S_1| >= tau -> main_stance SUPPORTS / REFUTES
 N_months: 6                 # old-news gap (recency cue AND t_post - t_event >= N months)
+explicit_date_check: true   # v2: old_news also when the claim's own DATE is >= N months after the supporting-evidence date
+evidence_text_dates: false  # v2: also use DATE entities inside supporting passages as evidence dates (tuned on dev + temporal controls)
 k: 5                        # top-k claims per input and top-k offline-index hits per claim
-min_evidence: 2             # E_i needed for R3 / R5 / R6 / R7 (E_i = non-neutral items with w_s >= 0.5)
+min_evidence: 3             # E_i needed for R3 / R5 / R6 / R7 (E_i = non-neutral items with w_s >= 0.5)
 reliable_weight: 0.5        # w_s threshold that makes an item count towards E_i
 important_claim: 0.6        # c_i >= this = "important claim" (R5 / R6)
 factcheck_match_cosine: 0.75  # R2: Tier-1 fact-check item must match the main claim at least this well

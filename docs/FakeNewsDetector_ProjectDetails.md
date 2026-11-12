@@ -405,7 +405,7 @@ Inputs: `t_post` (publication date of the input; for pasted text, "today" unless
 For the top-k claims (weights `c_i` = claim score, main claim = claim 1):
 
 - `S_i = Σ_e ev.signed` (net signed evidence for claim i), `E_i` = number of non-neutral evidence items with `w_s ≥ 0.5`.
-- `main_stance` = SUPPORTS if `S_1 ≥ +τ`, REFUTES if `S_1 ≤ −τ`, else NEUTRAL (`τ = 0.6` default).
+- `main_stance` = SUPPORTS if `S_1 ≥ +τ`, REFUTES if `S_1 ≤ −τ`, else NEUTRAL (`τ = 0.8` since the 2026-11-12 dev tuning, `docs/results/fusion_thresholds.md`; MSE2 default was 0.6).
 - `p_fake` = DistilBERT fake probability; `p_liar` = 3-way LIAR head on the main claim (headline).
 - Temporal flags from §13.4.
 
@@ -418,11 +418,11 @@ For the top-k claims (weights `c_i` = claim score, main claim = claim 1):
 | R0 | Source domain of the input is on the satire/known-hoax list | FAKE (reason: "originates from a satire/hoax site") |
 | R1 | No evidence retrieved for any claim, **or** all evidence NEUTRAL, **or** `E_1 = 0` | **UNVERIFIABLE** |
 | R2 | A Tier-1 fact-checker item with rating ∈ {False, Pants on Fire, Fabricated} matches the main claim (cosine ≥ 0.75) | **FAKE** |
-| R3 | `main_stance = REFUTES` and `E_1 ≥ 2` | **FAKE** |
+| R3 | `main_stance = REFUTES` and `E_1 ≥ 3` | **FAKE** |
 | R4 | `main_stance = SUPPORTS` and (`old_news` or `out_of_context` or `mismatch_headline`) | **MISLEADING** |
-| R5 | `main_stance = SUPPORTS` and at least one other important claim (`c_i ≥ 0.6`) has `S_i ≤ −τ` with `E_i ≥ 2` | **PARTIALLY TRUE** |
-| R6 | `main_stance = NEUTRAL` and important claims are split (≥ 1 supported, ≥ 1 refuted, each `E_i ≥ 2`) | **PARTIALLY TRUE** |
-| R7 | `main_stance = SUPPORTS` and `E_1 ≥ 2` | **REAL** |
+| R5 | `main_stance = SUPPORTS` and at least one other important claim (`c_i ≥ 0.6`) has `S_i ≤ −τ` with `E_i ≥ 3` | **PARTIALLY TRUE** |
+| R6 | `main_stance = NEUTRAL` and important claims are split (≥ 1 supported, ≥ 1 refuted, each `E_i ≥ 3`) | **PARTIALLY TRUE** |
+| R7 | `main_stance = SUPPORTS` and `E_1 ≥ 3` | **REAL** |
 | R8 | `main_stance = SUPPORTS` or `REFUTES` but `E_1 = 1` (single source) — **tie-break**: if `p_fake ≥ 0.85` and stance REFUTES → FAKE; if `p_fake ≤ 0.15` and stance SUPPORTS → REAL; otherwise | **UNVERIFIABLE** (reason: "only one source") |
 | R9 | Anything else | **UNVERIFIABLE** |
 

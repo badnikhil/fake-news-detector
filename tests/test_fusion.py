@@ -16,9 +16,21 @@ def claim(evidence, score=1.0):
     return {"text": "c", "score": score, "evidence": evidence}
 
 
-def test_config_values_match_master_doc():
-    c = config()
-    assert (c["tau"], c["N_months"], c["k"], c["clf_adj"]) == (0.6, 6, 5, 0.10)
+@pytest.fixture(autouse=True)
+def mse2_thresholds(monkeypatch):
+    """Rule-logic tests below are written for the MSE2 thresholds (tau 0.6, min_evidence 2: two items at p 0.9 x w 0.8
+    make S = 1.44 >= tau and E = 2); fusion.yaml now holds the v2 dev-tuned values (docs/results/fusion_thresholds.md)."""
+    from src.fusion import rules
+    pinned = {**rules.config(), "tau": 0.6, "min_evidence": 2}
+    monkeypatch.setattr(rules, "config", lambda: pinned)
+
+
+def test_config_values_match_tuned_yaml():  # v2 dev tuning (2026-11-12): tau 0.6 -> 0.8, min_evidence 2 -> 3
+    import yaml
+
+    from src.fusion.rules import FUSION_YAML
+    c = yaml.safe_load(FUSION_YAML.read_text())
+    assert (c["tau"], c["min_evidence"], c["N_months"], c["k"], c["clf_adj"]) == (0.8, 3, 6, 5, 0.10)
 
 
 def test_lang_precheck():
@@ -112,3 +124,15 @@ def test_old_news_flag():
     assert not temporal_check("Kerala under water", sup, t_post="2026-09-10")["old_news"]  # no recency cue
     assert not temporal_check("BREAKING: Kerala", sup, t_post="2018-09-01")["old_news"]  # gap < 6 months
     assert has_recency_cue("Just in: x") and not has_recency_cue("Deliver the goods")  # 'live' is a whole word
+
+
+def test_old_news_from_explicit_claim_date():  # v2: the claim names its own (recent) date, the evidence is old
+    sup = [{"stance": "SUPPORTS", "date": "2016-12-10", "p": 0.9, "w_source": 0.8}]
+    claim = "Scientists discovered a dinosaur tail preserved in amber in September 2025."
+    t = temporal_check(claim, sup, main_claim=claim, t_post="2025-09-01")
+    assert t["old_news"] and t["date_conflict"] and t["claim_date"] == "2025-09-01" and not t["recency_cue"]
+    hist = "In 2018 Kerala saw its worst floods in a century"  # history correctly dated -> no flag
+    assert not temporal_check(hist, [{"stance": "SUPPORTS", "date": "2018-08-17"}], main_claim=hist,
+                              t_post="2026-09-10")["old_news"]
+    off = {**config(), "explicit_date_check": False}
+    assert not temporal_check(claim, sup, main_claim=claim, t_post="2025-09-01", cfg=off)["old_news"]

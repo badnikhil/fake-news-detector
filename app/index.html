@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fake News Detector</title>
+<meta name="description" content="Evidence-grounded fake news and misinformation checker (KIET B.Tech NLP project).">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="styles.css">
+<script>try{const t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top">
+  <div class="wrap top-row">
+    <a class="brand" href="#analyse">Fake News &amp; Misinformation Detector</a>
+    <nav aria-label="Main">
+      <a href="#analyse" data-nav="analyse">Analyse</a>
+      <a href="#about" data-nav="about">About</a>
+      <button type="button" id="theme" class="ghost" aria-label="Switch colour theme">Theme</button>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+  <!-- ======================= Analyse screen ======================= -->
+  <section id="screen-analyse" aria-labelledby="h-analyse">
+    <h1 id="h-analyse">Check a headline, article or link</h1>
+    <p class="muted">Claims are checked against fact-checks and news evidence. The verdict comes from the evidence, not from the writing style.</p>
+
+    <form id="form" class="card" novalidate>
+      <div role="tablist" aria-label="Input type" class="tabs">
+        <button type="button" role="tab" id="tab-headline" aria-controls="panel-headline" aria-selected="true" data-type="headline">Headline</button>
+        <button type="button" role="tab" id="tab-article" aria-controls="panel-article" aria-selected="false" tabindex="-1" data-type="article">Article</button>
+        <button type="button" role="tab" id="tab-url" aria-controls="panel-url" aria-selected="false" tabindex="-1" data-type="url">URL</button>
+      </div>
+
+      <div role="tabpanel" id="panel-headline" aria-labelledby="tab-headline">
+        <label for="in-headline">Headline or single claim</label>
+        <textarea id="in-headline" rows="2" placeholder="e.g. The United States has the highest corporate tax rate in the world."></textarea>
+      </div>
+      <div role="tabpanel" id="panel-article" aria-labelledby="tab-article" hidden>
+        <label for="in-title">Article title <span class="muted">(optional)</span></label>
+        <input id="in-title" type="text">
+        <label for="in-article">Article text</label>
+        <textarea id="in-article" rows="8" placeholder="Paste the article body here"></textarea>
+      </div>
+      <div role="tabpanel" id="panel-url" aria-labelledby="tab-url" hidden>
+        <label for="in-url">Article URL <span class="muted">(online mode only)</span></label>
+        <input id="in-url" type="url" inputmode="url" placeholder="https://...">
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="in-date">Publication date of the input <span class="muted">(optional, for the old-news check)</span></label>
+          <input id="in-date" type="date">
+        </div>
+        <fieldset class="mode">
+          <legend>Mode</legend>
+          <label><input type="radio" name="mode" value="online" checked> Online</label>
+          <label><input type="radio" name="mode" value="offline"> Offline</label>
+          <p id="mode-note" class="muted small"></p>
+        </fieldset>
+      </div>
+
+      <div class="actions">
+        <button type="submit" id="go" class="primary">Analyse</button>
+        <span id="status" role="status" aria-live="polite"></span>
+      </div>
+    </form>
+
+    <section aria-labelledby="h-examples" class="examples">
+      <h2 id="h-examples">Try an example</h2>
+      <p class="muted small">One per verdict class; all of them work in offline mode (bundled PolitiFact index).</p>
+      <ul id="examples" class="example-list"></ul>
+    </section>
+
+    <!-- ======================= Result screen ======================= -->
+    <section id="result" aria-labelledby="h-result" hidden>
+      <h2 id="h-result" class="sr-only">Result</h2>
+      <div id="verdict" class="verdict card" tabindex="-1">
+        <p class="verdict-label"><span id="v-icon" aria-hidden="true"></span> Verdict: <strong id="v-text"></strong></p>
+        <div class="conf">
+          <label for="v-meter">Confidence</label>
+          <meter id="v-meter" min="0" max="1" low="0.5" high="0.75" optimum="1"></meter>
+          <span id="v-conf"></span>
+        </div>
+        <p id="v-explanation" class="lead"></p>
+        <p class="small"><span class="badge" id="v-rule"></span> <span id="v-reason"></span></p>
+        <p id="v-uncertainty" class="uncertainty"></p>
+        <div class="actions">
+          <button type="button" id="download" class="ghost">Download JSON</button>
+          <button type="button" id="again" class="ghost">New check</button>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <section class="card" aria-labelledby="h-claims">
+          <h3 id="h-claims">Key claims</h3>
+          <ol id="claims" class="claims"></ol>
+        </section>
+        <section class="card" aria-labelledby="h-dates">
+          <h3 id="h-dates">Dates</h3>
+          <dl id="dates" class="kv"></dl>
+          <p id="date-warn" class="warn" hidden></p>
+        </section>
+      </div>
+
+      <section aria-labelledby="h-evidence">
+        <h3 id="h-evidence">Evidence</h3>
+        <div id="evidence"></div>
+      </section>
+
+      <section class="card style-panel" aria-labelledby="h-style">
+        <h3 id="h-style">Style signals</h3>
+        <p class="caption">Writing-style signals only &mdash; these do not decide the verdict.</p>
+        <p id="clf" class="small"></p>
+        <div id="lime" class="lime"></div>
+      </section>
+
+      <details class="card">
+        <summary>Technical details</summary>
+        <dl id="details" class="kv"></dl>
+      </details>
+    </section>
+  </section>
+
+  <!-- ======================= About screen ======================= -->
+  <section id="screen-about" aria-labelledby="h-about" hidden>
+    <h1 id="h-about">About this tool</h1>
+    <section class="card">
+      <h2>What the verdicts mean</h2>
+      <dl class="classes">
+        <dt><span aria-hidden="true">&#10004;</span> REAL</dt><dd>At least two reliable sources support the main claim and nothing important is contradicted.</dd>
+        <dt><span aria-hidden="true">&#10006;</span> FAKE</dt><dd>A fact-checker rates a matching claim false, or at least two reliable sources contradict it (or the input comes from a satire / known-hoax site).</dd>
+        <dt><span aria-hidden="true">&#9680;</span> PARTIALLY TRUE</dt><dd>The main claim is supported but another important claim is contradicted, or the important claims are split.</dd>
+        <dt><span aria-hidden="true">&#9888;</span> MISLEADING</dt><dd>The facts are real but presented wrongly: old news shown as new, the wrong place or year, or a headline its own article contradicts.</dd>
+        <dt><span aria-hidden="true">?</span> UNVERIFIABLE</dt><dd>We could not find enough reliable evidence either way. This does not mean the claim is false.</dd>
+      </dl>
+    </section>
+    <section class="card">
+      <h2>How it works</h2>
+      <p>Input &rarr; claim extraction (spaCy) &rarr; evidence retrieval (offline FAISS index of PolitiFact fact-checks; online: DuckDuckGo, Wikipedia, Google Fact Check) &rarr; stance detection (NLI, DeBERTa-v3-small) &rarr; date / context checks &rarr; rule-based fusion (rules R0&ndash;R9). The writing-style classifier only adjusts confidence by &plusmn;0.10 and breaks single-source ties; it never decides the verdict on its own.</p>
+      <h3>Sources searched in the current mode</h3>
+      <ul id="about-sources"></ul>
+      <p class="small muted" id="about-thresholds"></p>
+    </section>
+    <section class="card">
+      <h2>Limitations</h2>
+      <ul>
+        <li>English only. Other languages return UNVERIFIABLE.</li>
+        <li>Offline mode only knows the bundled PolitiFact ratings (LIAR + FakeNewsNet, up to about 2018); recent events come back UNVERIFIABLE.</li>
+        <li>Fact-check ratings are applied only when the claim restates the checked statement; paraphrases and negations can be missed.</li>
+        <li>Stance detection is imperfect (about 0.73 accuracy on a FEVER sample), so read the evidence cards, not just the label.</li>
+        <li>Style signals reflect training-data writing style, not truth.</li>
+      </ul>
+    </section>
+    <section class="card">
+      <h2>Team</h2>
+      <p>Navishka Sharma, Naitik Kukreja, Naveen, Prateek Srivastava, Nikhil &mdash; B.Tech NLP project, Dept. of CSE (AI/ML), KIET Group of Institutions, 2026.</p>
+    </section>
+  </section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

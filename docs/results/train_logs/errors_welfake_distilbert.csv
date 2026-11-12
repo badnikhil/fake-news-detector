@@ -1,0 +1,62 @@
+id,true,pred,score,confidence,category,comment,nn_id
+welfake_10322,fake,real,0.291888,0.20811200000000002,opinion / first-person commentary,408 words; nearest train doc cos 0.17 (fake); first-person 2.2/100w,welfake_68011
+welfake_11186,fake,real,0.065845,0.434155,short / low-content,35 words; nearest train doc cos 0.11 (fake); first-person 0.0/100w,welfake_61479
+welfake_11684,fake,real,0.248534,0.25146599999999997,truncation,1117 words; nearest train doc cos 0.19 (fake); first-person 4.4/100w,welfake_13310
+welfake_13691,real,fake,0.995151,0.495151,truncation,836 words; nearest train doc cos 0.34 (fake); first-person 0.0/100w; fake-leaning cues: hillary,welfake_37389
+welfake_16036,fake,real,0.000714,0.499286,source cue points the wrong way,329 words; nearest train doc cos 0.13 (real); first-person 0.0/100w; real-leaning cues: breitbart,welfake_61980
+welfake_16789,fake,real,0.000245,0.499755,truncation,1488 words; nearest train doc cos 0.23 (fake); first-person 1.4/100w,welfake_25619
+welfake_1688,fake,real,0.00562,0.49438,style overlap (wire-style fake / tabloid-style real),416 words; nearest train doc cos 0.11 (fake); first-person 0.0/100w,welfake_11413
+welfake_21088,fake,real,0.003299,0.496701,style overlap (wire-style fake / tabloid-style real),478 words; nearest train doc cos 0.10 (fake); first-person 0.2/100w,welfake_15412
+welfake_21134,fake,real,0.000341,0.499659,style overlap (wire-style fake / tabloid-style real),338 words; nearest train doc cos 0.10 (real); first-person 0.6/100w,welfake_65253
+welfake_22169,fake,real,0.000448,0.499552,style overlap (wire-style fake / tabloid-style real),152 words; nearest train doc cos 0.34 (fake); first-person 0.0/100w,welfake_44621
+welfake_24159,fake,real,0.053601,0.446399,truncation,746 words; nearest train doc cos 0.12 (real); first-person 2.3/100w,welfake_47954
+welfake_258,fake,real,0.00033,0.49967,truncation,955 words; nearest train doc cos 0.29 (fake); first-person 0.6/100w,welfake_54805
+welfake_26291,fake,real,0.000947,0.499053,truncation,1095 words; nearest train doc cos 0.20 (fake); first-person 1.5/100w,welfake_6706
+welfake_26385,fake,real,0.085404,0.414596,style overlap (wire-style fake / tabloid-style real),349 words; nearest train doc cos 0.18 (fake); first-person 0.0/100w,welfake_27641
+welfake_26591,real,fake,0.989286,0.489286,truncation,787 words; nearest train doc cos 0.16 (fake); first-person 0.4/100w,welfake_20645
+welfake_29007,real,fake,0.984985,0.484985,truncation,929 words; nearest train doc cos 0.13 (real); first-person 0.1/100w,welfake_65779
+welfake_30305,fake,real,0.110088,0.389912,source cue points the wrong way,302 words; nearest train doc cos 0.10 (real); first-person 0.3/100w; real-leaning cues: breitbart,welfake_68261
+welfake_31287,real,fake,0.999849,0.499849,style overlap (wire-style fake / tabloid-style real),161 words; nearest train doc cos 0.40 (real); first-person 1.2/100w,welfake_12075
+welfake_31398,fake,real,0.016372,0.483628,source cue points the wrong way,497 words; nearest train doc cos 0.19 (real); first-person 0.2/100w; real-leaning cues: breitbart,welfake_63235
+welfake_31533,fake,real,0.010189,0.489811,truncation,710 words; nearest train doc cos 0.10 (fake); first-person 1.1/100w,welfake_58837
+welfake_33747,fake,real,3.8e-05,0.499962,truncation,1064 words; nearest train doc cos 0.11 (fake); first-person 3.2/100w,welfake_22441
+welfake_37013,fake,real,9.4e-05,0.499906,republished wire copy (site-level label),"289 words; nearest train doc cos 0.22 (fake); first-person 0.3/100w; real-leaning cues: reuters, said on wednesday",welfake_21010
+welfake_37401,fake,real,0.004755,0.495245,truncation,555 words; nearest train doc cos 0.15 (fake); first-person 0.0/100w,welfake_470
+welfake_37690,fake,real,0.001151,0.498849,opinion / first-person commentary,191 words; nearest train doc cos 0.12 (fake); first-person 2.6/100w,welfake_50776
+welfake_37889,fake,real,0.006004,0.493996,truncation,1307 words; nearest train doc cos 0.94 (fake); first-person 0.5/100w,welfake_45923
+welfake_38440,fake,real,0.001645,0.498355,style overlap (wire-style fake / tabloid-style real),162 words; nearest train doc cos 0.28 (real); first-person 0.0/100w,welfake_29159
+welfake_39370,fake,real,0.000115,0.499885,truncation,2256 words; nearest train doc cos 0.20 (fake); first-person 0.4/100w,welfake_54444
+welfake_41349,fake,real,0.001367,0.498633,style overlap (wire-style fake / tabloid-style real),208 words; nearest train doc cos 0.09 (real); first-person 0.0/100w,welfake_69083
+welfake_42157,real,fake,0.506874,0.006874000000000047,truncation,513 words; nearest train doc cos 0.15 (real); first-person 0.4/100w,welfake_48509
+welfake_44514,fake,real,0.000302,0.499698,style overlap (wire-style fake / tabloid-style real),375 words; nearest train doc cos 0.31 (real); first-person 0.3/100w,welfake_46445
+welfake_44599,real,fake,0.84759,0.34758999999999995,truncation,1138 words; nearest train doc cos 0.12 (fake); first-person 2.5/100w; fake-leaning cues: hillary,welfake_63829
+welfake_45278,fake,real,0.019625,0.480375,style overlap (wire-style fake / tabloid-style real),181 words; nearest train doc cos 0.14 (real); first-person 0.6/100w,welfake_47059
+welfake_45333,real,fake,0.996183,0.49618300000000004,truncation,638 words; nearest train doc cos 0.23 (real); first-person 3.0/100w,welfake_41975
+welfake_4553,fake,real,0.018125,0.481875,source cue points the wrong way,340 words; nearest train doc cos 0.13 (fake); first-person 1.5/100w; real-leaning cues: breitbart,welfake_55857
+welfake_45732,fake,real,0.138055,0.36194499999999996,short / low-content,45 words; nearest train doc cos 0.11 (fake); first-person 0.0/100w,welfake_31967
+welfake_46034,real,fake,0.993042,0.493042,opinion / first-person commentary,182 words; nearest train doc cos 0.14 (fake); first-person 3.3/100w,welfake_11974
+welfake_48922,fake,real,0.002415,0.497585,truncation,1240 words; nearest train doc cos 0.19 (real); first-person 0.0/100w,welfake_55129
+welfake_49302,fake,real,0.000135,0.499865,style overlap (wire-style fake / tabloid-style real),430 words; nearest train doc cos 0.12 (fake); first-person 0.5/100w,welfake_31364
+welfake_49933,fake,real,0.00019,0.49981,truncation,580 words; nearest train doc cos 0.14 (fake); first-person 4.8/100w,welfake_62773
+welfake_5039,fake,real,0.001455,0.498545,truncation,666 words; nearest train doc cos 0.36 (real); first-person 0.8/100w; real-leaning cues: reuters,welfake_35842
+welfake_53333,fake,real,5.9e-05,0.499941,style overlap (wire-style fake / tabloid-style real),348 words; nearest train doc cos 0.12 (fake); first-person 0.3/100w,welfake_4849
+welfake_56434,fake,real,0.380471,0.119529,truncation,975 words; nearest train doc cos 0.09 (fake); first-person 2.2/100w,welfake_12696
+welfake_56981,fake,real,0.007756,0.492244,style overlap (wire-style fake / tabloid-style real),366 words; nearest train doc cos 0.16 (real); first-person 0.3/100w,welfake_63432
+welfake_58881,real,fake,0.963334,0.463334,truncation,"2530 words; nearest train doc cos 0.17 (real); first-person 1.2/100w; fake-leaning cues: hillary, twitter",welfake_13224
+welfake_59199,fake,real,4.2e-05,0.499958,republished wire copy (site-level label),499 words; nearest train doc cos 0.54 (fake); first-person 1.4/100w; real-leaning cues: reuters,welfake_50326
+welfake_60781,fake,real,0.024284,0.475716,opinion / first-person commentary,510 words; nearest train doc cos 0.24 (fake); first-person 2.7/100w,welfake_59614
+welfake_62254,fake,real,0.00749,0.49251,short / low-content,41 words; nearest train doc cos 0.12 (fake); first-person 0.0/100w,welfake_31176
+welfake_6346,fake,real,0.005686,0.494314,truncation,695 words; nearest train doc cos 0.12 (fake); first-person 1.6/100w,welfake_47514
+welfake_63466,fake,real,0.474422,0.02557799999999999,truncation,1351 words; nearest train doc cos 0.21 (fake); first-person 0.1/100w; real-leaning cues: associated press,welfake_23903
+welfake_64053,fake,real,0.213213,0.286787,short / low-content,41 words; nearest train doc cos 0.15 (real); first-person 0.0/100w,welfake_58387
+welfake_65407,real,fake,0.999798,0.49979799999999996,truncation,1292 words; nearest train doc cos 0.13 (real); first-person 1.4/100w; fake-leaning cues: hillary,welfake_50133
+welfake_68251,fake,real,0.000117,0.499883,style overlap (wire-style fake / tabloid-style real),195 words; nearest train doc cos 0.25 (fake); first-person 1.0/100w,welfake_50505
+welfake_68466,real,fake,0.97658,0.47658,style overlap (wire-style fake / tabloid-style real),411 words; nearest train doc cos 0.64 (real); first-person 0.2/100w,welfake_24219
+welfake_69121,fake,real,8.9e-05,0.499911,truncation,699 words; nearest train doc cos 0.14 (fake); first-person 0.0/100w,welfake_69163
+welfake_69375,real,fake,0.708918,0.20891800000000005,opinion / first-person commentary,139 words; nearest train doc cos 0.21 (fake); first-person 2.9/100w,welfake_26045
+welfake_70193,real,fake,0.999946,0.499946,truncation,1064 words; nearest train doc cos 0.18 (real); first-person 1.1/100w,welfake_55503
+welfake_8702,fake,real,1.7e-05,0.499983,style overlap (wire-style fake / tabloid-style real),271 words; nearest train doc cos 0.89 (fake); first-person 1.1/100w,welfake_50149
+welfake_9440,fake,real,0.000376,0.499624,opinion / first-person commentary,325 words; nearest train doc cos 0.58 (fake); first-person 2.5/100w,welfake_39650
+welfake_9637,real,fake,0.997301,0.497301,style overlap (wire-style fake / tabloid-style real),225 words; nearest train doc cos 0.13 (real); first-person 0.0/100w,welfake_36378
+welfake_9649,fake,real,0.003112,0.496888,source cue points the wrong way,202 words; nearest train doc cos 0.19 (real); first-person 1.5/100w; real-leaning cues: said on monday,welfake_45700
+welfake_9677,fake,real,3.6e-05,0.499964,truncation,887 words; nearest train doc cos 0.16 (fake); first-person 0.2/100w,welfake_64791

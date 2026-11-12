@@ -1,0 +1,42 @@
+{
+  "dataset": "isot",
+  "model": "distilbert",
+  "artefact": "data/models/distilbert-welfake-v1",
+  "params": {
+    "max_len": 256,
+    "lr": 5e-05,
+    "epochs": 3,
+    "per_device_batch": 16,
+    "grad_accum": 1,
+    "effective_batch": 16,
+    "warmup_ratio": 0.1,
+    "weight_decay": 0.01,
+    "scheduler": "linear",
+    "fp16": true,
+    "optimizer": "adamw_torch",
+    "class_weights": null,
+    "input": "title [SEP] text (pair), head truncation"
+  },
+  "score": "softmax P(fake)",
+  "test": {
+    "accuracy": 0.9992014905509715,
+    "precision_macro": 0.9992216882274243,
+    "recall_macro": 0.9991606398657024,
+    "f1_macro": 0.999191090469042,
+    "precision_fake": 0.9993993993993994,
+    "recall_fake": 0.9987995198079231,
+    "f1_fake": 0.999099369558691,
+    "confusion": [
+      [
+        2090,
+        1
+      ],
+      [
+        2,
+        1664
+      ]
+    ],
+    "roc_auc": 0.9999994258822611,
+    "n": 3757
+  }
+}

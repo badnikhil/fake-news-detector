@@ -1,0 +1,19 @@
+# docker compose -f docker/compose.yml up --build      -> http://localhost:8000  (MODE=online by default)
+# MODE=offline docker compose -f docker/compose.yml up -> no network calls (see docs/deployment.md)
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: fakenews:latest
+    ports:
+      - "8000:8000"
+    environment:
+      MODE: ${MODE:-online}
+      GOOGLE_FACTCHECK_API_KEY: ${GOOGLE_FACTCHECK_API_KEY:-}   # optional; from your shell / .env, never committed
+    volumes:
+      - evidence-cache:/app/data/cache   # online evidence cache survives restarts
+    mem_limit: 4g
+    restart: unless-stopped
+volumes:
+  evidence-cache:

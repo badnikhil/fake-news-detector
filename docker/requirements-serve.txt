@@ -1,0 +1,26 @@
+# Serving-only dependencies for the Docker image (docker/Dockerfile). Exact pins = the versions the dev venv was
+# tested with on 2026-11-12 (scikit-learn must match the version that pickled data/models/*.joblib).
+# torch is installed separately from the CPU wheel index; lime is installed with --no-deps (lime_text needs only
+# numpy/scipy/scikit-learn; its scikit-image dependency is for image explanations).
+numpy==2.4.6
+pandas==2.3.3
+pyarrow==21.0.0
+scipy==1.17.1
+scikit-learn==1.9.1
+joblib==1.6.0
+langdetect==1.0.9
+requests==2.34.2
+pyyaml==6.0.3
+jinja2==3.1.6
+spacy==3.8.16
+transformers==4.57.6
+sentence-transformers==5.7.0
+faiss-cpu==1.15.1
+fastapi==0.162.0
+uvicorn==0.54.0
+httpx==0.28.1
+ddgs==9.16.1
+trafilatura==2.3.1
+htmldate==1.11.0
+dateparser==1.4.3
+pytest==8.4.2

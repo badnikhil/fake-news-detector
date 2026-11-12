@@ -50,3 +50,7 @@ ddgs>=9,<10
 trafilatura>=1.12,<3
 htmldate>=1.9,<2
 dateparser>=1.2,<2
+
+# --- explanations + front-end (ESE) ---
+lime>=0.2.0.1,<0.3   # only lime.lime_text is used; the Docker image installs it --no-deps (skips scikit-image)
+jinja2>=3.1,<4

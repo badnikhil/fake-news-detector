@@ -9,7 +9,7 @@ SPACY_MODEL_URL ?= https://github.com/explosion/spacy-models/releases/download/e
 NOT_YET = @echo "make $@: not implemented until MSE2/ESE"
 
 .PHONY: setup download data index train-baselines tune-baselines train-distilbert train-liar train models \
-        eval-models eval-e2e eval run test paper docker-build docker-run nb-run lint clean-data help
+        eval-models eval-e2e tune-fusion eval-temporal eval run test paper docker-build docker-run nb-run lint clean-data help
 
 help:
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  %-16s %s\n", $$1, $$2}'
@@ -61,17 +61,22 @@ train: train-baselines train-distilbert train-liar ## umbrella: all three train-
 models: train index ## umbrella: train + index
 eval-models: ## test metrics + CM/ROC/sweep figures (+ DistilBERT if data/models/distilbert-welfake-v1/ exists), classifier_table.md, error_analysis.md, cross_dataset.md (~15 min CPU; needs train-baselines)
 	$(PY) -u -m src.eval.eval_models 2>&1 | tee docs/results/train_logs/eval_models.log
-eval-e2e: ## end-to-end 5-class evaluation on the Live Claims Set (ESE)
-	$(NOT_YET)
+eval-e2e: ## Live Claims eval split offline+online, ablation, latency, case studies -> docs/results/{e2e,ablation,latency,case_studies}.md (network; cached reruns ~15 min CPU)
+	nice -n 19 $(PY) -u -m src.eval.eval_e2e all 2>&1 | tee docs/results/train_logs/eval_e2e.log
+tune-fusion: ## fusion-threshold grid on the 30 dev Live Claims (online, cached) -> docs/results/fusion_thresholds.md
+	nice -n 19 $(PY) -u -m src.eval.eval_e2e run --split dev --mode online
+	$(PY) -m src.eval.eval_e2e tune
+eval-temporal: ## O5 old-news flag on data/temporal_set/temporal_set.csv (online) -> docs/results/temporal.md
+	nice -n 19 $(PY) -u -m src.eval.eval_e2e temporal
 eval: eval-models eval-e2e ## everything
 run: ## FastAPI on :8000 (MODE=offline make run = no network; CPU, < 4 GB RAM)
 	$(PY) -m uvicorn src.api.main:app --host 127.0.0.1 --port $${PORT:-8000}
 paper: ## build the IEEE paper -> paper/main.pdf (delegates to paper/Makefile: latexmk, tectonic fallback)
 	$(MAKE) -C paper
-docker-build: ## build the Docker image (ESE)
-	$(NOT_YET)
-docker-run: ## run the Docker image (ESE)
-	$(NOT_YET)
+docker-build: ## build the CPU-only image fakenews:latest (models + index baked in; needs make index + data/models/) -> docs/deployment.md
+	nice -n 19 docker build -f docker/Dockerfile -t fakenews:latest .
+docker-run: ## run fakenews:latest on :8000 (MODE=offline make docker-run for the no-network demo; GOOGLE_FACTCHECK_API_KEY passed through if set)
+	docker run --rm -p $${PORT:-8000}:8000 -e MODE=$${MODE:-online} $${GOOGLE_FACTCHECK_API_KEY:+-e GOOGLE_FACTCHECK_API_KEY} fakenews:latest
 
 clean-data: ## remove processed/splits (raw is kept)
 	rm -f data/processed/*.parquet data/splits/*.csv

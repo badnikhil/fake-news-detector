@@ -4,6 +4,8 @@ subtitle: "Fake News & Misinformation Detector — End-Semester Examination (Wor
 date: "v1.0 — 27 August 2026 (prepared in advance; fill every `[fill]` before the ESE)"
 ---
 
+> **Status (2026-11-12, paper/ESE-doc agent).** Measured (numbers from `docs/results/`): DistilBERT full train (lr 5e-5, max_len 256) WELFake **test macro-F1 0.9898** (acc 0.9900, AUC 0.9995) → **O1 met**; ISOT 0.9992 (in-domain). Cross-dataset (classical only): SVM W∖I→ISOT 0.6611, ISOT→W∖I 0.5480. End-to-end on the 65 held-out Live Claims (v2, leakage guard on): **online acc 0.2000 / macro-F1 0.1667 / UNVERIFIABLE precision 0.0943**, offline 0.0923 / 0.0343 → **O6 NOT met**; **O3 met** (100 % ≥ 1 online passage); temporal set 50 % correct, flag never fired → **O5 NOT met**; stance FEVER 0.7267 → **O4 NOT met** (carried from MSE2). Leakage finding: v1 (0.1854) used the item's own fact-check page as evidence for 34/65 items; with those removed 0.1260; guard added in v2. Fusion re-tuned on dev + temporal controls: tau 0.8, min_evidence 3. Latency (laptop CPU, median): offline 40 ms, online cached 2,890 ms, uncached 11,032 ms; peak RSS 2,373.8 MB. Paper `paper/main.tex` final draft: abstract numbers, e2e/ablation/temporal/latency/case-study results, comparison table (11 rows) + limitations, 25 references, **10 pages** (tectonic). Not done / not ours: double labelling + κ, FR-12 request logging, `notebooks/06_e2e_eval.ipynb`, UI screenshots, Turnitin, venue/arXiv submission, HF Space deploy (user), Render lite (does not fit 512 MB), Firefox test, screenshots. Docker (measured, `docs/deployment.md`): image ≈ 3.1 GB, offline container peak RSS 1.33 GB, gallery 5/5 with `--network none`, 23 tests pass inside. DistilBERT max_len 512 arm and DistilBERT cross-dataset: not run.
+
 # 1. Title Block & Marking Scheme
 
 | Field | Value |
@@ -69,18 +71,18 @@ Full pipeline online and offline: input → `ingest` → `preprocess` → `claim
 
 ## 3.3 Acceptance criteria / Definition of Done
 
-- [ ] `make eval` regenerates `docs/results/e2e.md`, `ablation.md`, `latency.md` from a fresh clone (seed 42).
-- [ ] Live Claims Set has ≥ 90 items, every item double-labelled, Cohen's κ reported, ≥ 15 per class where possible.
-- [ ] **End-to-end 5-class macro-F1 ≥ 0.55** (objective O6); per-class precision/recall table present.
-- [ ] **UNVERIFIABLE precision ≥ 0.70** (O6): when we say "cannot tell", we are right ≥ 70 % of the time.
-- [ ] Online evidence coverage: ≥ 1 passage for ≥ 85 % of Live Claims items (O3); offline index answers in < 2 s.
-- [ ] Ablation table shows the expected ordering: classifier-only < + evidence & stance < + temporal (macro-F1), with offline-only reported honestly.
-- [ ] Temporal test set: old-news flag precision and recall reported; **≥ 80 % correct** on 30 items (O5).
-- [ ] Stance accuracy ≥ 85 % (3-way) on the FEVER dev subset (O4) — carried from MSE2.
-- [ ] One worked case study per class (§3.4) with the exact input, the rule that fired, and the produced JSON; 2 failure cases discussed.
-- [ ] Edge-case table (§3.6) verified by hand; none of the cases returns HTTP 500.
-- [ ] `pytest tests/` passes; `test_fusion.py` has one test per rule R0–R9 and one for the R8 tie-break in both directions.
-- [ ] Every request is logged (input hash, verdict, latency) — FR-12 — and the latency table is built from those logs.
+- [ ] `make eval` regenerates `docs/results/e2e.md`, `ablation.md`, `latency.md` from a fresh clone (seed 42). — *`make eval-e2e` is implemented and produced all three files; a fresh-clone run was not verified, and online numbers depend on live search results (cache `data/cache/evidence.sqlite`).*
+- [ ] Live Claims Set has ≥ 90 items, every item double-labelled, Cohen's κ reported, ≥ 15 per class where possible. — *95 items, but single-labelled (label = fact-checker rating), no κ; UNVERIFIABLE has 9. Double labelling / κ is team-only work.*
+- [ ] **End-to-end 5-class macro-F1 ≥ 0.55** (objective O6); per-class precision/recall table present. — *NOT met: 0.1667 online, 0.0343 offline (v2); per-class table is in `e2e.md` and the paper.*
+- [ ] **UNVERIFIABLE precision ≥ 0.70** (O6): when we say "cannot tell", we are right ≥ 70 % of the time. — *NOT met: 0.0943 (53 of 65 answers are UNVERIFIABLE).*
+- [x] Online evidence coverage: ≥ 1 passage for ≥ 85 % of Live Claims items (O3); offline index answers in < 2 s. — *100 % of eval items; offline end-to-end median 40 ms / p90 164 ms (`latency.md`).*
+- [ ] Ablation table shows the expected ordering: classifier-only < + evidence & stance < + temporal (macro-F1), with offline-only reported honestly. — *Table done (`ablation.md`), but the ordering holds only for the first step (0.1328 < 0.1667); + temporal = 0.1667 (no change). Reported as such.*
+- [ ] Temporal test set: old-news flag precision and recall reported; **≥ 80 % correct** on 30 items (O5). — *Reported (`temporal.md`): flag never fired, recall 0, precision undefined, 50 % correct → O5 NOT met. Set lives in `data/temporal_set/`.*
+- [ ] Stance accuracy ≥ 85 % (3-way) on the FEVER dev subset (O4) — carried from MSE2. — *NOT met: 0.7267 (zero-shot).*
+- [x] One worked case study per class (§3.4) with the exact input, the rule that fired, and the produced JSON; 2 failure cases discussed. — *`docs/results/case_studies.md` (no screenshots); only the FAKE and UNVERIFIABLE inputs got their intended verdict.*
+- [ ] Edge-case table (§3.6) verified by hand; none of the cases returns HTTP 500. — *16 cases run automatically (TestClient), 0 × 5xx (`case_studies.md`); the by-hand check is still open (team).*
+- [x] `pytest tests/` passes; `test_fusion.py` has one test per rule R0–R9 and one for the R8 tie-break in both directions.
+- [ ] Every request is logged (input hash, verdict, latency) — FR-12 — and the latency table is built from those logs. — *Not done; latency comes from the `timings_ms` response field instead.*
 
 ## 3.4 Worked case studies (one per class)
 
@@ -163,14 +165,16 @@ Inputs are the master-doc §8 examples; fill the output column from the actual r
 
 ## 4.3 Acceptance criteria / Definition of Done
 
-- [ ] All three screens work in Chrome and Firefox; the Result screen renders every field of the `/analyze` JSON (verdict, confidence, reason, claims, evidence, temporal, classifier, uncertainty, rule_fired).
-- [ ] Every result shows: rule fired, ≥ 1 evidence card *or* explicit "no evidence found", an uncertainty sentence, and the dates panel.
-- [ ] LIME highlights appear for article/headline input in ≤ 3 s extra (cached on repeat).
-- [ ] Temporal warning shows both dates and the gap in months (US-4).
-- [ ] Example gallery has ≥ 5 inputs (one per class) that work in offline mode.
-- [ ] "Download JSON" returns the full result object.
-- [ ] Verdict readable without colour; keyboard-only run-through possible; phone layout does not scroll horizontally.
-- [ ] Optional: Ollama paraphrase toggle (stretch) — raw template text always kept.
+- [ ] All three screens work in Chrome and Firefox; the Result screen renders every field of the `/analyze` JSON (verdict, confidence, reason, claims, evidence, temporal, classifier, uncertainty, rule_fired). — *verified in headless Chrome only; Firefox not tested.*
+- [x] Every result shows: rule fired, ≥ 1 evidence card *or* explicit "no evidence found", an uncertainty sentence, and the dates panel. — *per the UI/Docker agent (2026-11-12, `docs/deployment.md`, agent-docs).*
+- [x] LIME highlights appear for article/headline input in ≤ 3 s extra (cached on repeat). — *DistilBERT LIME, 80 samples: headlines 0.55–0.78 s, gallery articles 2.07–2.12 s; repeats cached (0 ms).*
+- [ ] Temporal warning shows both dates and the gap in months (US-4). — *dates panel implemented, but the old-news warning can only be shown online (offline evidence has no dates); not demonstrated.*
+- [x] Example gallery has ≥ 5 inputs (one per class) that work in offline mode. — *REAL R7 · FAKE R2 · PARTIALLY TRUE R5 · MISLEADING R4 · UNVERIFIABLE R1, also in the network-disabled container.*
+- [x] "Download JSON" returns the full result object. — *analyze result + `lime`; per the UI/Docker agent (2026-11-12, `docs/deployment.md`, agent-docs).*
+- [x] Verdict readable without colour; keyboard-only run-through possible; phone layout does not scroll horizontally. — *icon + text verdict, WAI-ARIA keyboard tabs, phone width without horizontal scroll checked in headless Chrome; per the UI/Docker agent (2026-11-12, `docs/deployment.md`, agent-docs).*
+- [ ] Optional: Ollama paraphrase toggle (stretch) — raw template text always kept. — *not built (stretch).*
+
+*2026-11-12: UI items ticked from the UI/Docker agent's verification (headless Chrome); Firefox untested; no `docs/screenshots/` yet.*
 
 ## 4.4 How the examiner can verify it in ≤ 3 minutes
 
@@ -215,15 +219,17 @@ One Docker image (`python:3.11-slim`, CPU-only torch wheel, ≈ 2.5 GB) used for
 
 ## 5.3 Acceptance criteria / Definition of Done
 
-- [ ] `docker compose -f docker/compose.yml up --build` on a clean Linux/Windows/macOS machine serves the UI on port 8000.
-- [ ] Public HF Space URL responds to `GET /health` with `status: ok` and serves the UI; warmed up the morning of the ESE (it sleeps after inactivity).
-- [ ] Render `MODE=lite` URL responds to `/health` (backup; not the main demo).
-- [ ] `GOOGLE_FACTCHECK_API_KEY` set only as an HF secret / env var; `grep -r "AIza" src/ app/` returns nothing.
-- [ ] `/health` reports the model versions; `/config` reports `mode`, `sources`, `tau = 0.6`, `N_months = 6`.
-- [ ] `MODE=offline` container returns a verdict for every example-gallery input with the network disabled (`docker network disconnect` or Wi-Fi off).
-- [ ] Peak RSS of the running container ≤ 4 GB on CPU; image size and model footprint recorded in `docs/deployment.md`.
-- [ ] Median latency on the Space: ≤ 15 s online, ≤ 5 s offline (O7).
-- [ ] `pytest tests/test_api.py` green inside the container.
+- [x] `docker compose -f docker/compose.yml up --build` on a clean Linux/Windows/macOS machine serves the UI on port 8000. — *verified on the dev laptop (Linux) only, not a clean Windows/macOS machine; image ≈ 3.1 GB, build 6 min.*
+- [ ] Public HF Space URL responds to `GET /health` with `status: ok` and serves the UI; warmed up the morning of the ESE (it sleeps after inactivity). — *not deployed; the user deploys (steps in `docs/deployment.md`).*
+- [ ] Render `MODE=lite` URL responds to `/health` (backup; not the main demo). — *not deployed; `MODE=lite` still loads DeBERTa (≈ 1.3 GB RSS) and does not fit Render free 512 MB without a pipeline change.*
+- [x] `GOOGLE_FACTCHECK_API_KEY` set only as an HF secret / env var; `grep -r "AIza" src/ app/` returns nothing. — *read from env only; grep empty (2026-11-12); no key was used in the evaluation.*
+- [x] `/health` reports the model versions; `/config` reports `mode`, `sources`, `tau = 0.8`, `N_months = 6` (tau re-tuned 0.6 → 0.8, min_evidence 2 → 3 on 2026-11-12). — *covered by `tests/test_api.py` (`test_health_reports_versions`, `test_config_reports_sources_and_thresholds`).*
+- [x] `MODE=offline` container returns a verdict for every example-gallery input with the network disabled (`docker network disconnect` or Wi-Fi off). — *`--network none`, 5/5 gallery verdicts as on the host.*
+- [x] Peak RSS of the running container ≤ 4 GB on CPU; image size and model footprint recorded in `docs/deployment.md`. — *1.33 GB peak (offline, after gallery ×2 + LIME); image ≈ 3.1 GB; models ≈ 0.94 GB.*
+- [ ] Median latency on the Space: ≤ 15 s online, ≤ 5 s offline (O7). — *no Space yet; in the local container offline median 0.50 s (0.22 s repeat); laptop online median 11,032 ms uncached / 2,890 ms cached (`latency.md`).*
+- [x] `pytest tests/test_api.py` green inside the container. — *23 passed (`test_api.py` + `test_explain.py`) under `--network none`.*
+
+*2026-11-12: Docker items ticked from `docs/deployment.md`; HF Space / Render deploy is the user's step.*
 
 ## 5.4 How the examiner can verify it in ≤ 3 minutes
 
@@ -275,12 +281,12 @@ Final §VI Results and §VII Discussion of `paper/main.tex`, every number genera
 
 ## 6.3 Acceptance criteria / Definition of Done
 
-- [ ] Every number in §VI equals the corresponding value in `docs/results/` (spot-check 5 at random).
-- [ ] Tables 1–8 and Figures 1–5 present, numbered, captioned, referenced in the text.
-- [ ] Error analysis paragraph cites ≥ 3 concrete misclassified examples with the reason.
-- [ ] Limitations paragraph lists ≥ 5 items honestly (see §12.2 of this file).
-- [ ] Cross-dataset drop and leakage audit discussed as a finding, not hidden.
-- [ ] `make paper` (latexmk) builds `paper/main.pdf` without warnings about missing references/figures.
+- [x] Every number in §VI equals the corresponding value in `docs/results/` (spot-check 5 at random). — *all Results numbers copied from `docs/results/*.md` (2026-11-12).*
+- [ ] Tables 1–8 and Figures 1–5 present, numbered, captioned, referenced in the text. — *Paper has 12 tables and 4 figures, all referenced; missing vs. this plan: claim-identification P@3/κ (not measured), latency as a table (given in text), e2e confusion-matrix figure (per-class table instead), UI screenshot.*
+- [x] Error analysis paragraph cites ≥ 3 concrete misclassified examples with the reason. — *welfake_8702, welfake_9677, Chandrayaan-3, LC003, Ghaziabad (v1).*
+- [x] Limitations paragraph lists ≥ 5 items honestly (see §12.2 of this file). — *7 items.*
+- [x] Cross-dataset drop and leakage audit discussed as a finding, not hidden. — *plus the e2e evidence-leakage finding (v1 0.1854 → 0.1260).*
+- [x] `make paper` (latexmk) builds `paper/main.pdf` without warnings about missing references/figures. — *built with tectonic (latexmk not installed); no undefined refs/citations, no overfull boxes; 10 pages.*
 
 ## 6.4 How the examiner can verify it in ≤ 3 minutes
 
@@ -290,7 +296,7 @@ Open `paper/main.pdf` §VI; pick any number in Table 5; open `docs/results/e2e.m
 
 | Question | Model answer |
 |---|---|
-| Your best result is what? | DistilBERT macro-F1 `[fill]` on WELFake test (target ≥ 0.95); e2e 5-class macro-F1 `[fill]` (target ≥ 0.55). |
+| Your best result is what? | DistilBERT macro-F1 0.9898 on WELFake test (target ≥ 0.95, met); e2e 5-class macro-F1 0.1667 online (target ≥ 0.55, not met). |
 | Why is there such a gap between 0.95 and 0.55? | Different tasks: in-domain binary style classification vs. open-world 5-class fact verification on fresh claims with live retrieval. |
 | What does the confusion matrix tell you? | Most confusion is PARTIALLY TRUE ↔ MISLEADING ↔ REAL; FAKE vs. REAL is rarely confused when fact-check evidence exists `[adjust to actual]`. |
 | Which component is the bottleneck? | Retrieval: when no reliable evidence is found, everything downstream is moot; that is why coverage (O3) is reported separately. |
@@ -309,11 +315,11 @@ Master doc §19 table filled with our measured numbers and discussed in `paper/m
 | PolitiFact / Snopes / AltNews / BOOM (manual) | Claims chosen by editors | 6-point / free text | Yes (best) | Yes (best) | Yes (manual) | n/a | No (content) | Theirs: accuracy, gold standard (our labels come from them). Ours: instant, any input |
 | Google Fact Check Explorer | Keywords | Fact-checker ratings | Links | No | No | No | No | Ours works when no fact-check exists (NLI over news); theirs only surfaces existing checks |
 | NewsGuard (extension) | Domain | Site trust score | No | Partial | No | No | No | Ours: claim-level; theirs: site-level only |
-| Wang 2017 (LIAR) | Statement | 6-way | No | No | No | Yes | Yes (data) | ~27 % 6-way text-only; our LIAR 3-way head `[fill]` |
-| FakeBERT (Kaliyar et al., 2021) | Article | 2-way | No | No | No | Yes | Partly | ~98.9 % in-domain; our DistilBERT `[fill]` in-domain, `[fill]` cross-dataset — we show in-domain numbers do not transfer |
-| FEVER baselines / KGAT | Claim | 3-way | Yes (Wikipedia) | Partial | No | Yes | Yes | ~32–70 % FEVER score; our stance model `[fill]` accuracy on FEVER dev subset |
-| ISOT-based papers (Ahmed et al., 2017) | Article | 2-way | No | No | No | Yes | Partly | ~92–99 %; our artefact-only classifier gets `[fill]` → leakage |
-| **This project** | Headline / article / URL | **5-way incl. UNVERIFIABLE** | **Yes, with dates + tier** | **Yes (rule + LIME + uncertainty)** | **Yes** | **Yes** | **Yes** | e2e macro-F1 `[fill]`; honest uncertainty; runs on a laptop |
+| Wang 2017 (LIAR) | Statement | 6-way | No | No | No | Yes | Yes (data) | ~27 % 6-way text-only; our LIAR 3-way head 0.4669 acc, 6-way twin 0.2689 |
+| FakeBERT (Kaliyar et al., 2021) | Article | 2-way | No | No | No | Yes | Partly | ~98.9 % in-domain; our DistilBERT 0.9898 macro-F1 in-domain; cross-dataset only for TF-IDF (SVM 0.6611 / 0.5480) — we show in-domain numbers do not transfer |
+| FEVER baselines / KGAT | Claim | 3-way | Yes (Wikipedia) | Partial | No | Yes | Yes | ~32–70 % FEVER score; our stance model 0.7267 accuracy on FEVER dev subset (zero-shot) |
+| ISOT-based papers (Ahmed et al., 2017) | Article | 2-way | No | No | No | Yes | Partly | ~92–99 %; our artefact-only classifier gets 0.9973 on raw ISOT → leakage |
+| **This project** | Headline / article / URL | **5-way incl. UNVERIFIABLE** | **Yes, with dates + tier** | **Yes (rule + LIME + uncertainty)** | **Yes** | **Yes** | **Yes** | e2e macro-F1 0.1667 online / 0.0343 offline; honest uncertainty; runs on a laptop |
 
 ## 7.2 Artefacts
 
@@ -325,10 +331,10 @@ Master doc §19 table filled with our measured numbers and discussed in `paper/m
 
 ## 7.3 Acceptance criteria / Definition of Done
 
-- [ ] Table has ≥ 7 rows across all four families (manual fact-checkers, search tools, style classifiers, evidence-based systems).
-- [ ] Every "their accuracy" cell has a citation; every "our" cell is a number from `docs/results/`.
-- [ ] Discussion states clearly where existing systems beat us (manual accuracy; in-domain binary accuracy) — no over-claiming.
-- [ ] The three "we do what they cannot" points are explicit: verdict when no fact-check exists, temporal check, UNVERIFIABLE + uncertainty.
+- [x] Table has ≥ 7 rows across all four families (manual fact-checkers, search tools, style classifiers, evidence-based systems). — *paper Table XII, 10 external rows + ours.*
+- [x] Every "their accuracy" cell has a citation; every "our" cell is a number from `docs/results/`. — *manual fact-checkers and Google Fact Check Explorer have qualitative cells only (no number to cite).*
+- [x] Discussion states clearly where existing systems beat us (manual accuracy; in-domain binary accuracy) — no over-claiming.
+- [x] The three "we do what they cannot" points are explicit: verdict when no fact-check exists, temporal check, UNVERIFIABLE + uncertainty. — *with the honest caveats: temporal check never fired; UNVERIFIABLE precision 0.0943.*
 
 ## 7.4 How the examiner can verify it in ≤ 3 minutes
 
@@ -349,13 +355,13 @@ Open §VII, read the table; ask for one row's citation in `refs.bib`; ask the Go
 
 ## 8.1 IEEE formatting checklist
 
-- [ ] IEEEtran conference template (Overleaf "IEEE Conference Template"), `\documentclass[conference]{IEEEtran}`, two-column.
-- [ ] **≤ 6 pages** target incl. references (master doc §20 allows 6–8; most IEEE conferences charge for extra pages — confirm with the chosen venue).
-- [ ] Title, author block with department/affiliation/e-mail (per venue's double-blind rule), abstract 150–200 words, index terms.
-- [ ] Section numbering I–VIII as in master doc §20; all figures/tables numbered and referenced in text; captions above tables, below figures.
-- [ ] References in IEEE style via BibTeX (`paper/refs.bib`, `\bibliographystyle{IEEEtran}`), ≥ 20 entries, every dataset and tool cited.
-- [ ] No orphan headings, no overfull boxes, vector figures (`pipeline.pdf`), fonts embedded (`pdffonts main.pdf`).
-- [ ] PDF/A or plain PDF as the venue requires; file named `paper/main.pdf`.
+- [x] IEEEtran conference template (Overleaf "IEEE Conference Template"), `\documentclass[conference]{IEEEtran}`, two-column.
+- [ ] **≤ 6 pages** target incl. references (master doc §20 allows 6–8; most IEEE conferences charge for extra pages — confirm with the chosen venue). — *currently 10 pages; trimming depends on the venue (team decision).*
+- [x] Title, author block with department/affiliation/e-mail (per venue's double-blind rule), abstract 150–200 words, index terms. — *abstract ≈ 200 words.*
+- [ ] Section numbering I–VIII as in master doc §20; all figures/tables numbered and referenced in text; captions above tables, below figures. — *figures/tables numbered, referenced, captions placed correctly; but the paper has 7 sections (I–VII) because the team removed "Experimental Setup".*
+- [ ] References in IEEE style via BibTeX (`paper/refs.bib`, `\bibliographystyle{IEEEtran}`), ≥ 20 entries, every dataset and tool cited. — *25 entries (team cap), all datasets cited; some tools (spaCy, trafilatura, scikit-learn, ddgs) are not cited because of the 25-reference cap.*
+- [x] No orphan headings, no overfull boxes, vector figures (`pipeline.pdf`), fonts embedded (`pdffonts main.pdf`). — *0 overfull boxes, 21/21 fonts embedded (2026-11-12).*
+- [ ] PDF/A or plain PDF as the venue requires; file named `paper/main.pdf`. — *plain PDF at `paper/main.pdf`; venue not chosen yet (team).*
 
 ## 8.2 Plagiarism policy
 
@@ -363,6 +369,8 @@ Open §VII, read the table; ask for one row's citation in `refs.bib`; ask the Go
 - [ ] Turnitin check #1 in week 14 (16–22 Nov), #2 in week 16 (30 Nov – 6 Dec), **target < 10 % similarity excluding references and quotes**.
 - [ ] If above 10 %: identify the flagged passages in the report, rewrite in own words (never synonym-swap), remove template boilerplate phrases, re-run, keep both reports.
 - [ ] Final report saved as `paper/plagiarism_report.pdf`; the similarity index quoted on the title slide.
+
+*Team-only: Turnitin checks are run by the team / guide.*
 
 ## 8.3 Artefacts and verification
 
@@ -406,6 +414,8 @@ Examiner verification (≤ 3 min): flip through the PDF for two-column layout, n
 - [ ] Submission made before the ESE date; receipt PDF saved; paper ID recorded.
 - [ ] arXiv submission made (or endorsement request pending with proof) — `[fill arXiv ID]`.
 - [ ] `docs/paper.md` filled; the submitted PDF is identical to `paper/main.pdf`.
+
+*Team-only: venue choice, conference and arXiv submission are done by the team after guide sign-off.*
 
 ## 9.4 Verification and likely viva questions
 

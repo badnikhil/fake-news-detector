@@ -23,10 +23,11 @@ md("""# 03 — Fine-tuned DistilBERT (WELFake sweep) and the LIAR 3-way head (MS
 
 This notebook **does not train**: it loads what `make train-distilbert` / `make train-liar` saved on the RTX 2050.
 
-**Status (2026-10-26):** the WELFake sweep was **stopped on user decision after 3 of 6 configs** (lr {2e-5, 3e-5, 5e-5} at
-max_len 256). The three max_len 512 runs and the full-train retrain did not run and are deferred to ESE. Sweep runs keep no weights, so
-there is **no DistilBERT WELFake checkpoint and no DistilBERT test number**. The served classifier stays TF-IDF and MSE2 objective O1
-is not checked. The LIAR 3-way head ran completely.
+**Status (ESE, 2026-11-12):** the WELFake sweep was **stopped on user decision after 3 of 6 configs** (lr {2e-5, 3e-5, 5e-5} at
+max_len 256, 2026-10-26); the three max_len 512 runs stay deferred. The best completed run (val macro-F1) was retrained on the
+**full** WELFake train split (48,639 rows) at max_len 256 -> `data/models/distilbert-welfake-v1/` (best epoch only) and evaluated on the
+WELFake and ISOT test splits (numbers in the sweep table below, objective O1 = WELFake test macro-F1 >= 0.95). `/classify` now serves
+this checkpoint. The LIAR 3-way head ran completely.
 
 Code: `src/models/distilbert.py`, `src/models/liar_head.py`.""")
 
@@ -62,12 +63,13 @@ pd.DataFrame(rows).sort_values("best_val_macro_F1", ascending=False).reset_index
 code("""display(Markdown(D.SWEEP_MD.read_text().split("\\n\\n", 2)[2]))
 display(Image(str(C.FIGURES_DIR / "sweep_distilbert_lr.png")))""")
 
-md("""## 2. Training curve of the best completed sweep run
+md("""## 2. Training curve of the full-train run
 
-There was no full-train retrain, so `docs/figures/train_distilbert.png` shows the best **20k-subset** run: train loss logged every 50 steps
-plus the per-epoch mean, val loss, and val macro-F1 per epoch with the best epoch marked.""")
+`docs/figures/train_distilbert.png` shows the **full-train** run (48,639 rows): train loss logged every 50 steps plus the per-epoch mean,
+val loss, and val macro-F1 per epoch with the best epoch marked. Its test numbers are in the "Held-out test" table above.""")
 
-code("""best = max(recs, key=lambda r: r["best_val_macro_f1"])
+code("""best = json.loads(D.FINAL_LOG.read_text())
+print("config:", best["config"], "| minutes:", best["minutes"], "| peak GPU GiB:", best["peak_gpu_mem_gib"])
 display(pd.DataFrame(best["per_epoch"]).set_index("epoch"))
 display(Image(str(C.FIGURES_DIR / "train_distilbert.png")))""")
 
@@ -101,7 +103,7 @@ md("""## Summary
 
 * The completed sweep runs and the LIAR head can be reproduced with `make train-distilbert` / `make train-liar` (seed 42; the logs in
   `docs/results/train_logs/` record the full config, hardware and wall-clock). `--sweep` skips runs whose log already exists, so re-running
-  continues with the max_len 512 configs (deferred to ESE).
+  continues with the max_len 512 configs (still deferred); `--full --eval-test --render` retrains the best completed run.
 * Tables: `docs/results/distilbert_sweep.md`, `docs/results/liar_head.md`; figures: `docs/figures/train_distilbert.png`,
   `docs/figures/sweep_distilbert_lr.png`, `docs/figures/train_liar.png`.""")
 

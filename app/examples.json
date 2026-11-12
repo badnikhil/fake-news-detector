@@ -1,0 +1,34 @@
+[
+ {
+  "expect": "REAL",
+  "rule": "R7",
+  "input_type": "headline",
+  "text": "The United States has the highest corporate tax rate in the world."
+ },
+ {
+  "expect": "FAKE",
+  "rule": "R2",
+  "input_type": "headline",
+  "text": "Phoenix, Arizona, is the No. 2 kidnapping capital of the world."
+ },
+ {
+  "expect": "PARTIALLY TRUE",
+  "rule": "R5",
+  "input_type": "article",
+  "title": "The United States has the highest corporate tax rate in the world.",
+  "text": "Lawmakers in Washington said on Monday that the United States has the highest corporate tax rate in the world, at 35 percent. The senator also said that Martin Luther King Jr. was a Republican. Supporters cheered at the rally."
+ },
+ {
+  "expect": "MISLEADING",
+  "rule": "R4",
+  "input_type": "article",
+  "title": "The United States has the highest corporate tax rate in the world.",
+  "text": "A new OECD report released on Monday found that the United States has one of the lowest corporate tax rates among developed economies. Analysts said the effective rate paid by most firms is well below the average of other rich countries."
+ },
+ {
+  "expect": "UNVERIFIABLE",
+  "rule": "R1",
+  "input_type": "headline",
+  "text": "The bakery on Maple Street in Springfield ran out of croissants at 9 am last Tuesday."
+ }
+]

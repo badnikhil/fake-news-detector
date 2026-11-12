@@ -1,0 +1,13 @@
+# Allow-list: the image needs only the serving code, the front-end, the offline index and the served classifier.
+*
+!docker/requirements-serve.txt
+!src/
+!app/
+!tests/test_api.py
+!tests/test_explain.py
+!data/index/
+!data/models/distilbert-welfake-v1/
+!data/models/tfidf_lr_welfake_v0.joblib
+**/__pycache__
+data/models/distilbert-welfake-v1/trainer_state.json
+data/models/distilbert-welfake-v1/training_args.json

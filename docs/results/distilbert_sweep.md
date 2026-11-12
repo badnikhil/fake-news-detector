@@ -7,16 +7,24 @@
 | sweep 20k (20000) | 2e-05 | 256 | 16 × 1 | 3 | 0.1 | 42 | **0.9869** | 0.9872 | 0.9792 → 0.9807 → 0.9869 | 14.8 | 1.68 | NVIDIA GeForce RTX 2050 |
 | sweep 20k (20000) | 3e-05 | 256 | 16 × 1 | 3 | 0.1 | 42 | **0.9863** | 0.9865 | 0.9826 → 0.9854 → 0.9863 | 14.3 | 1.68 | NVIDIA GeForce RTX 2050 |
 | **best completed** sweep 20k (20000) | 5e-05 | 256 | 16 × 1 | 3 | 0.1 | 42 | **0.9871** | 0.9873 | 0.9792 → 0.9870 → 0.9871 | 15.2 | 1.69 | NVIDIA GeForce RTX 2050 |
-| sweep 20k | 2e-05 | 512 | 8 × 2 | not run (stopped on user decision, 2026-10-26) — deferred to ESE |  |  |  |  |  |  |  |  |
-| sweep 20k | 3e-05 | 512 | 8 × 2 | not run (stopped on user decision, 2026-10-26) — deferred to ESE |  |  |  |  |  |  |  |  |
-| sweep 20k | 5e-05 | 512 | 8 × 2 | not run (stopped on user decision, 2026-10-26) — deferred to ESE |  |  |  |  |  |  |  |  |
-| full-train retrain of the winner (48,639) | — | — | — | not run (stopped on user decision, 2026-10-26) — deferred to ESE |  |  |  |  |  |  |  |  |
+| sweep 20k | 2e-05 | 512 | 8 × 2 | not run (stopped on user decision, 2026-10-26; the max_len 512 arm stays deferred at ESE) |  |  |  |  |  |  |  |  |
+| sweep 20k | 3e-05 | 512 | 8 × 2 | not run (stopped on user decision, 2026-10-26; the max_len 512 arm stays deferred at ESE) |  |  |  |  |  |  |  |  |
+| sweep 20k | 5e-05 | 512 | 8 × 2 | not run (stopped on user decision, 2026-10-26; the max_len 512 arm stays deferred at ESE) |  |  |  |  |  |  |  |  |
+| **full train** (48639) | 5e-05 | 256 | 16 × 1 | 3 | 0.1 | 42 | **0.9930** | 0.9931 | 0.9870 → 0.9906 → 0.9930 | 31.6 | 1.68 | NVIDIA GeForce RTX 2050 |
 
-**Best completed run:** lr = 5e-05, max_len = 256 (val macro-F1 0.9871 at epoch 3). Only 3 of 6 configs ran, so this is the best of the completed runs, not a sweep winner; the sweep runs save no weights, so **no DistilBERT checkpoint exists** and no DistilBERT test number exists (`data/models/distilbert-welfake-v1/` was not created; the served classifier stays TF-IDF). MSE2 objective O1 (DistilBERT macro-F1 ≥ 0.95 on WELFake test) is therefore not checked.
+**Best completed run:** lr = 5e-05, max_len = 256 (val macro-F1 0.9871 at epoch 3). Only 3 of 6 configs ran (max_len 256 only), so this is the best of the completed runs, not a full-sweep winner.
+The final model `data/models/distilbert-welfake-v1/` was retrained on the full train split with this config (sweep winner `distilbert_sweep_lr5e-05_len256`; the full-train config equals the winner): best epoch 3, val macro-F1 0.9930, 31.6 min.
 
 **lr = 5e-5:** at max_len 256 it fits the 20k subset fastest (train loss 0.0077 at epoch 3 vs 0.0153 / 0.0105 for 2e-5 / 3e-5) and its val loss rises from epoch 2 (0.0572) to epoch 3 (0.0671), i.e. it starts to overfit, while val macro-F1 stays flat (0.9870 -> 0.9871); it ties lr 2e-5 (0.9869) within 0.0002 — no lr is clearly better at 256.
 
-**Expected — not measured** (†expected, not measured; to be replaced by the ESE run). Full-train WELFake **test** macro-F1 of the retrained winner: *≈ 0.98–0.99*† — basis: the three completed 20k-subset runs reach val macro-F1 0.9863–0.9871, and the WELFake val–test gaps of the three tuned classical models are within ±0.003 (`classifier_table.md`); training on all 48,639 rows is not expected to lower it. On that basis O1 (≥ 0.95) is *expected* to be met† — it is still **not checked**. ISOT test (in-domain, ISOT ⊂ WELFake, ~80 % of ISOT test rows are in WELFake train): *expected high*†, no numeric range. Cross-dataset WELFake∖ISOT ↔ ISOT: *expected to drop sharply, like the classical models*† (measured SVM test macro-F1 0.6611 W∖I→ISOT and 0.5480 ISOT→W∖I, `cross_dataset.md`) — direction only, no number.
+## Held-out test (final model, threshold 0.5) — `train_logs/distilbert_welfake_v1_test.json`
+
+| test split | n | accuracy | macro-F1 | P_fake | R_fake | ROC-AUC |
+|---|---|---|---|---|---|---|
+| welfake | 6080 | 0.9900 | 0.9898 | 0.9947 | 0.9823 | 0.9995 |
+| isot | 3757 | 0.9992 | 0.9992 | 0.9994 | 0.9988 | 1.0000 |
+
+ISOT test is in-domain, not cross-dataset (ISOT ⊂ WELFake; ~80 % of ISOT test rows are in WELFake train).
 
 ## Published reference points (other work) — not our measurement
 
