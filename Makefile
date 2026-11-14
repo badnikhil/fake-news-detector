@@ -9,7 +9,7 @@ SPACY_MODEL_URL ?= https://github.com/explosion/spacy-models/releases/download/e
 NOT_YET = @echo "make $@: not implemented until MSE2/ESE"
 
 .PHONY: setup download data index train-baselines tune-baselines train-distilbert train-liar train models \
-        eval-models eval-e2e tune-fusion eval-temporal agreement eval run test paper docker-build docker-run nb-run lint clean-data help
+        eval-models eval-e2e tune-fusion eval-temporal agreement eval run test paper paper-md docker-build docker-run nb-run lint clean-data help
 
 help:
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  %-16s %s\n", $$1, $$2}'
@@ -75,6 +75,8 @@ run: ## FastAPI on :8000 (MODE=offline make run = no network; CPU, < 4 GB RAM)
 	$(PY) -m uvicorn src.api.main:app --host 127.0.0.1 --port $${PORT:-8000}
 paper: ## build the IEEE paper -> paper/main.pdf (delegates to paper/Makefile: latexmk, tectonic fallback)
 	$(MAKE) -C paper
+paper-md: ## paper/main.tex -> paper/main.md (GFM; pandoc + tectonic for citation/table numbers, figures/pipeline.png via pdftoppm)
+	python3 paper/tex2md.py
 docker-build: ## build the CPU-only image fakenews:latest (models + index baked in; needs make index + data/models/) -> docs/deployment.md
 	nice -n 19 docker build -f docker/Dockerfile -t fakenews:latest .
 docker-run: ## run fakenews:latest on :8000 (MODE=offline make docker-run for the no-network demo; GOOGLE_FACTCHECK_API_KEY passed through if set)

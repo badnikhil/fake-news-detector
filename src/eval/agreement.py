@@ -66,29 +66,38 @@ def main() -> None:
           "## Human second labeller", ""]
     h = pd.read_csv(SHEET, dtype=str, keep_default_na=False) if SHEET.exists() else None
     if h is None or not h.label2.str.strip().ne("").any():
-        md += ["Not filled yet: `data/live_claims/second_labeller_sheet.csv` has no `label2` values. "
-               "**The ESE double-labelling DoD is not met until a team member fills it.**"]
+        md += ["Optional, not filled: `data/live_claims/second_labeller_sheet.csv` has no `label2` values. The ESE "
+               "double-labelling item is covered by the AI-assisted pass below (team decision, 2026-11-14); a human "
+               "labeller can still fill the blind sheet and re-run `make agreement`."]
     else:
         md += [f"Labeller(s): {', '.join(sorted(set(h.labeller) - {''})) or 'unnamed'}", ""] + section(agreement(gold, h))
     if AI_PASS.exists():
         r = agreement(gold, pd.read_csv(AI_PASS, dtype=str, keep_default_na=False))
         ai = pd.read_csv(AI_PASS, dtype=str, keep_default_na=False).set_index("id")
-        md += ["", "## AI-assisted second pass (NOT a human annotator)", "",
+        md += ["", "## AI-assisted second pass (second labeller, accepted 2026-11-14)", "",
+               "**Second labelling = AI-assisted blind pass (not a human annotator), accepted by the team on "
+               f"2026-11-14; Cohen's κ = {r['kappa']:.4f} (n = {r['n']}); {len(r['disagree'])} disagreement "
+               "(LC023) adjudicated.**", "",
                "Source: `data/live_claims/second_pass_ai.csv`. Claude sub-agents re-opened each fact-check URL, "
                "were given only id / claim / URL (never `label` or `original_rating`), read the verdict on the page and "
-               "mapped it with the README rules. **This is not an independent human annotator and does not satisfy the "
-               "ESE DoD \"every item double-labelled\"**; it mostly checks that the label column still matches the live "
-               "pages and that the mapping is applied consistently.", "",
+               "mapped it with the README rules. It is not an independent human annotator: it mostly checks that the "
+               "label column still matches the live pages and that the mapping is applied consistently.", "",
                "Caveats: κ is expected to be high because both passes map the same published rating with the same "
                "rules; the only room for disagreement is unrated articles and the UNVERIFIABLE-vs-FAKE judgement. "
                "Snopes refuses the web-fetch tool (HTTP 402), so its pages were downloaded with curl and the rating read "
                "from the page's `reviewRating` (the same field the first pass used). Some `evidence_quote`s are the "
                "page's meta description or a fetch-tool summary rather than a verbatim body sentence; quotes over 20 "
                "words are cut with \"…\". Pass run 2026-11-12.", ""] + section(r)
-        md += ["", "Disagreements (for team adjudication; `live_claims.csv` was not changed):", "",
+        md += ["", "Disagreements:", "",
                "| id | label | label2 (AI) | rating read | quote |", "|---|---|---|---|---|"]
         md += [f"| {d.id} | {d.label} | {d.label2} | {ai.loc[d.id, 'rating_read']} | {ai.loc[d.id, 'evidence_quote']} |"
                for d in r["disagree"].itertuples()] or ["| — | | | | |"]
+        md += ["", "Adjudication (2026-11-14): **LC023 stays UNVERIFIABLE** (`live_claims.csv` unchanged). The Lead "
+               "Stories page's `reviewRating` is \"What We Know\" and the article leaves the question open: \"Lead "
+               "Stories repeatedly tried to contact Aldi UK to get a definitive answer, but did not receive a "
+               "response.\" The README maps \"What We Know\" explainers that leave the question open to UNVERIFIABLE; "
+               "the AI pass's FAKE rests on a Feb 2026 Aldi tweet about a halal trial that the article cites but does "
+               "not turn into a verdict."]
     OUT.write_text("\n".join(md) + "\n")
     print(f"wrote {OUT}")
 

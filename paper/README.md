@@ -9,12 +9,15 @@
 | `figures/` | Figures exported from `docs/figures/` (PDF preferred). Empty at MSE1 (`.gitkeep`). |
 | `Makefile` | `make` → `main.pdf` using `latexmk` if installed, otherwise `tectonic`. `make check` prints the bib count and fails on undefined citations. |
 | `main.pdf` | Built output (committed so examiners can open it without a TeX install). |
+| `main.md` | GitHub-flavoured Markdown copy of the paper, generated from `main.tex` by `tex2md.py` (`make paper-md`). Same text, numbers, table/figure numbering and 25 references as the PDF; the PDF is the version of record. |
+| `tex2md.py` | Converter (stdlib + pandoc; runs tectonic in a temp dir to read citation/table numbers from `main.aux`/`main.bbl`, exports `figures/pipeline.png` with `pdftoppm`). |
 
 ## Building
 
 ```bash
 make -C paper            # or: cd paper && latexmk -pdf main.tex   /   tectonic main.tex
 make -C paper check      # bib count, undefined-citation check, page count
+make paper-md            # regenerate paper/main.md after every main.tex edit (commit both)
 ```
 
 ### Toolchain notes (28 Aug 2026)
@@ -35,3 +38,4 @@ make -C paper check      # bib count, undefined-citation check, page count
 ## Status log
 
 * 2026-08-28 — v0.1: skeleton, abstract placeholder, §I and §II written, 33 verified references, builds with tectonic (4 pages incl. stubs, 0 undefined citations, 0 BibTeX warnings).
+* 2026-11-14 — Live Claims second labelling (AI-assisted blind pass, κ 0.9865) added to §III and Limitations; `main.md` + `make paper-md` added. Still 5 pages, 25 references.
